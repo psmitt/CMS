@@ -6,25 +6,44 @@ const { app, BrowserWindow } = require('electron')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win
+let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600 })
+  mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   // and load the index.html of the app.
   // win.loadFile('src/index.html')
-  win.loadURL(`file://${__dirname}/index.html`)
+  mainWindow.loadURL(`file://${__dirname}/index.html`)
 
   // Open the DevTools.
-  win.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
+
+  // IPC demo
+  const ipc = electron.ipcMain
+  const countdown = require('./IPC/javascript-module')
+  const windows = [];
+  [1, 2, 3].forEach(_ => {
+    let win = new BrowserWindow({ width: 400, height: 400 })
+    win.loadURL(`file://${__dirname}/IPC/event.html`)
+    win.on('closed', _ => { mainWindow = null })
+    windows.push(win)
+  })
+  ipc.on('May I start countdown?', _ => {
+    countdown(count => {
+      windows.forEach(win => {
+        if ( mainWindow )
+          win.webContents.send('Yes, start countdown now!', count)
+      })
+    })
+  })
 
   // Emitted when the window is closed.
-  win.on('closed', () => {
+  mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    win = null
+    mainWindow = null
   })
 }
 
@@ -45,7 +64,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (win === null) {
+  if (mainWindow === null) {
     createWindow()
   }
 })
