@@ -1,3 +1,5 @@
 # CMS
 Client application for Configuration Management System
-Test
+
+CMS Client is an Electron application for displaying XML-based process
+descriptions and execute the process-related database operations.
