@@ -1,0 +1,22 @@
+{
+  "name": "cms",
+  "version": "0.0.0",
+  "description": "Client application for Configuration Management System",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/psmitt/CMS.git"
+  },
+  "author": "Peter Zs. Schmidt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/psmitt/CMS/issues"
+  },
+  "homepage": "https://github.com/psmitt/CMS#readme",
+  "devDependencies": {
+    "electron": "^3.0.3"
+  }
+}
