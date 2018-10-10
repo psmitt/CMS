@@ -20,23 +20,23 @@ function createWindow () {
   mainWindow.webContents.openDevTools()
 
   // IPC demo
-  const ipc = electron.ipcMain
-  const countdown = require('./IPC/javascript-module')
-  const windows = [];
-  [1, 2, 3].forEach(_ => {
-    let win = new BrowserWindow({ width: 400, height: 400 })
-    win.loadURL(`file://${__dirname}/IPC/event.html`)
-    win.on('closed', _ => { mainWindow = null })
-    windows.push(win)
-  })
-  ipc.on('May I start countdown?', _ => {
-    countdown(count => {
-      windows.forEach(win => {
-        if ( mainWindow )
-          win.webContents.send('Yes, start countdown now!', count)
-      })
-    })
-  })
+  // const ipc = electron.ipcMain
+  // const countdown = require('./IPC/javascript-module')
+  // const windows = [];
+  // [1, 2, 3].forEach(_ => {
+  //   let win = new BrowserWindow({ width: 400, height: 400 })
+  //   win.loadURL(`file://${__dirname}/IPC/event.html`)
+  //   win.on('close', _ => { mainWindow = null })
+  //   windows.push(win)
+  // })
+  // ipc.on('May I start countdown?', _ => {
+  //   countdown(count => {
+  //     windows.forEach(win => {
+  //       if ( mainWindow )
+  //         win.webContents.send('Yes, start countdown now!', count)
+  //     })
+  //   })
+  // })
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
