@@ -1,0 +1,160 @@
+body
+{
+ font-family: Verdana;
+ min-width:   675px;
+}
+
+th
+{
+ text-align: left;
+ padding-bottom: 10px;
+}
+
+td
+{
+ padding-right: 20px;
+}
+
+/* Sign.php */
+
+th.sign
+{
+ font-variant:   small-caps;
+ vertical-align: top;
+}
+
+td.sign
+{
+ font-variant: normal;
+ font-size:    9pt;
+ font-weight:  normal;
+ text-align:   left;
+ padding:      0;
+}
+
+/* Menu.php */
+
+a
+{
+ color:   #0066D0;
+ outline: 0;
+}
+
+a:hover
+{
+ color:   #666666;
+}
+
+a.menu
+{
+ display:block;
+
+ position: relative;
+ top:      0;
+ bottom:   0;
+ left:     0;
+ right:    0;
+
+ background-color: #008238;  /* HC zöld  */
+ color:            white;
+ outline:          none;
+ text-decoration:  none;
+
+ padding:       5px;
+ border-style:  outset;
+ border-width:  thin;
+ border-color:  white;
+ border-radius: 5px;
+}
+
+a.menu:before
+{
+ content: "\025B6 \020";
+}
+
+a.menu:hover
+{
+ background-color: white;
+ color:            black;
+ cursor:           pointer;
+}
+
+/* Menu.php: Login Form */
+
+form
+{
+ margin-top:    20px;
+ padding:       5px;
+ border:        solid;
+ border-width:  thin;
+ border-color:  grey;
+ border-radius: 5px;
+}
+
+td.menu
+{
+ font-family:  Tahoma;
+ font-variant: normal;
+ font-size:    10pt;
+ font-weight:  normal;
+ padding:      0;
+}
+
+input
+{
+ width: 95%;
+}
+
+input.labelin
+{
+ color:      grey;
+ font-style: italic;
+}
+
+input.labelout
+{
+ color:      black;
+ font-style: normal;
+}
+
+select
+{
+ width: 100%;
+}
+
+/* Info.php */
+
+div.question
+{
+ position: relative;
+ top:      0;
+ bottom:   0;
+ left:     0;
+ right:    0;
+
+ margin:        1px;
+ padding:       3px;
+ padding-left:  22px;
+ border-style:  outset;
+ border-width:  thin;
+ border-color:  lightgrey;
+ border-radius: 15px;
+ 
+ font-size:   10pt;
+ font-weight: bold;
+
+ background-color: lightgrey;
+ background-repeat:   no-repeat;
+ background-position: 4px center;
+ 
+ cursor: pointer;
+}
+
+div.answer
+{
+ margin:      10px;
+ margin-left: 25px;
+ font-size:   11pt;
+ overflow:    auto;
+ display:     none;
+}

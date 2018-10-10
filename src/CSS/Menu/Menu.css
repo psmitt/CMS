@@ -1,0 +1,85 @@
+body {
+  margin-top: 50px;
+  min-width: 327px;
+  font-family: Tahoma;
+  -ms-user-select: none; /* prevent unwanted text selection */
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  overflow-x: hidden;
+}
+
+td {
+  padding: 0;
+}
+
+img {
+  cursor: pointer;
+}
+
+div {
+  font-weight: bold;
+  margin: 10px;
+}
+
+  div div {
+    margin: 0;
+    margin-left: 4px;
+    border-left-style: solid;
+    border-left-width: 7px;
+    border-left-color: gainsboro;
+    font-weight: normal;
+    padding-top: 5px;
+    padding-left: 5px;
+    display: none;
+  }
+
+span {
+  background-repeat: no-repeat;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-right: 3px;
+  cursor: pointer;
+}
+
+  span.logout {
+    background-image: url('/CSS/Menu/Menu_logout.png');
+    background-position: right;
+    padding: 0;
+    padding-right: 20px;
+  }
+
+  span.submenu {
+    background-image: url("Menu_submenu.png");
+  }
+
+    span.submenu.locked {
+      background-image: url("Menu_submenu_lock.png");
+    }
+
+  span.item {
+    background-image: url("Menu_item.png");
+  }
+
+    span.item.locked {
+      background-image: url("Menu_item_lock.gif");
+    }
+
+a {
+  text-decoration: none;
+  background-color: white;
+  color: green;
+  cursor: pointer;
+}
+
+  a.selected {
+    background-color: green;
+    color: white;
+  }
+
+  a:focus {
+    outline: none;
+  }
+
+#language {
+  margin-left: 5px;
+}

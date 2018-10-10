@@ -1,0 +1,491 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Menu</title>
+  <link href="CSS/Header.css" rel="stylesheet">
+  <link href="CSS/Menu/Menu.css" rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <table>
+      <tbody>
+        <tr>
+          <td><img title="Keresés | Alaphelyzet" onclick="searchMenu(true)" oncontextmenu="return searchMenu()" src="CSS/Search.png" data-title="Find | Reset"></td>
+          <td><input id="search_field" onkeypress="if (event.keyCode == 13) searchMenu(true)" type="search"></td>
+          <td><img title="Kezdőlap beállítása | törlése" onclick="if (confirm(literal['Set current contents as a Startup Page?'])) setStartupPage(true);" oncontextmenu="if (confirm(literal['Clear Startup Page?'])) setStartupPage(false); return false;"
+              src="CSS/Home.png" data-title="Set | Clear Startup Page"></td>
+          <td><img title="Felhasználói Portál" onclick="top.location='/EUP'" src="CSS/EUP.png" data-title="End User Page"></td>
+          <td><select id="language">
+              <option title="Bosanski&#10;Босански">BA</option>
+              <option title="Čeština">CZ</option>
+              <option title="Deutsch">DE</option>
+              <option title="English">EN</option>
+              <option title="Español">ES</option>
+              <option title="Français">FR</option>
+              <option title="Hrvatski">HR</option>
+              <option title="Magyar" selected="">HU</option>
+              <option title="Nederlands">NL</option>
+              <option title="Norsk">NO</option>
+              <option title="Polski">PL</option>
+              <option title="Român">RO</option>
+              <option title="Pyccĸий">RU</option>
+              <option title="Svenska">SV</option>
+              <option title="Türkçe">TR</option>
+            </select></td>
+        </tr>
+      </tbody>
+    </table>
+  </header>
+  <div id="FAVORITES"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">KEDVENCEK</a></div>
+  <div><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">TUDÁSBÁZIS</a>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Eseménykezelés</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_start_working" target="Task">Munkakezdés</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_personal_visit" target="Task">Személyes látogatás</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_phone_call" target="Task">Telefonhívás</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_email_message" target="Task">E-mail</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_incoming_ticket" target="Task">Bejövő ticket</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_own_observation" target="Task">Saját észrevétel</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_alarm_signal" target="Task">Értesítés, riasztás, időzített
+          feladat</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Event_stop_working" target="Task">Napi zárás</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Ismétlődő feladatok</a>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Naponta</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_SDE_ticket" target="Task">SDE bejegyzések kitöltése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_SDE_process" target="Task">SDE bejegyzések feldolgozása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_SDE_overview" target="Task">SDE bejegyzések ellenőrzése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">CMS logok ellenőrzése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Hetente</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_backup_tape" target="Task">Kazettacsere a mentőegységben</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_asset_SAP" target="Task">Üres SAP jelzések beállítása (HG)</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Kéthetente</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_IT_meeting" target="Task">IT videokonferencia (SI)</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Havonta</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_score_card" target="Task">Teljesítményjelentés (SI)</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_data_validation" target="Task">CMS adatok keresztvalidálása (SI)</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_credentials_update" target="Task">Jelszavak frissítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_stock_taking" target="Task">Raktárleltár</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_asset_inventory_and_maintenance" target="Task">Leltározás és
+            karbantartás</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Negyedévente</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_local_admins" target="Task">Helyi rendszergazdák ellenőrzése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_AC_Audit" target="Task">Kellékanyag leltár</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_PC_replacement" target="Task">Standard hardver csere</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Félévente</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">Szoftverleltár</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Évente</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Pluralsight" target="Task">Pluralsight E-Learning</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Task_asset_disposal" target="Task">Selejtezés</a></div>
+      </div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Felhasználók támogatása</a>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Alapvető adminisztráció</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_LC_Register" target="Task">Új felhasználó felvétele</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_Outlook_signature" target="Task">Outlook aláírás beállítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_LC_Change" target="Task">Felhasználói adatok megváltozása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_LC_Move" target="Task">Költözés új irodába</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_LC_Terminate" target="Task">Távozó felhasználó kivezetése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Hozzáférés-szabályozás</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://kb/#tab:homeTab:crumb:7:artId:1833:src:article" target="_blank">HCGuest
+            hozzáférés igénylése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="HUN/pdf/Create guest account on anchor WLC.pdf" target="_blank">HCGuest tartalék
+            rendszer</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_intern" target="Task">Intern AD fiók átmeneti kiadása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_partner" target="Task">Külső partner eseti bejelentkezése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_remote" target="Task">Állandó VPN hozzáférés beállítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_tanulo" target="Task">Oktatótermi tanuló fiókok kezelése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="HUN/php/Form_card_management.php" target="Data">Belépőkártyák kezelése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_SafeQ" target="Task">Központi nyomtatás beállítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_shared_folder" target="Task">Hozzáférés megosztott mappához</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Konferenciaszolgáltatások</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">Telefonkonferencia</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">Videokonferencia</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">Live Meeting</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_conference_webex" target="Task">WebEx webkonferencia</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=User_Forum_Vac" target="Task">Váci fórum</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://kb/al/12/3/4963.html?cid=2" target="Task">E-Learning</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Hardver eszközök kezelése</a>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Életciklus-folyamatok</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Purchase" target="Task">Beszerzés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Register" target="Task">Nyilvántartásba vétel</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Move" target="Task">Eszköz áthelyezése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Repair" target="Task">Javíttatás</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Restore" target="Task">Visszavétel</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Sale" target="Task">Eladás</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Lost" target="Task">Elveszített eszköz</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_LC_Retire" target="Task">Kivezetés ( nem SAP )</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="HUN/php/Form_asset_disposal.php?form=Asset_disposal_SAP" target="Data">Kivezetés (
+            SAP )</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Kellékek</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_AC_Register" target="Task">Kellék rögzítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_AC_Purchase" target="Task">Kellék beszerzése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_AC_Incoming" target="Task">Kellék bevételezése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_AC_Outgoing" target="Task">Kellék kiadása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_AC_Audit" target="Task">Kellék leltár</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Számítógépek</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_Win7_install" target="Task">Windows 7 telepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_Win10_install" target="Task">Windows 10 telepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=HW_rename_OS" target="Task">Standard kliens átnevezése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Profile_standard" target="Task">Windows 7 profil kialakítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Profile_Win10" target="Task">Windows 10 profil kialakítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Profile_Schenck" target="Task">Schenck profil kialakítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Profile_virtual_desktop" target="Task">Vékony kliens profil
+            kialakítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Profile_transfer" target="Task">Profil átköltöztetése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Nyomtatók</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Print_Konica_DCA" target="Task">Konica DCA regisztráció</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Print_Konica_install" target="Task">Konica telepítés és beállítás kis
+            telephelyen</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Print_Epson_FX890" target="Task">Epson FX-890</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Print_Tally_2150" target="Task">Tally 2150</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Print_Tally_2265" target="Task">Tally 2265</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Mobiltelefonok</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Phone_mobile_issues" target="Task">Előfizetés-ügyintézés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Phone_SIM_replacement" target="Task">SIM kártya csere</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Phone_iOS_activate" target="Task">iPhone aktiválás</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">iPhone adattörlés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Phone_android_activate" target="Task">Samsung Android aktiválás</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">Samsung Android adattörlés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Phone_from_Android_to_iPhone" target="Task">Átállás Android-ról
+            iPhone-ra</a></div>
+      </div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Szoftverek kezelése</a>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Életciklus-folyamatok</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_LC_Demand" target="Task">Szoftver igénylés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a style="color: gray;">Szoftver beszerzés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_LC_Register" target="Task">Szoftver nyilvántartásba vétele</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_LC_Deploy" target="Task">Szoftver telepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_LC_Maintain" target="Task">Szoftver karbantartása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_LC_Audit" target="Task">Szoftver audit</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_LC_Remove" target="Task">Szoftver eltávolítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_LC_Retire" target="Task">Szoftver selejtezése</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Carol" target="Task">Carol kliens telepítése</a></div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Citrix</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Citrix_apps" target="Task">Alkalmazás telepítése és publikálása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Citrix_troubleshooting" target="Task">Citrix hibaelhárítás</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Dorner</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Dorner_Remote_Support" target="Task">Dorner távoli elérés
+            támogatása</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_IE_proxy" target="Task">Internet Explorer proxy beállítás</a></div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Kulcs-Soft</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_KS_server_update" target="Task">Kulcs-Soft programok frissítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_KS_license_check" target="Task">Licensz ellenőrzése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Microsoft Excel</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Excel_Amlas" target="Task">Amlas adatkapcsolat</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Microsoft Office Picture Manager</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Picture_Manager" target="Task">Picture Manager telepítése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Microsoft Outlook</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Outlook_shared_mailbox" target="Task">Közös postaláda létrehozása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Outlook_folders" target="Task">Magyar mappanevek helyreállítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Outlook_cleanup" target="Task">Fiók archiválása és kiürítése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Mozilla Firefox</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Firefox_authenticate" target="Task">Firefox hitelesítési probléma
+            megoldása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Firefox_certificate" target="Task">Firefox tanúsítványprobléma
+            megoldása</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">MPTBG</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_MPTBG_server_restart" target="Task">Szerver újraindítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_MPTBG_client_install" target="Task">Kliens telepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_MPTBG_client_update" target="Task">Kliens frissítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_MPTBG_logon" target="Task">Bejelentkezés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="HUN/pdf/Jogfajták az MPTBG rendszerben.pdf" target="_blank">Jogosultságok kiosztása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_MPTBG_waybill_change" target="Task">Szállítólevél módosítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_MPTBG_Dorner" target="Task">Dorner szinkronizálás</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_MPTBG_invoice_failure" target="Task">Rossz számlakép</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Parallel laborprogram</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Parallel_install" target="Task">Parallel telepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Parallel_reinstall" target="Task">Parallel újratelepítése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Pécsi Tára mérlegprogram</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_PecsiTara_reinstall" target="Task">Mérlegprogram újratelepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_PecsiTara_newuser" target="Task">Új felhasználó felvétele</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_PI_install" target="Task">PI alkalmazások telepítése</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_ShareFile" target="Task">ShareFile szolgáltatás telepítése</a></div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Transmit EgInfo</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Transmit_EgInfo" target="Task">Transmit EgInfo telepítése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Visual Basic</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_VB_runtime_error" target="Task">Futásidejű hibák ( Runtime Errors
+            )</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_VB_meszuzem" target="Task">Mészüzemi adatátadás leállt</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">XP Mode</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_TBG_Betosys" target="Task">Betosys telepítése / újratelepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Megyeri" target="Task">Megyeri telepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=SW_Megyeri_recovery" target="Task">Megyeri helyreállítása</a></div>
+      </div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Hálózatkezelés</a>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Telephelyek kezelése</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_Site_Register" target="Task">Új telephely nyilvántartásba vétele</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_WAN_Order" target="Task">Helyi internetkapcsolat létesítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_DMVPN_Order" target="Task">DMVPN szolgáltatás igénylése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_DMVPN_Router" target="Task">DMVPN router konfigurálása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_WAN_Change" target="Task">Internet kapcsolat megváltoztatása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_WAN_Outage" target="Task">Internet kiesés elhárítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_Site_Close" target="Task">Telephely bezárása</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Helyi hálózat</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_LAN_Subnet" target="Task">Alhálózat kialakítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_LAN_Socket" target="Task">Új hálózati aljzat telepítése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_LAN_IP" target="Task">IP címek kezelése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="HUN/php/Form_asset_MAC.php" target="Data">MAC címek kezelése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_LAN_Switch" target="Task">Switch üzembe helyezése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_LAN_Firewall" target="Task">Tűzfal üzembe helyezése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_LAN_Wifi_AP" target="Task">WiFi AP üzembe helyezése</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Vezetékes telefonok</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_PBX_device_deployment" target="Task">Telefonkészülék kiadása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=Site_phone_troubleshooting" target="Task">Hibaelhárítás a
+            telephelyeken</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_PBX_device_replacement" target="Task">Készülékcsere</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_PBX_change" target="Task">Vezetékes mellék módosítása</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="HUN/htm/Phone_wipe_BOSCH.htm" target="Task">BOSCH telefonok törlése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="HUN/htm/Phone_set_busy.htm" target="Task">Foglalt jelzés beállítása</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Task.php?task=NW_SMTP_relay" target="Task">SMTP relay beállítása</a></div>
+    </div>
+  </div>
+  <div><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">JELENTÉSEK</a>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Általános jelentések</a>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Telephelyi jelentések</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Tree.php?tree=Topography" target="Data">Helyrajzi térkép</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Site_inventory" target="Data">Telephelyek, leltári lapok</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Site_manager_office" target="Data">Telephelyvezetők eltérő irodái</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=IP_subnet_vs_Site" target="Data">IP címek és lelőhelyek összevetése</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_maintenance_Beremend" target="Data">Beremendi karbantartási
+            lista</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Hálózati beállítások</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Tree.php?tree=Topology" target="Data">Hálózati térkép</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=NW_IP_MAC_OS" target="Data">Hálózati címek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=NW_DHCP" target="Data">DHCP tartományok</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=NW_Firewall" target="Data">Tűzfal szabályok</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Person_contact" target="Data">Névjegyalbum</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Person_external" target="Data">Külsősök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_actual" target="Data">Teljes eszközlista</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Configuration" target="Data">Lelőhely-történet</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Servers" target="Data">Szerverek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=License" target="Data">Szoftver licenszek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Credentials" target="Data">Jelszavak, PIN-PUK kódok</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=PBX" target="Data">Telefonmellékek kiosztása</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Felhasználók aláírásai és eszközei</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Card_all" target="Data">Belépőkártyák</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=User_signature" target="Data">Outlook aláírások</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Orphan_folders" target="Data">Árva mappák a szervereken</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Users_assets" target="Data">Felhasználók eszközei</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Users_multiple_assets" target="Data">Felhasználók több PC-vel,
+          telefonnal</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Workplace_Beremend" target="Data">Beremendi munkahelyek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Workplace_Vac" target="Data">Váci munkahelyek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Workplace_Other" target="Data">Betonos és kavicsos munkahelyek</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Fajtánkénti listák</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_computer" target="Data">Számítógépek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_network" target="Data">Hálózati eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_paper_based" target="Data">Saját nyomtatók, lapolvasók</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_Konica_Minolta" target="Data">Konica Minolta eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_telephony_PBX" target="Data">Vonalas telefonok</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_telephony_mobile" target="Data">Mobiltelefonok és stickek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_telephony_SIM_Voda" target="Data">Vodafone SIM kártyák</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_telephony_SIM_T" target="Data">T-Systems SIM kártyák</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Állapot szerinti listák</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_productive" target="Data">Üzembe helyezett eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_to_deliver" target="Data">Kiadandó eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_spare" target="Data">Tartalék eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_damaged" target="Data">Hibás eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_repair" target="Data">Javításon lévő eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_to_invoice" target="Data">Számlázandó eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_to_dispose" target="Data">Selejtezendő eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Asset_dismissed" target="Data">Kivezetett eszközök</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Társadatbázisok</a>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">AD</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_users" target="Data">Felhasználók</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_users_no_charge" target="Data">Költségfüggetlen felhasználók</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_direct_reports" target="Data">Felettesek és beosztottak</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Tree.php?tree=Organigram" target="Data">Szervezeti ábra</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_computers" target="Data">Személyi számítógépek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_computers_patching" target="Data">Teszt csoport</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_servers" target="Data">Szerverek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_groups" target="Data">Biztonsági csoportok</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_groups_empty" target="Data">Üres csoportok</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AD_unmanaged" target="Data">Gazdátlan objektumok</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Compargo</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Compargo_Beremend" target="Data">Beremendi Compargo adatok</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Compargo_Beremend_vs_CMS" target="Data">Beremendi eltérések</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Compargo_Vac" target="Data">Váci Compargo adatok</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Compargo_Vac_vs_CMS" target="Data">Váci eltérések</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://messagestats/MessageStatsReports" target="_blank">Exchange, OCS, Lync</a></div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">HR - Ebédeltetés</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=HR_lunch" target="Data">Ebéd összesítő</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=HR_lunch_order" target="Data">Ebédrendelések</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=HR_lunch_storno" target="Data">Ebédlemondások</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=HR" target="Data">HR - Műszakigazolás</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=AirWatch" target="Data">AirWatch</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=MDM" target="Data">MDM Excel</a></div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">SafeQ</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SafeQ_users_Beremend" target="Data">Beremendi felhasználók</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SafeQ_cc_Beremend" target="Data">Beremendi költséghelyek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SafeQ_users_Vac" target="Data">Váci felhasználók</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SafeQ_cc_Vac" target="Data">Váci költséghelyek</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">SAP</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SAP" target="Data">Teljes eszközállomány</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SAP_hardware_assets" target="Data">Hardver eszközök</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SAP_software_assets" target="Data">Szellemi termékek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SAP_HW_vs_CMS" target="Data">Eltérések a SAP és a CMS között</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">SCCM</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SCCM_clients" target="Data">Személyi számítógépek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SCCM_network_adapters" target="Data">MAC és IP címek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SCCM_local_admins" target="Data">Helyi rendszergazdák</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://grpsafranrep1/ReportServer/Pages/ReportViewer.aspx?%2fConfigMgr_CS1%2fSite+-+Client+Information%2fComputers+with+corrupted+or+old+or+without+SCCM+client+-+Online+in+last+14+days&amp;CollID=CS1000B2"
+            target="_blank">Hiányzó vagy sérült SCCM kliensek</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://grpsafranrep1/ReportServer/Pages/ReportViewer.aspx?%2fConfigMgr_CS1%2fSoftware+Updates+-+A+Compliance%2fCompliance+HC+2&amp;title=SWU Workstations&amp;Status=2&amp;collname=All Windows Workstations HUN"
+            target="_blank">Hiányzó Windows frissítések a PC-ken</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://grpsafranrep1/ReportServer/Pages/ReportViewer.aspx?%2fConfigMgr_CS1%2fSoftware+Packaging+Factory%2fComputers+with+specific+Software+Packaging+Factory+package+installed&amp;CollName=All Windows Workstations HUN"
+            target="_blank">Telepített szoftvercsomagok</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://grpsafranrep1/ReportServer/Pages/ReportViewer.aspx?%2fConfigMgr_CS1%2fSoftware+Packaging+Factory%2fList+of+packages+available+in+HC+Software+Distributon+Wizard+for+specific+country&amp;ID=HUN"
+            target="_blank">Elérhető szoftvercsomagok</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">SDO Servers</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_servers_full" target="Data">SDO Server CMDB - Full ( Slow )</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_servers_operational" target="Data">SDO Operational Servers</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://deusdheid0089/Reports/Pages/Report.aspx?ItemPath=%2fSystemCenter%2fServiceManager%2fHC+CI+Reports%2fServer_Detailed_View"
+            target="Data">SDO Server Details</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_servers_vs_AD" target="Data">SDO vs. AD Servers</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_servers_vs_CMS" target="Data">SDO vs. CMS Servers</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_SMTP_Relays" target="Data">SDO SMTP Relays</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_video" target="Data">SDO Video</a></div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">SDO WAN</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_WAN_Locations" target="Data">SDO WAN Locations</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_Locations_vs_CMS_Sites" target="Data">SDO Locations vs. CMS Sites</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_WAN_Circuits" target="Data">SDO WAN Circuits</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_vs_CMS_Circuits" target="Data">SDO vs. CMS Circuits</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_WAN_Subnets" target="Data">SDO WAN Subnets</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_vs_CMS_Subnets" target="Data">SDO vs. CMS Subnets</a></div>
+      </div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=SDO_Thin_Clients" target="Data">SDO Wyse</a></div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Solarwinds</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="http://orion" target="_blank">Orion Monitoring</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Solarwinds" target="Data">Solarwinds Nodes</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Solarwinds_vs_CMS_asset" target="Data">Solarwinds vs. Assets</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Solarwinds_vs_CMS_server" target="Data">Solarwinds vs. Servers</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">T-Systems</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=PBX_Beremend" target="Data">Beremendi jelentés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=PBX_Beremend_vs_CMS" target="Data">Beremendi eltérések</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=PBX_Vac" target="Data">Váci jelentés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=PBX_Vac_vs_CMS" target="Data">Váci eltérések</a></div>
+      </div>
+      <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Vodafone</a>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=_SIM" target="Data">Vodafone jelentés</a></div>
+        <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=Vodafone_vs_CMS" target="Data">Vodafone eltérések</a></div>
+      </div>
+    </div>
+  </div>
+  <div><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">SZERKESZTHETŐ TÁBLÁK</a>
+    <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Person_actual" target="Data">Személyes adatok</a></div>
+    <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=PBX_Beremend" target="Data">CMS Beremendi mellékek</a></div>
+    <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=PBX_Vac" target="Data">CMS Váci mellékek</a></div>
+    <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Credentials_password" target="Data">Nyilvántartott jelszavak</a></div>
+  </div>
+  <div><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">ADATBÁZIS</a>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Emberek</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Company" target="Data">Cégek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Position" target="Data">Beosztások</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Person" target="Data">Személyek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Card" target="Data">Belépőkártyák</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Létesítmények</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Site" target="Data">Telephelyek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Location" target="Data">Helyiségek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Socket" target="Data">Aljzatok</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=PBX" target="Data">Telefonközpontok</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Hardver eszközök</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Category" target="Data">Eszközfajták</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Manufacturer" target="Data">Gyártók</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Hardware" target="Data">Termékek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Asset" target="Data">Eszközök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=MAC" target="Data">MAC-címek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Configuration" target="Data">Lelőhelyek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=_SAP_HW" target="Data">_SAP</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Kellékanyagok</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Accessory_type" target="Data">Kellékfajták</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Accessory" target="Data">Kellékek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Component" target="Data">Tartozékok</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Accessory_level" target="Data">Kellékszintek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Store" target="Data">Kellékfogyasztás</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Hálózatok, IP címek</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Circuit" target="Data">Áramkörök</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Subnet" target="Data">Alhálózatok</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=IP_asset" target="Data">Hardver IP címek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=IP_os" target="Data">Rendszer IP címek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Firewall" target="Data">Tűzfalak</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Szoftverek</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Manufacturer" target="Data">Gyártók</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Software" target="Data">Szoftverek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=License" target="Data">Licenszek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=OS" target="Data">Operációs rendszerek</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Application" target="Data">Alkalmazások</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="View.php?view=_SAP_SW" target="Data">_SAP</a></div>
+    </div>
+    <div style="display: none;"><span class="submenu" onclick="expandMenu(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="expandMenu(this.previousSibling)">Kódok és jelszavak</a>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Credentials" target="Data">Jelszavak</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Access" target="Data">Hozzáférések</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Access_group" target="Data">Csoportok</a></div>
+      <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Member" target="Data">Csoporttagság</a></div>
+    </div>
+    <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="Table.php?table=Task" target="Data">Feladatok</a></div>
+    <div style="display: none;"><span class="item" ondblclick="addFavorite(this)" oncontextmenu="return lockMenu(this)"></span><a onclick="highLight(this)" href="/CMDB" target="_blank"><img style="border: currentColor; border-image: none; height: 16px; vertical-align: bottom;"
+          src="CSS/Menu/Menu_phpMyAdmin.png"></a></div>
+  </div>
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+  <script src="JS/jquery.min.js"></script>
+  <script src="JS/Localization.js"></script>
+  <script src="JS/Header.js"></script>
+  <script src="JS/Menu.js"></script>
+  <script>if (window.module) module = window.module;</script>
+
+</body>
+
+</html>

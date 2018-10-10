@@ -1,0 +1,11 @@
+#Menu { left: 0; top: 0; width: 340px; height: 100% }
+#Task { left: 340px; top: 0; width: calc(100% - 340px); height: 0; transition: height 1s; }
+#Data { left: 340px; bottom: 0; width: calc(100% - 340px); height: 0; transition: height 1s;
+       border-top: solid lightgrey thin; }
+/* MOBILE LAYOUT */
+@media only screen and (max-width : 712px) {
+#Menu { left: 0; top: 0; width: 340px; height: 100% }
+#Task { left: 340px; top: 0; width: calc(100% - 340px); height: 0; transition: height 1s; }
+#Data { left: 340px; bottom: 0; width: calc(100% - 340px); height: 0; transition: height 1s;
+       border-top: solid lightgrey thin; }
+}

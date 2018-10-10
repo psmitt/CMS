@@ -1,0 +1,100 @@
+﻿/* GLOBAL */
+
+body {
+ margin: 0;
+ margin-top: 40px;
+ font-family: sans-serif;
+ font-size: 10pt;
+}
+
+a {
+ text-decoration: none;
+ color: #0066D0;
+ cursor: pointer;
+}
+
+a:hover {
+ color: #666666;
+}
+
+/* HEADER */
+
+header {
+ position: fixed; /* keep fixed on the top of the screen */
+ left: 0; top: 0; width: calc(100% - 10px); height: 30px;
+ border: solid thick white;
+ background-color: white; /* hide overlapped body elements */
+ z-index: 1; /* hide overlapped body elements */
+ display: flex; /* keep all in one line */
+ justify-content: space-between;
+ white-space: nowrap;
+}
+
+header > span { /* document title */
+ font-size: 18pt;
+ font-weight: bold;
+ overflow-x: hidden;
+ text-overflow: ellipsis;
+}
+
+header > span img { /* up-down arrow */
+ margin: 0;
+ vertical-align: top;
+ cursor: pointer;
+}
+
+header div, label {
+ display: inline-block;
+}
+
+/* MESSAGE BOX */
+
+#message-box {
+ padding: 4px;
+ box-shadow: 1px 1px 1px #888888;
+}
+
+/* MENUBAR */
+
+#menubar {
+ vertical-align: middle;
+ padding: 2px;
+ padding-bottom: 0;
+}
+
+#menubar label {
+ padding-left: 3px;
+ height: 18px;
+ width: 21px;
+}
+
+#menubar input {
+ margin: 0;
+ height: 18px;
+ width: 18px;
+}
+
+#menubar button {
+ padding: 1px;
+ height: 18px;
+ vertical-align: top;
+}
+
+#menubar button.ui-button-text-only {
+ padding-left: 3px;
+ padding-right: 3px;
+ font-family: Arial Narrow;
+ font-size: small;
+}
+
+#menubar .ui-slider-horizontal {
+ vertical-align: top;
+ height: 16px;
+ width: 100px;
+}
+
+#menubar .ui-slider-handle {
+ height: 14px;
+ width: 14px;
+ top: 0;
+}

@@ -1,0 +1,218 @@
+﻿table {
+ table-layout: fixed; /* prevent size change */
+ transform-origin: 0 0;
+ border-collapse: collapse;
+}
+
+col.side {
+ width: 27px;
+}
+
+#head-table {
+ font-weight: bold;
+ background-color: white;
+ position: fixed; /* keep table head fixed on the top of the screen */
+ top: 40px;
+ z-index: 1; /* hide data rows */
+}
+
+body {
+ overflow-x: auto;
+ overflow-y: hidden;
+}
+
+#data-table {
+  border-right: 44px solid transparent; /* because of the scrollbar */
+}
+
+/* ROWS */
+
+#editor-row { /* Table */
+ border-bottom: 1px solid white; /* switch off in Edge */
+ display: none;
+}
+
+#editor-row, /* Table */
+#filter-row {
+ height: 42px;
+ min-height: 42px;
+ max-height: 42px;
+}
+
+#title-row {
+ height: 30px;
+ min-height: 30px;
+ max-height: 30px;
+}
+
+#filter-row input {
+ width: 100%;
+ height: 20px;
+}
+
+#editor-row button,
+#filter-row button {
+ margin-top: 0;
+}
+
+#filter-row,
+#title-row {
+ border-bottom: 2px solid black;
+}
+
+/* CELLS */
+
+th {
+ border: none;
+ padding: 3px;
+ vertical-align: top;
+}
+
+th > button {
+ padding: 0;
+ margin: 1px;
+ height: 20px;
+ width: 20px;
+}
+
+td {
+ border: thin solid darkgray;
+ word-wrap: break-word;
+ padding: 3px;
+ vertical-align: top;
+}
+
+#head-table td {
+ border: none;
+}
+
+#editor-row td { /* Table */
+ position: relative;
+}
+
+#title-row td {
+ cursor: pointer;
+ padding-top: 7px;
+}
+
+#title-row td div {
+ display: inline-block;
+ vertical-align: bottom;
+}
+
+#title-row td div.title {
+ max-width: calc(100% - 25px);
+ padding-left: 3px;
+ overflow: hidden; /* hide long titles' tail */
+ white-space: nowrap; /* keep titles in one line */
+}
+
+#title-row td div.ui-icon {
+ float: right;
+}
+
+#data-table th > span { /* key */
+ display: none;
+}
+
+#data-table td {
+ font-family: 'Arial Narrow', sans-serif;
+ font-size: medium;
+ padding: 5px;
+ white-space: pre-wrap;
+}
+
+#data-table td.mono {
+ font-family: monospace;
+ font-size: medium;
+ font-weight: bold;
+ padding-top: 6px;
+}
+
+#data-table td.left {
+ text-align: left;
+}
+
+#data-table td.center {
+ text-align: center;
+}
+
+#data-table td.right {
+ text-align: right;
+}
+
+#data-table td span {
+ color: red;
+ font-weight: bold;
+}
+
+/* INPUT ELEMENTS: Table */
+
+#editor-row .selection,
+#editor-row select {
+ width: 100%;
+}
+
+#editor-row :not(.selection) > input,
+#editor-row textarea {
+ width: calc(100% - 5px);
+}
+
+/* SCROLLBAR */
+
+#scrollbar {
+ position: fixed;
+ border: solid thin gray;
+ right: 0;
+ top: 42px;
+ height: calc(100% - 75px);
+ width: 20px;
+ z-index: 2;
+ padding: 0;
+ padding-bottom: 31px;
+}
+
+#scrollbar button {
+ padding: 0;
+ width: 100%;
+ height: 20px;
+}
+
+#scrollbar button:first-child {
+ padding-left: 1px;
+}
+
+#slider {
+ height: calc(100% - 43px);
+ width: 100%;
+ border: none;
+}
+
+#slider .ui-slider-handle {
+ height: 32px;
+ left: 0;
+ width: 18px;
+ margin-bottom: -16px;
+}
+
+#slider .ui-slider-handle:focus {
+ outline: none;
+}
+
+/* CONTEXT MENU */
+
+#contextmenu {
+ font-size: x-small;
+ z-index: 99;
+}
+
+#contextmenu .ui-menu-item {
+ margin: 5px;
+}
+
+#contextmenu a {
+ display: inline-block;
+ width: calc(100% - 30px);
+ font-weight: bold;
+ white-space: nowrap; /* keep menu item in one line */
+}
