@@ -2,7 +2,7 @@ const electron = require('electron')
 
 // const app = electron.app
 // const BrowserWindow = electron.BrowserWindow
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, shell } = require('electron')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -13,8 +13,10 @@ function createWindow () {
   mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   // and load the index.html of the app.
-  // win.loadFile('src/index.html')
-  mainWindow.loadURL(`file://${__dirname}/Menu.html`)
+  // mainWindow.loadFile('src/index.html')
+  // mainWindow.loadFile('C:\\inetpub\\xmlroot\\HUN\\Menu\\3. Tables.xml')
+  // mainWindow.loadURL('file://C:\\inetpub\\xmlroot\\HUN\\Menu\\3. Tables.xml')
+  mainWindow.loadURL(`file://${__dirname}/Menu/Menu.html`)
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()

@@ -1,0 +1,47 @@
+body, input {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: large;
+}
+
+#search {
+  width: 100%;
+  background-image: url('magnifier_glass.svg');
+  background-size: auto 61.8%;
+  background-position: 7px center;
+  background-repeat: no-repeat;
+
+  border-color: lightgray;
+  border-style: solid;
+  border-width: thin;
+  border-radius: 5px;
+
+  padding: 10px;
+  padding-left: 40px;
+  margin-bottom: 20px;
+}
+
+#search:hover {
+  border-color: skyblue;
+}
+
+#search:focus {
+  outline: none;
+  border-color: deepskyblue;
+}
+
+div {
+  margin-left: 20px;
+  line-height: 2;
+}
+
+.branch {
+  background-image: url('triangle_right.svg');
+  background-size: auto 80%;
+  background-position: left 2px;
+  background-repeat: no-repeat;
+  padding-left: 20px;
+}
+
+div div .branch {
+  background-image: url('triangle_down.svg');
+}
