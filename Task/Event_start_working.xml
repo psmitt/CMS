@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task SYSTEM "../../DTD/Task.dtd">
+<task title="Munkakezdés">
+  <action>
+    <todo>Frissítem az IT Naptárat</todo>
+    <button title="IT Naptár" class="link" order="https://onedrive.live.com/edit.aspx?resid=FC01EF85EEE9FE5E!742"/>
+    <action>
+      <todo>Ellenőrzöm, hogy az elmúlt napok-hetekbeli távolléteim be vannak-e jegyezve az IT Naptárba.</todo>
+    </action>
+    <action>
+      <todo>Tervezett jövőbeli távolléteimet egyeztetem feletteseimmel és a Service Desk-kel, majd jóváhagyásukkal bejegyzem a Naptárba.</todo>
+    </action>
+    <action>
+      <todo>Tudatosítom, kik a hiányzó kollégák, kit fogok ma helyettesíteni.
+            Adott esetben ezt egyeztetem a Service Deskkel.</todo>
+    </action>
+  </action>
+  <action>
+    <todo>Megtervezem a napomat</todo>
+    <action>
+      <todo>Tudatosítom, melyek a mai nap kiemelt eseményei.</todo>
+      <action>
+        <todo>Megnézem, milyen globális változások esedékesek a közeljövőben.</todo>
+        <button title="Change Calendar" class="link" order="https://teamnet.grouphc.net/git/GIP/GIProcess/Lists/Change%20Management/All%20Changes.aspx"/>
+      </action>
+    </action>
+    <action>
+      <todo>Ellenőrzöm a Naptári bejegyzéseimet, hogy van-e halaszthatatlan vagy határidős munkám,
+            amely miatt segítséget kell kérnem a napi ügyeim intézésében.
+            Adott esetben ezt egyeztetem a Service Deskkel.</todo>
+    </action>
+  </action>
+  <action>
+    <todo>Feldolgozom a leveleimet.</todo>
+    <button title="Postaláda" class="task" order="Event_email_message"/>
+  </action>
+  <decision>
+    <question>Én vagyok ma a Service Desk telefonügyeletes?</question>
+    <option>
+      <answer>Igen.</answer>
+      <action>
+        <todo>Ellenőrzöm, hogy a 1777-es hívások az én telefonomra legyenek átirányítva.</todo>
+      </action>
+      <action>
+        <todo>Feldolgozom a Service Desk postafiókba beérkezett leveleket.</todo>
+        <button title="Postaláda" class="task" order="Event_email_message"/>
+      </action>
+      <action>
+        <todo>Ellenőrzöm az SDE bejegyzéseket.</todo>
+        <button title="SDE ellenőrzés" class="task" order="Task_SDE_overview"/>
+      </action>
+    </option>
+    <option>
+      <answer>Nem.</answer>
+      <action>
+        <todo>Feldolgozom a nevemen lévő SDE bejegyzéseket.</todo>
+        <button title="SDE" class="task" order="Task_SDE_process"/>
+      </action>
+      <action>
+        <todo>Terv szerint végrehajtom az esedékes ismétlődő feladataimat.</todo>
+      </action>
+      <action>
+        <todo>Terv szerint végrehajtom a projektekkel kapcsolatos feladataimat.</todo>
+      </action>
+    </option>
+  </decision>
+  <action>
+    <todo>A munkaidő végéig követem az Eseménykezelés folyamatait.</todo>
+  </action>
+</task>
+
+{"task":  {"$":{"title":"Munkakezdés"},
+    "action":[
+        {"todo":[
+            "Frissítem az IT Naptárat"
+            ],
+         "button":[
+            {"$":{"title":"IT Naptár","class":"link","order":"https://onedrive.live.com/edit.aspx?resid=FC01EF85EEE9FE5E!742"}}
+            ],
+         "action":[
+            {"todo":[
+                "Ellenőrzöm, hogy az elmúlt napok-hetekbeli távolléteim be vannak-e jegyezve az IT Naptárba."
+                ]
+            },
+            {"todo":[
+                "Tervezett jövőbeli távolléteimet egyeztetem feletteseimmel ... Naptárba."
+                ]
+            },
+            {"todo":[
+                "Tudatosítom, kik a ... eskkel."
+                ]
+            }
+          ]
+        },
+        {"todo":["Megtervezem a napomat"],"action":[{"todo":["Tudatosítom, melyek a mai nap kiemelt eseményei."],"action":[{"todo":["Megnézem, milyen globális változások esedékesek a közeljövőben."],"button":[{"$":{"title":"Change Calendar","class":"link","order":"https://teamnet.grouphc.net/git/GIP/GIProcess/Lists/Change%20Management/All%20Changes.aspx"}}]}]},{"todo":["Ellenőrzöm a Naptári bejegyzéseimet, hogy van-e halaszthatatlan vagy határidős munkám,\r\n            amely miatt segítséget kell kérnem a napi ügyeim intézésében.\r\n            Adott esetben ezt egyeztetem a Service Deskkel."]}]},{"todo":["Feldolgozom a leveleimet."],"button":[{"$":{"title":"Postaláda","class":"task","order":"Event_email_message"}}]},{"todo":["A munkaidő végéig követem az Eseménykezelés folyamatait."]}],"decision":[{"question":["Én vagyok ma a Service Desk telefonügyeletes?"],"option":[{"answer":["Igen."],"action":[{"todo":["Ellenőrzöm, hogy a 1777-es hívások az én telefonomra legyenek átirányítva."]},{"todo":["Feldolgozom a Service Desk postafiókba beérkezett leveleket."],"button":[{"$":{"title":"Postaláda","class":"task","order":"Event_email_message"}}]},{"todo":["Ellenőrzöm az SDE bejegyzéseket."],"button":[{"$":{"title":"SDE ellenőrzés","class":"task","order":"Task_SDE_overview"}}]}]},{"answer":["Nem."],"action":[{"todo":["Feldolgozom a nevemen lévő SDE bejegyzéseket."],"button":[{"$":{"title":"SDE","class":"task","order":"Task_SDE_process"}}]},{"todo":["Terv szerint végrehajtom az esedékes ismétlődő feladataimat."]},{"todo":["Terv szerint végrehajtom a projektekkel kapcsolatos feladataimat."]}]}]}]}}
+
+
+{"menu":
+  {"$": {"title":"ADATBÁZIS","group":"Admin"},
+   "menu":
+   [
+     {"$": {"title":"Emberek"},
+      "menu":
+      [
+        {"$":{"title":"Cégek","class":"table","order":"Company"}
+        },
+        {"$":{"title":"Beosztások","class":"table","order":"Position"}
+        },
+        {"$":{"title":"Személyek","class":"table","order":"Person"}
+        },
+        {"$":{"title":"Belépőkártyák","class":"table","order":"Card"}
+        }
+      ]
+     },
+     {"$":{"title":"Létesítmények"},
+      "menu":
+      [
+        {"$":{"title":"Telephelyek","class":"table","order":"Site"}
+        },
+        {"$":{"title":"Helyiségek","class":"table","order":"Location"}
+        },
+        {"$":{"title":"Aljzatok","class":"table","order":"Socket"}
+        },
+        {"$":{"title":"Telefonközpontok","class":"table","order":"PBX"}}]},{"$":{"title":"Hardver eszközök"},"menu":[{"$":{"title":"Eszközfajták","class":"table","order":"Category"}},{"$":{"title":"Gyártók","class":"table","order":"Manufacturer"}},{"$":{"title":"Termékek","class":"table","order":"Hardware"}},{"$":{"title":"Eszközök","class":"table","order":"Asset"}},{"$":{"title":"MAC-címek","class":"table","order":"MAC"}},{"$":{"title":"Lelőhelyek","class":"table","order":"Config
+
+
+
+

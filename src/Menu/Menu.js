@@ -1,4 +1,95 @@
-function localizePage () {
+const fs = require('fs')
+const path = require('path')
+const parseString = require('xml2js').parseString
+
+var $Menu
+
+function loadMenuFiles(folder) {
+  $('div').remove()
+  fs.readdir(folder, (error, files) => {
+    if (error) throw error
+    for (let file of files) {
+      let xmlData = fs.readFileSync(path.join(folder, file), 'utf8')
+      parseString(xmlData, (error, json) => {
+        if (error) throw error
+        appendSubMenu(json.menu, document.body)
+      })
+    }
+    $Menu = $('.branch, .item')
+  })
+}
+
+// append submenu to root node
+function appendSubMenu(submenu, parent) {
+  let node = document.createElement('div')
+  if (Object.keys(submenu).length == 1)
+    node.innerHTML = `<span class="item">${submenu.$.title}</span>`
+  else {
+    node.innerHTML = `<span class="branch expanded">${submenu.$.title}</span>`
+    for (let child of submenu.menu)
+      appendSubMenu(child, node)
+  }
+  parent.appendChild(node)
+}
+
+// loadMenuFiles('C:\\Users\\schmidtp\\Documents\\CMS 5.x\\CMS\\Task')
+loadMenuFiles('C:\\inetpub\\xmlroot\\HUN\\Menu')
+
+$(document).on('keydown', event => {
+  if (event.which == 27) {
+    $('#search').focus()
+  }
+})
+
+$('#search').on('input', function() {
+  let term = $(this).val().trim()
+  if (term) {
+    let words = term.split(' ').map(word => new RegExp(word))
+    let pattern = new RegExp('(' + term.replace(/ /g, '|') + ')', 'g')
+    $Menu.each(function(i) {
+      let text = this.textContent
+      let hit = true
+      for (let word of words) {
+        hit &= word.test(text)
+      }
+      this.innerHTML = hit ? text.replace(pattern, '<mark>$1</mark>') : text
+    })
+    $('div').show()
+    $('div').not(':has(mark)').hide()
+  } else {
+    $('div').show()
+    $('div div').hide()
+  }
+  setBranchIcons(document.body)
+})
+
+function setBranchIcons(root) {
+  $('.branch', root).each(function(i) {
+    if ($(this).siblings(':hidden').length === 0)
+      this.className = 'branch expanded'
+    else if ($(this).siblings().not(':hidden').length === 0)
+      this.className = 'branch collapsed'
+    else
+      this.className = 'branch filtered'
+  })
+}
+
+$(document.body).on('click', '.branch', function() {
+  console.log(window.getSelection().type);
+  if (window.getSelection().type !== 'Range') {
+    console.log(window.getSelection().type);
+    if ($(this).hasClass('expanded')) {
+      $('div', this.parentNode).hide()
+      this.className = 'branch collapsed'
+    } else {
+      $(this).siblings().show()
+      this.className = 'branch expanded'
+    }
+    setBranchIcons(this.parentNode)
+  }
+})
+
+function localizePage() {
   $('[data-title]').forEach(_ => {
     $(this).prop('title', literal[$(this).attr('data-title')])
   })
@@ -17,7 +108,7 @@ $('#language').change(_ => {
   */
 })
 
-function setStartupPage (really) {
+function setStartupPage(really) {
   alert('setStartupPage')
 }
 /*
@@ -45,28 +136,28 @@ function setStartupPage (really) {
 
 // MENU ITEMS
 
-function highLight (item) { // <A>
+function highLight(item) { // <A>
   $('a').removeClass('selected')
   $(item).addClass('selected').blur() // remove focus decoration
 }
 
 // Lock or Unlock menu element from collapse/expansion
 // Lock makes the menu element always displayed
-function lockMenu (icon) { // <SPAN>
+function lockMenu(icon) { // <SPAN>
   $(icon).toggleClass('locked')
   //saveLocks()
   return false // disable context menu
 }
 
 // Display submenu elements based on lock and/or selection
-function displayMenu (submenu) { // <DIV>
+function displayMenu(submenu) { // <DIV>
   $(submenu).find('div').toArray().reverse().forEach(div => {
-    if ($(div).children('span').hasClass('locked')
-     || $(div).children('a').hasClass('selected'))
-        $(div).addClass('display')
+    if ($(div).children('span').hasClass('locked') ||
+      $(div).children('a').hasClass('selected'))
+      $(div).addClass('display')
     if ($(div).hasClass('display')) {
-        $(div).parent().addClass('display')
-        $(div).removeClass('display').show()
+      $(div).parent().addClass('display')
+      $(div).removeClass('display').show()
     } else {
       $(div).hide()
     }
@@ -75,7 +166,7 @@ function displayMenu (submenu) { // <DIV>
 }
 
 // Expand or Collapse submenu
-function expandMenu (icon) { // <SPAN>
+function expandMenu(icon) { // <SPAN>
   expand = false
   for (child of $(icon.parentNode).children('div').filter(':hidden')) {
     $(child).show('fast')
@@ -86,11 +177,11 @@ function expandMenu (icon) { // <SPAN>
 }
 
 // Regular search
-function searchMenu (really) { // false resets the menu
+function searchMenu(really) { // false resets the menu
   if ($('#search_field').val())
-      filter = new RegExp($('#search_field').val(), 'im')
+    filter = new RegExp($('#search_field').val(), 'im')
   else
-      really = false
+    really = false
 
   for (each of $('body > div')) {
     titles = $(each).find('a')
