@@ -1,0 +1,75 @@
+:root {
+  --nav-width: 20em;
+  --header-height: 3em;
+  --tab-height: 2em;
+  --aside-width: 10em;
+}
+
+body {
+  overflow: hidden;
+}
+
+nav {
+  box-sizing: border-box;
+  padding: 5px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--nav-width);
+}
+
+nav>header {
+  width: 100%;
+  height: var(--header-height);
+}
+
+nav>section {
+  width: 100%;
+  height: calc(100% - var(--header-height));
+  overflow-y: auto;
+}
+
+main {
+  background-color: orange;
+  box-sizing: border-box;
+  padding: 5px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: calc(100% - var(--nav-width));
+}
+
+main>header {
+  background-color: brown;
+  height: var(--tab-height);
+}
+
+main>section {
+  background-color: lightyellow;
+  height: calc(100% - var(--tab-height));
+}
+
+main>section>aside {
+  background-color: lightgreen;
+  float: right;
+  top: var(--tab-height);
+  width: var(--aside-width);
+  height: 100%;
+  overflow-y: auto;
+}
+
+main>section>article {
+  background-color: lightblue;
+  width: calc(100% - var(--aside-width));
+  height: 50%;
+  overflow: auto;
+}
+
+main>section>footer {
+  background-color: gray;
+  width: calc(100% - var(--aside-width));
+  height: 50%;
+  overflow: auto;
+}

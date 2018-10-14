@@ -1,3 +1,6 @@
+'use strict'
+require('electron-reload')(__dirname)
+
 const electron = require('electron')
 
 // const app = electron.app
@@ -14,10 +17,10 @@ function createWindow () {
   mainWindow.maximize()
 
   // and load the index.html of the app.
-  // mainWindow.loadFile('src/index.html')
+   mainWindow.loadFile('src/index.html')
   // mainWindow.loadFile('C:\\inetpub\\xmlroot\\HUN\\Menu\\3. Tables.xml')
   // mainWindow.loadURL('file://C:\\inetpub\\xmlroot\\HUN\\Menu\\3. Tables.xml')
-  mainWindow.loadURL(`file://${__dirname}/Menu/Menu.html`)
+  // mainWindow.loadURL(`file://${__dirname}/Menu/Menu.html`)
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()

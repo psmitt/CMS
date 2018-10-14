@@ -12,7 +12,7 @@ function loadMenuFiles(folder) {
       let xmlData = fs.readFileSync(path.join(folder, file), 'utf8')
       parseString(xmlData, (error, json) => {
         if (error) throw error
-        appendSubMenu(json.menu, document.body)
+        appendSubMenu(json.menu, document.getElementById('menu'))
       })
     }
     $Menu = $('.branch, .item')
@@ -44,8 +44,8 @@ $(document).on('keydown', event => {
 $('#search').on('input', function() {
   let term = $(this).val().trim()
   if (term) {
-    let words = term.split(' ').map(word => new RegExp(word))
-    let pattern = new RegExp('(' + term.replace(/ /g, '|') + ')', 'g')
+    let words = term.split(' ').map(word => new RegExp(word, 'i'))
+    let pattern = new RegExp('(' + term.replace(/ /g, '|') + ')', 'ig')
     $Menu.each(function(i) {
       let text = this.textContent
       let hit = true
@@ -57,6 +57,9 @@ $('#search').on('input', function() {
     $('div').show()
     $('div').not(':has(mark)').hide()
   } else {
+    $Menu.each(function(i) {
+      this.innerHTML = this.textContent
+    })
     $('div').show()
     $('div div').hide()
   }
@@ -75,9 +78,7 @@ function setBranchIcons(root) {
 }
 
 $(document.body).on('click', '.branch', function() {
-  console.log(window.getSelection().type);
   if (window.getSelection().type !== 'Range') {
-    console.log(window.getSelection().type);
     if ($(this).hasClass('expanded')) {
       $('div', this.parentNode).hide()
       this.className = 'branch collapsed'
