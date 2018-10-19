@@ -1,48 +1,98 @@
 'use strict'
+
 require('electron-reload')(__dirname)
 
-const electron = require('electron')
+const {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  Menu,
+  shell
+} = require('electron')
 
-// const app = electron.app
-// const BrowserWindow = electron.BrowserWindow
-const { app, BrowserWindow, globalShortcut, shell } = require('electron')
+const menu = Menu.buildFromTemplate([{
+  label: 'Window',
+  submenu: [{
+    label: 'New',
+    accelerator: 'Ctrl+N'
+  }, {
+    label: 'Change Root',
+    accelerator: 'Ctrl+O',
+    click: (item, window) => {
+      window.webContents.send('Change Root')
+    },
+  }, {
+    label: 'Force Reload',
+    role: 'forceReload',
+    accelerator: 'Ctrl+R'
+  }, {
+    type: 'separator'
+  }, {
+    label: 'Minimize',
+    role: 'minimize'
+  }, {
+    label: 'Close',
+    role: 'close',
+    accelerator: 'Ctrl+F4'
+  }, {
+    label: 'Close All',
+    role: 'quit',
+    accelerator: 'Alt+F4'
+  }]
+}, {
+  label: 'Edit',
+  submenu: [{
+    label: 'Copy',
+    role: 'copy',
+    accelerator: 'Ctrl+C'
+  }, {
+    label: 'Paste',
+    role: 'paste',
+    accelerator: 'Ctrl+V'
+  }]
+}, {
+  label: 'View',
+  submenu: [{
+    label: 'Zoom In',
+    role: 'zoomIn'
+  }, {
+    label: 'Zoom Out',
+    role: 'zoomOut'
+  }, {
+    label: 'Zoom Reset',
+    role: 'resetZoom',
+    accelerator: 'Ctrl+0'
+  }, {
+    label: 'Full Screen On/Off',
+    role: 'toggleFullScreen',
+    accelerator: 'F11'
+  }, {
+    label: 'Dev Tools On/Off',
+    role: 'toggleDevTools',
+    accelerator: 'F12'
+  }]
+}, {
+  label: 'Help',
+  submenu: [{
+    label: `About ${app.getName()}`,
+    role: 'about'
+  }]
+}])
+Menu.setApplicationMenu(menu)
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow()
   mainWindow.maximize()
 
-  // and load the index.html of the app.
-   mainWindow.loadFile('src/index.html')
-  // mainWindow.loadFile('C:\\inetpub\\xmlroot\\HUN\\Menu\\3. Tables.xml')
-  // mainWindow.loadURL('file://C:\\inetpub\\xmlroot\\HUN\\Menu\\3. Tables.xml')
-  // mainWindow.loadURL(`file://${__dirname}/Menu/Menu.html`)
-
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
 
-  // IPC demo
-  // const ipc = electron.ipcMain
-  // const countdown = require('./IPC/javascript-module')
-  // const windows = [];
-  // [1, 2, 3].forEach(_ => {
-  //   let win = new BrowserWindow({ width: 400, height: 400 })
-  //   win.loadURL(`file://${__dirname}/IPC/event.html`)
-  //   win.on('close', _ => { mainWindow = null })
-  //   windows.push(win)
-  // })
-  // ipc.on('May I start countdown?', _ => {
-  //   countdown(count => {
-  //     windows.forEach(win => {
-  //       if ( mainWindow )
-  //         win.webContents.send('Yes, start countdown now!', count)
-  //     })
-  //   })
-  // })
+  mainWindow.loadFile('src/index.html')
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
@@ -58,9 +108,6 @@ function createWindow () {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow()
-  globalShortcut.register('Alt+F4', () => {
-    console.log('Alt+F4')
-  })
 })
 
 // Quit when all windows are closed.

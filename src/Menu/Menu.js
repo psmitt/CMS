@@ -1,52 +1,49 @@
-const fs = require('fs')
-const path = require('path')
-const parseString = require('xml2js').parseString
-
-var $Menu
-
 function loadMenuFiles(folder) {
-  $('div').remove()
+  $('#menu').empty()
   fs.readdir(folder, (error, files) => {
     if (error) throw error
     for (let file of files) {
-      let xmlData = fs.readFileSync(path.join(folder, file), 'utf8')
-      parseString(xmlData, (error, json) => {
-        if (error) throw error
-        appendSubMenu(json.menu, document.getElementById('menu'))
-      })
+      if (fs.statSync(path.join(folder, file)).isFile()) {
+        let xmlString = fs.readFileSync(path.join(folder, file), 'utf8')
+        const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+          $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
+        $(xmlDoc).children().each(function () {
+          appendSubMenu($(this), document.getElementById('menu'))
+        })
+      }
     }
     $Menu = $('.branch, .item')
   })
 }
 
 // append submenu to root node
-function appendSubMenu(submenu, parent) {
+function appendSubMenu($submenu, parent) {
   let node = document.createElement('div')
-  if (Object.keys(submenu).length == 1)
-    node.innerHTML = `<span class="item">${submenu.$.title}</span>`
-  else {
-    node.innerHTML = `<span class="branch expanded">${submenu.$.title}</span>`
-    for (let child of submenu.menu)
-      appendSubMenu(child, node)
+  if ($submenu.children().length) {
+    node.innerHTML = `<span class="branch expanded">${$submenu.attr('title')}</span>`
+    $submenu.children().each(function () {
+      appendSubMenu($(this), node)
+    })
+  } else {
+    let onclick = 'onclick='
+    switch ($submenu.attr('class')) {
+      case 'task':
+        onclick += `"loadTask('${path.join(rootDir, 'Task', $submenu.attr('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+      case 'view':
+        onclick += `"loadView('${path.join(rootDir, 'View', $submenu.attr('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+    }
+    node.innerHTML = `<span class="item" ${onclick}>${$submenu.attr('title')}</span>`
   }
   parent.appendChild(node)
 }
 
-// loadMenuFiles('C:\\Users\\schmidtp\\Documents\\CMS 5.x\\CMS\\Task')
-loadMenuFiles('C:\\inetpub\\xmlroot\\HUN\\Menu')
-
-$(document).on('keydown', event => {
-  if (event.which == 27) {
-    $('#search').focus()
-  }
-})
-
-$('#search').on('input', function() {
+$('#search').on('input', function () {
+  $('.hit').removeClass('hit')
   let term = $(this).val().trim()
   if (term) {
     let words = term.split(' ').map(word => new RegExp(word, 'i'))
     let pattern = new RegExp('(' + term.replace(/ /g, '|') + ')', 'ig')
-    $Menu.each(function(i) {
+    $Menu.each(function (i) {
       let text = this.textContent
       let hit = true
       for (let word of words) {
@@ -54,20 +51,21 @@ $('#search').on('input', function() {
       }
       this.innerHTML = hit ? text.replace(pattern, '<mark>$1</mark>') : text
     })
-    $('div').show()
-    $('div').not(':has(mark)').hide()
+    $('#menu div').show()
+    $('#menu div').not(':has(mark)').hide()
+    $($('.item:has(mark)')[0]).addClass('hit')
   } else {
-    $Menu.each(function(i) {
+    $Menu.each(function (i) {
       this.innerHTML = this.textContent
     })
-    $('div').show()
-    $('div div').hide()
+    $('#menu div').show()
+    $('#menu div div').hide()
   }
   setBranchIcons(document.body)
 })
 
 function setBranchIcons(root) {
-  $('.branch', root).each(function(i) {
+  $('.branch', root).each(function (i) {
     if ($(this).siblings(':hidden').length === 0)
       this.className = 'branch expanded'
     else if ($(this).siblings().not(':hidden').length === 0)
@@ -77,7 +75,41 @@ function setBranchIcons(root) {
   })
 }
 
-$(document.body).on('click', '.branch', function() {
+$('#search').on('keydown', event => {
+  switch (event.originalEvent.code) {
+    case 'ArrowDown':
+    case 'ArrowUp':
+    case 'Enter':
+      event.preventDefault();
+      let $hits = $('.item:has(mark)')
+      if ($hits.length > 0) {
+        let index = $hits.index($('.hit')[0])
+        switch (event.originalEvent.code) {
+          case 'ArrowDown':
+            if (index < $hits.length - 1) {
+              $('.hit').removeClass('hit')
+              $($hits.eq(index + 1)).addClass('hit')
+            }
+            break;
+          case 'ArrowUp':
+            if (index > 0) {
+              $('.hit').removeClass('hit')
+              $($hits.eq(index - 1)).addClass('hit')
+            }
+            break;
+          case 'Enter':
+            $('.hit').click()
+            break;
+        }
+      }
+  }
+})
+
+$('#search').on('blur', _ => {
+  $('.hit').removeClass('hit')
+})
+
+$(document.body).on('click', '.branch', function () {
   if (window.getSelection().type !== 'Range') {
     if ($(this).hasClass('expanded')) {
       $('div', this.parentNode).hide()

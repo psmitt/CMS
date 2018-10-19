@@ -1,7 +1,6 @@
 :root {
   --nav-width: 20em;
-  --header-height: 3em;
-  --tab-height: 2em;
+  --header-height: 2.5em;
   --aside-width: 10em;
 }
 
@@ -21,6 +20,7 @@ nav {
 
 nav>header {
   width: 100%;
+  line-height: 0;
   height: var(--header-height);
 }
 
@@ -43,18 +43,18 @@ main {
 
 main>header {
   background-color: brown;
-  height: var(--tab-height);
+  height: var(--header-height);
 }
 
 main>section {
   background-color: lightyellow;
-  height: calc(100% - var(--tab-height));
+  height: calc(100% - var(--header-height));
 }
 
 main>section>aside {
   background-color: lightgreen;
   float: right;
-  top: var(--tab-height);
+  top: var(--header-height);
   width: var(--aside-width);
   height: 100%;
   overflow-y: auto;
@@ -64,7 +64,8 @@ main>section>article {
   background-color: lightblue;
   width: calc(100% - var(--aside-width));
   height: 50%;
-  overflow: auto;
+  white-space: nowrap;
+  overflow-x: hidden;
 }
 
 main>section>footer {

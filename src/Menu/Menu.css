@@ -28,45 +28,56 @@ body, input {
   border-color: deepskyblue;
 }
 
-body > div {
-  margin-right: 30px;
-}
-
-div {
+#menu div {
+  line-height: 0;
   margin-left: 10px;
-  line-height: 2;
   cursor: pointer;
 }
 
-span {
+#menu span {
   display: inline-block;
+  box-sizing: border-box;
+  line-height: 2;
   width: 100%;
   padding-left: 24px;
   border-radius: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-span:hover {
+#menu span:hover {
   background-color: #e9dbc8;
+  white-space: normal;
 }
 
-.branch {
+#menu span.hit {
+  background-color: #d4d4f7; /* dark lavender */
+  background-image: url('triangle_right.svg');
+  background-size: auto 61.8%;
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+
+#menu .branch {
   margin-left: -10px;
+  width: calc(100% + 10px);
   background-size: auto 61.8%;
   background-position: 12px center;
   background-repeat: no-repeat;
   padding-left: 43px;
 }
 
-.collapsed {
+#menu .collapsed {
   background-image: url('triangle_right.svg');
 }
-.expanded {
+#menu .expanded {
   background-image: url('triangle_down.svg');
 }
-.filtered {
+#menu .filtered {
   background-image: url('triangle_down_right.svg');
 }
 
-mark {
+#menu mark {
   background-color: lavender;
 }

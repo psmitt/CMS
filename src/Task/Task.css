@@ -1,0 +1,30 @@
+article h1 {
+  margin: 0.5em;
+}
+
+article > div {
+  padding-right: 35px; /* scroll bar */
+}
+
+article div div {
+  margin-left: 1.5em;
+}
+
+article input {
+  height: 1em;
+  width: 1em;
+  margin: 0.5em;
+  vertical-align: top;
+}
+
+article span {
+  display: inline-block;
+  line-height: 1.5;
+  padding-top: 0.3em;
+  white-space: normal;
+}
+
+article button {
+  margin-left: 1em;
+  vertical-align: text-top;
+}

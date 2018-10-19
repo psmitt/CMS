@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Munkakezdés</title>
+  <link href="/CSS/HC.ICO" rel="icon" />
+  <link href="/CSS/Header.css" rel="stylesheet" />
+  <link href="/CSS/Task/Task.css" rel="stylesheet" />
+</head>
+
+<body>
+  <header>
+    <span title="Munkakezdés">Munkakezdés</span>
+    <div>
+      <img src="/CSS/Task/Task_save.png" data-title="Save task | Saved tasks" onclick="task.context = prompt(literal['Save as... ( specify related context, e.g. ticket # )'],task.context);
+               if (task.context != null) saveTask()"
+        oncontextmenu="window.open('Tree.php?tree=Tasks_own','Data');
+                     return false;" />
+    </div>
+  </header>
+  <article>
+    <div><input type="checkbox" onclick="takeStep(this)" /><span>Frissítem az IT Naptárat <button type="button" onclick="var target=event.ctrlKey?'_blank':'_blank';window.open('https://onedrive.live.com/edit.aspx?resid=FC01EF85EEE9FE5E!742',target)">IT
+          Naptár</button></span>
+      <div><input type="checkbox" onclick="takeStep(this)" /><span>Ellenőrzöm, hogy az elmúlt napok-hetekbeli távolléteim be vannak-e jegyezve az IT Naptárba.</span></div>
+      <div><input type="checkbox" onclick="takeStep(this)" /><span>Tervezett jövőbeli távolléteimet egyeztetem feletteseimmel és a Service Desk-kel, majd jóváhagyásukkal bejegyzem a Naptárba.</span></div>
+      <div><input type="checkbox" onclick="takeStep(this)" /><span>Tudatosítom, kik a hiányzó kollégák, kit fogok ma helyettesíteni.
+          Adott esetben ezt egyeztetem a Service Deskkel.</span></div>
+    </div>
+    <div><input type="checkbox" onclick="takeStep(this)" /><span>Megtervezem a napomat</span>
+      <div><input type="checkbox" onclick="takeStep(this)" /><span>Tudatosítom, melyek a mai nap kiemelt eseményei.</span>
+        <div><input type="checkbox" onclick="takeStep(this)" /><span>Megnézem, milyen globális változások esedékesek a közeljövőben. <button type="button" onclick="var target=event.ctrlKey?'_blank':'_blank';window.open('https://teamnet.grouphc.net/git/GIP/GIProcess/Lists/Change%20Management/All%20Changes.aspx',target)">Change
+              Calendar</button></span></div>
+      </div>
+      <div><input type="checkbox" onclick="takeStep(this)" /><span>Ellenőrzöm a Naptári bejegyzéseimet, hogy van-e halaszthatatlan vagy határidős munkám,
+          amely miatt segítséget kell kérnem a napi ügyeim intézésében.
+          Adott esetben ezt egyeztetem a Service Deskkel.</span></div>
+    </div>
+    <div><input type="checkbox" onclick="takeStep(this)" /><span>Feldolgozom a leveleimet. <button type="button" onclick="saveTask();var target=event.ctrlKey?'_blank':'Task';window.open('Task.php?task=Event_email_message'+'&main='+task.subtask,target)">Postaláda</button></span></div>
+    <div><input type="checkbox" onclick="takeStep(this)" /><span>Én vagyok ma a Service Desk telefonügyeletes?</span>
+      <div><input type="radio" onclick="takeStep(this)" /><span>Igen.</span>
+        <div><input type="checkbox" onclick="takeStep(this)" /><span>Ellenőrzöm, hogy a 1777-es hívások az én telefonomra legyenek átirányítva.</span></div>
+        <div><input type="checkbox" onclick="takeStep(this)" /><span>Feldolgozom a Service Desk postafiókba beérkezett leveleket. <button type="button" onclick="saveTask();var target=event.ctrlKey?'_blank':'Task';window.open('Task.php?task=Event_email_message'+'&main='+task.subtask,target)">Postaláda</button></span></div>
+        <div><input type="checkbox" onclick="takeStep(this)" /><span>Ellenőrzöm az SDE bejegyzéseket. <button type="button" onclick="saveTask();var target=event.ctrlKey?'_blank':'Task';window.open('Task.php?task=Task_SDE_overview'+'&main='+task.subtask,target)">SDE
+              ellenőrzés</button></span></div>
+      </div>
+      <div><input type="radio" onclick="takeStep(this)" /><span>Nem.</span>
+        <div><input type="checkbox" onclick="takeStep(this)" /><span>Feldolgozom a nevemen lévő SDE bejegyzéseket. <button type="button" onclick="saveTask();var target=event.ctrlKey?'_blank':'Task';window.open('Task.php?task=Task_SDE_process'+'&main='+task.subtask,target)">SDE</button></span></div>
+        <div><input type="checkbox" onclick="takeStep(this)" /><span>Terv szerint végrehajtom az esedékes ismétlődő feladataimat.</span></div>
+        <div><input type="checkbox" onclick="takeStep(this)" /><span>Terv szerint végrehajtom a projektekkel kapcsolatos feladataimat.</span></div>
+      </div>
+    </div>
+    <div><input type="checkbox" onclick="takeStep(this)" /><span>A munkaidő végéig követem az Eseménykezelés folyamatait.</span></div>
+
+    <script>
+      var task = {};
+      task.context = '';
+      task.filename = 'Event_start_working';
+      task.main = 0;
+      task.subtask = 0;
+      task.openTime = '1539592605';
+      task.checkString = '0';
+      task.displayString = '1';
+      task.scrollPosition = 0;
+    </script>
+  </article>
+  <script src="/JS/jquery.min.js"></script>
+  <script src="/JS/Localization.js"></script>
+  <script src="/JS/Header.js"></script>
+  <script src="/JS/Task.js"></script>
+</body>
+
+</html>
