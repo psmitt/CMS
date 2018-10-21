@@ -5,7 +5,7 @@ function loadTask(file) {
     if (error) throw error
     const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
       $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
-    $article.append(`<h1>${$(xmlDoc).find('task').attr('title')}</h1>`)
+    $article.append(`<h1><span>${$(xmlDoc).find('task').attr('title')}</span></h1>`)
     $(xmlDoc).find('task').children().each(function () {
       appendSubTask(this, $article[0])
     })

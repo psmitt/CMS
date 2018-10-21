@@ -2,12 +2,15 @@
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
+const mysql = require('mysql')
+const md5 = require('md5')
 const remote = require('electron').remote
 const ipc = require('electron').ipcRenderer
 const dialog = remote.dialog
 const currentWindow = remote.getCurrentWindow()
 
 var rootDir
+var mysql_pool
 
 function changeRoot(folder) {
   if (!folder) {
@@ -25,6 +28,15 @@ function changeRoot(folder) {
   else {
     fs.writeFile(path.join(os.homedir(), '.cms', 'lastpath.txt'), rootDir, 'utf8', (error) => {
       if (error) throw error
+    })
+    fs.readFile(path.join(rootDir, 'cmdb'), 'utf8', (error, cmdb) => {
+      if (error) throw error
+      console.log(cmdb);
+      let server = JSON.parse(cmdb)
+      console.log(server);
+      server.user = server.database.toUpperCase() + '_Admin'
+      server.password = md5(server.user)
+      mysql_pool = mysql.createPool(server)
     })
     loadMenuFiles(path.join(rootDir, 'Menu'))
   }
@@ -46,10 +58,11 @@ $(document).on('keypress', event => {
     $('#search').focus()
 });
 
-const mysql = require('mysql')
-var cmdb = mysql.createConnection({
+/*
+var mysql_pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'cmdb_mine',
   database: 'hun'
 })
+*/

@@ -1,7 +1,3 @@
-article h1 {
-  margin: 0.5em;
-}
-
 article > div {
   padding-right: 35px; /* scroll bar */
 }
@@ -17,7 +13,7 @@ article input {
   vertical-align: top;
 }
 
-article span {
+article div span {
   display: inline-block;
   line-height: 1.5;
   padding-top: 0.3em;

@@ -1,7 +1,37 @@
 table {
- border-collapse: collapse;
+  margin-right: 1px;
 }
 
-th, td {
-  border: solid thin;
+:root {
+  --row-height: 1.5em;
+}
+
+thead th { /* filter row */
+  position: sticky;
+  top: var(--header-height);
+  height: var(--row-height);
+  background-color: var(--light-background);
+  z-index: 1;
+}
+
+thead td { /* title row */
+  position: sticky;
+  height: var(--row-height);
+  top: calc(var(--header-height) + var(--row-height) + 3px);
+  background-color: var(--light-background);
+  border: none;
+  z-index: 1;
+}
+
+thead input {
+  width: 100%;
+}
+
+thead td {
+  font-weight: bold;
+}
+
+td {
+  border: solid thin lightgray;
+  padding-left: 0.5em;
 }

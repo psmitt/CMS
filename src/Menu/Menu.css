@@ -1,8 +1,3 @@
-body, input {
-  font-family: 'Fira Sans', sans-serif;
-  font-size: large;
-}
-
 #search {
   width: 100%;
   background-image: url('magnifier_glass.svg');
@@ -26,6 +21,10 @@ body, input {
 #search:focus {
   outline: none;
   border-color: deepskyblue;
+}
+
+#menu {
+  font-size: larger;
 }
 
 #menu div {

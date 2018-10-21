@@ -1,11 +1,50 @@
+/*
+::-webkit-scrollbar {
+  display: none;
+}
+*/
 :root {
+  --font-size: large;
   --nav-width: 20em;
   --header-height: 2.5em;
   --aside-width: 10em;
+  --light-background: white;
+  --light-color: black;
+  --dark-background: black;
+  --dark-color: white;
 }
 
-body {
+body, input {
+  font-family: 'Barlow Semi Condensed', sans-serif;
+  font-size: var(--font-size);
   overflow: hidden;
+}
+
+h1 {
+  z-index: 1;
+  position: sticky;
+  top: 0;
+  left: 0;
+  margin: 0;
+  font-size: var(--font-size);
+  height: var(--header-height);
+  line-height: var(--header-height);
+  padding-left: 0.5em;
+  background-color: var(--light-background);
+}
+
+h1>span {
+  font-size: larger;
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table {
+  transform: translate3d(0, 0, 0); /* optimize scrolling */
+  border-collapse: collapse;
 }
 
 nav {
@@ -69,7 +108,6 @@ main>section>article {
 }
 
 main>section>footer {
-  background-color: gray;
   width: calc(100% - var(--aside-width));
   height: 50%;
   overflow: auto;
