@@ -11,6 +11,7 @@ function loadView(file) {
     let $queries = $(xmlDoc).find('query')
     let colWidths
     if ($queries.length > 1) { // gap analysis
+      $('footer table').css('width', '1000px')
       $('footer colgroup').append(`
         ${'<col width="200"/>'.repeat(2)}
         ${'<col width="300"/>'.repeat(2)}
@@ -25,27 +26,100 @@ function loadView(file) {
         </tr>
       `)
     } else {
+      let tableWidth = 0
+      let titleRow = document.createElement('tr')
+      $columns.each(function (i) {
+        let width = $(this).attr('width')
+        if (width) {
+          tableWidth += parseInt(width)
+          $('footer colgroup').append(`<col width="${width}">`)
+        } else {
+          switch ($(this).attr('type')) {
+            case 'date':
+            case 'time':
+            case 'datetime':
+            case 'number':
+              tableWidth += 110
+              break;
+            default:
+              tableWidth += 170
+          }
+          $('footer colgroup').append('<col width="110">')
+        }
+        $(titleRow).append(`<td>${$(this).attr('title')}</td>`)
+        /*
+        let align = $(this).attr('type') === 'number' ? 'right' : 'left'
+        let font = ''
+        switch ($(this).attr('type')) {
+          case 'date':
+          case 'time':
+          case 'datetime':
+            align = 'center'
+          case 'number':
+            font = 'font-family: monospace;'
+        }
+        if ($(this).attr('align')) {
+          align = $(this).attr('align')
+        }
+        if ($(this).attr('font') === 'mono') {
+          font = 'font-family: monospace;'
+        }
+        */
+      })
+      $('footer table').css('width', tableWidth + 'px')
+      $('footer thead').append(`<tr>${'<th><input type="search"></th>'.repeat($columns.length)}</tr>`)
+      $('footer thead').append(titleRow)
+      /*
+            mysql_pool.getConnection((error, cmdb) => {
+              if (error) throw error
+              cmdb.query({
+                sql: $queries.text(),
+                nestTables: '.'
+              }, (error, result, fields) => {
+                if (error) throw error
+                for (let row of result) {
+                  let dataRow = document.createElement('tr')
+                  for (let data in row) {
+                    if (row[data]) {
+                      if (row[data] instanceof Date)
+                        $(dataRow).append(`<td>${row[data].toISOString().substring(0, 10)}</td>`)
+                      else
+                        $(dataRow).append(`<td>${row[data]}</td>`)
+                    } else { // null or emtpy string
+                      $(dataRow).append('<td></td>')
+                    }
+                  }
+                  $('footer tbody').append(dataRow)
+                }
+                cmdb.release();
+              })
+            })
+      */
       mysql_pool.getConnection((error, cmdb) => {
         if (error) throw error
-        $('footer thead').append(`<tr>${'<th><input type="search"></th>'.repeat($columns.length)}</tr>`)
-        let titleRow = document.createElement('tr')
-        $columns.each(function () {
-          $(titleRow).append(`<td>${$(this).attr('title')}</td>`)
-        })
-        $('footer thead').append(titleRow)
-        cmdb.query($queries.text(), (error, result, fields) => {
-          if (error) throw error
-          for (let row of result) {
-            let dataRow = document.createElement('tr')
-            for (let data in row) {
-              $(dataRow).append(`<td>${row[data]}</td>`)
+        cmdb.query({
+            sql: $queries.text(),
+            nestTables: '.'
+          }).stream().pipe(require('stream').Transform({
+            objectMode: true,
+            transform: function (row, encoding, callback) {
+              let dataRow = document.createElement('tr')
+              for (let data in row) {
+                if (row[data]) {
+                  if (row[data] instanceof Date)
+                    $(dataRow).append(`<td>${row[data].toISOString().substring(0, 10)}</td>`)
+                  else
+                    $(dataRow).append(`<td>${row[data]}</td>`)
+                } else { // null or emtpy string
+                  $(dataRow).append('<td></td>')
+                }
+              }
+              $('footer tbody').append(dataRow)
+              callback()
             }
-            $('footer tbody').append(dataRow)
-          }
-          cmdb.release();
-        })
+          }))
+          .on('finish', () => cmdb.release())
       })
-      $columns.each(function () {})
     }
   })
 }

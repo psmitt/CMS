@@ -31,11 +31,10 @@ function changeRoot(folder) {
     })
     fs.readFile(path.join(rootDir, 'cmdb'), 'utf8', (error, cmdb) => {
       if (error) throw error
-      console.log(cmdb);
       let server = JSON.parse(cmdb)
-      console.log(server);
       server.user = server.database.toUpperCase() + '_Admin'
       server.password = md5(server.user)
+      server.supportBigNumbers = true
       mysql_pool = mysql.createPool(server)
     })
     loadMenuFiles(path.join(rootDir, 'Menu'))

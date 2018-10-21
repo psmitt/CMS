@@ -1,5 +1,6 @@
 table {
   margin-right: 1px;
+  table-layout: fixed;
 }
 
 :root {
@@ -34,4 +35,8 @@ thead td {
 td {
   border: solid thin lightgray;
   padding-left: 0.5em;
+}
+
+tbody td {
+  white-space: pre-wrap;
 }
