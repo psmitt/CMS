@@ -112,3 +112,18 @@ main>section>footer {
   height: 50%;
   overflow: auto;
 }
+
+input {
+  border-color: lightgray;
+  border-style: solid;
+  border-width: thin;
+}
+
+input:hover {
+  border-color: skyblue;
+}
+
+input:focus {
+  outline: none;
+  border-color: deepskyblue;
+}

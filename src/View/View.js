@@ -153,7 +153,6 @@ function filterData() {
         column: i + 1,
         filter: new RegExp(this.value.replace(/ /g, '.*'), 'im')
       })
-      console.log(filters);
     }
   })
   let counter = 0
@@ -166,28 +165,28 @@ function filterData() {
       counter = dataTable.length;
       break;
     case 1:
-      i = filter[0].column
+      i = filters[0].column
       for (let row of dataTable) {
-        row[0] = filter[0].filter.test(row[i].replace(/\n/g, ' '));
-        counter++
+        if (row[0] = filters[0].filter.test(row[i].replace(/\n/g, ' ')))
+          counter++
       }
       break;
     default:
-      i = filter[0].column
+      i = filters[0].column
       for (let row of dataTable) {
-        row[0] = filter[0].filter.test(row[i].replace(/\n/g, ' '));
+        row[0] = filters[0].filter.test(row[i].replace(/\n/g, ' '));
       }
       let last = filters.length - 1
       for (let f = 1; f < last; f++) {
-        i = filter[f].column
+        i = filters[f].column
         for (let row of dataTable) {
-          row[0] = row[0] && filter[f].filter.test(row[i].replace(/\n/g, ' '));
+          row[0] = row[0] && filters[f].filter.test(row[i].replace(/\n/g, ' '));
         }
       }
-      i = filter[last].column
+      i = filters[last].column
       for (let row of dataTable) {
-        row[0] = row[0] && filter[last].filter.test(row[i].replace(/\n/g, ' '));
-        counter++
+        if (row[0] = row[0] && filters[last].filter.test(row[i].replace(/\n/g, ' ')))
+          counter++
       }
       break;
   }
@@ -197,6 +196,7 @@ function filterData() {
 
 function displayData() {
   let tbody = document.createElement('tbody')
+  let countRows = 0
   for (let row of dataTable) {
     if (row[0]) {
       let dataRow = rowTemplate.cloneNode(true)
@@ -204,7 +204,16 @@ function displayData() {
         $(this).text(row[i + 1])
       })
       tbody.appendChild(dataRow)
+      if (countRows++ > 100)
+        break;
     }
   }
   $('tbody', footer).replaceWith(tbody)
 }
+
+$(document.body).on('click', '#tool', function () {
+  let tools = document.getElementById('tools')
+  tools.style.display = tools.style.display !== 'block' ? 'block' : 'none'
+})
+
+$(document.body).on('input', 'main>section>footer input[type="search"]', filterData)

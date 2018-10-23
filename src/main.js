@@ -85,14 +85,13 @@ Menu.setApplicationMenu(menu)
 let mainWindow
 
 function createWindow() {
-  // Create the browser window.
-  mainWindow = new BrowserWindow()
-  mainWindow.maximize()
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools()
-
+  mainWindow = new BrowserWindow({
+    show: false
+  })
   mainWindow.loadFile('src/index.html')
+  mainWindow.webContents.on('did-finish-load', function () {
+    mainWindow.maximize();
+  });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

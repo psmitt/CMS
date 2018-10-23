@@ -5,22 +5,10 @@
   background-position: 7px center;
   background-repeat: no-repeat;
 
-  border-color: lightgray;
-  border-style: solid;
-  border-width: thin;
   border-radius: 5px;
 
   padding: 10px;
   padding-left: 40px;
-}
-
-#search:hover {
-  border-color: skyblue;
-}
-
-#search:focus {
-  outline: none;
-  border-color: deepskyblue;
 }
 
 #menu {

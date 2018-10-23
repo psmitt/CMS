@@ -1,3 +1,8 @@
+h1, thead th, thead td {
+  z-index: 1;
+  transform: translate3d(0,0,0);
+}
+
 h1>span:first-child {
   width: calc(100% - 4em);
 }
@@ -9,20 +14,23 @@ h1>span:first-child {
 
 #tool {
   cursor: pointer;
+  user-select: none;
 }
 
 #tools {
+  display: none;
   position: absolute;
   top: calc(var(--header-height) - 5px);
   right: 0;
   line-height: 1;
   background-color: white;
-  border: groove thick tan;
+  border: solid thin tan;
   border-radius: 5px;
 }
 
 #tools span {
   display: block;
+  font-weight: normal;
   padding: 3px;
   border-radius: 5px;
   cursor: pointer;
@@ -46,7 +54,6 @@ thead th { /* filter row */
   top: var(--header-height);
   height: var(--row-height);
   background-color: var(--light-background);
-  z-index: 1;
 }
 
 thead td { /* title row */
@@ -55,10 +62,10 @@ thead td { /* title row */
   top: calc(var(--header-height) + var(--row-height) + 3px);
   background-color: var(--light-background);
   border: none;
-  z-index: 1;
 }
 
 thead input {
+  margin: 1px;
   width: 100%;
 }
 
