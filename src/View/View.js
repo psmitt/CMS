@@ -1,22 +1,32 @@
+const streamTransform = require('stream').Transform
+
+const footer = $('main>section>footer')[0]
+
+let $queries // actual XML queries
+let dataTable // memory array of data rows with display property
+let rowTemplate // empty row template
+
 function loadView(file) {
-  let $footer = $('main>section>footer')
-  $footer.empty()
+  footer.innerHTML = fs.readFileSync('src/View/View.html', 'utf8') // emtpy template
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
     const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
       $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
-    $footer.append(`<h1><span title="${$(xmlDoc).find('view').attr('title')}">${$(xmlDoc).find('view').attr('title')}</span></h1>`)
-    $footer.append('<table><colgroup></colgroup><thead></thead><tbody></tbody></table>')
+
+    $('h1>span:first-child')[0].title = $(xmlDoc).find('view').attr('title')
+    $('h1>span:first-child').text($(xmlDoc).find('view').attr('title'))
+
+    $queries = $(xmlDoc).find('query')
+    rowTemplate = document.createElement('tr')
     let $columns = $(xmlDoc).find('column')
-    let $queries = $(xmlDoc).find('query')
-    let colWidths
+
     if ($queries.length > 1) { // gap analysis
-      $('footer table').css('width', '1000px')
-      $('footer colgroup').append(`
+      $('table', footer).css('width', '1000px')
+      $('colgroup', footer).append(`
         ${'<col width="200"/>'.repeat(2)}
         ${'<col width="300"/>'.repeat(2)}
       `)
-      $('footer thead').append(`
+      $('thead', footer).append(`
         <tr>${'<th><input type="search"></th>'.repeat(4)}</tr>
         <tr>
           <td>${$columns[0].getAttribute('title')}</td>
@@ -25,101 +35,176 @@ function loadView(file) {
           <td>${$queries[1].getAttribute('title')}</td>
         </tr>
       `)
-    } else {
+      tableRow.innerHTML = `
+        <td style="font-weight:bold"></td>
+        <td style="font-style:italic"></td>
+        <td></td><td></td>`
+    } else { // simple or compound view
       let tableWidth = 0
       let titleRow = document.createElement('tr')
       $columns.each(function (i) {
-        let width = $(this).attr('width')
-        if (width) {
-          tableWidth += parseInt(width)
-          $('footer colgroup').append(`<col width="${width}">`)
-        } else {
-          switch ($(this).attr('type')) {
-            case 'date':
-            case 'time':
-            case 'datetime':
-            case 'number':
-              tableWidth += 110
-              break;
-            default:
-              tableWidth += 170
-          }
-          $('footer colgroup').append('<col width="110">')
-        }
         $(titleRow).append(`<td>${$(this).attr('title')}</td>`)
-        /*
-        let align = $(this).attr('type') === 'number' ? 'right' : 'left'
+        let align = $(this).attr('type') === 'number' ? 'right' : ''
         let font = ''
+        let width = '170'
         switch ($(this).attr('type')) {
           case 'date':
           case 'time':
           case 'datetime':
             align = 'center'
           case 'number':
-            font = 'font-family: monospace;'
+            font = ' class="mono"'
+            width = '110'
         }
-        if ($(this).attr('align')) {
-          align = $(this).attr('align')
-        }
-        if ($(this).attr('font') === 'mono') {
-          font = 'font-family: monospace;'
-        }
-        */
+        align = $(this).attr('align') || align
+        if (align)
+          align = ` style="text-align:${align}"`
+        if ($(this).attr('font') === 'mono')
+          font = ' class="mono"'
+        width = $(this).attr('width') || width
+
+        tableWidth += parseInt(width)
+        $('footer colgroup').append(`<col width="${width}">`)
+        $(rowTemplate).append(`<td${font}${align}></td>`)
       })
       $('footer table').css('width', tableWidth + 'px')
       $('footer thead').append(`<tr>${'<th><input type="search"></th>'.repeat($columns.length)}</tr>`)
       $('footer thead').append(titleRow)
-      /*
-            mysql_pool.getConnection((error, cmdb) => {
-              if (error) throw error
-              cmdb.query({
-                sql: $queries.text(),
-                nestTables: '.'
-              }, (error, result, fields) => {
-                if (error) throw error
-                for (let row of result) {
-                  let dataRow = document.createElement('tr')
-                  for (let data in row) {
-                    if (row[data]) {
-                      if (row[data] instanceof Date)
-                        $(dataRow).append(`<td>${row[data].toISOString().substring(0, 10)}</td>`)
-                      else
-                        $(dataRow).append(`<td>${row[data]}</td>`)
-                    } else { // null or emtpy string
-                      $(dataRow).append('<td></td>')
-                    }
-                  }
-                  $('footer tbody').append(dataRow)
-                }
-                cmdb.release();
-              })
-            })
-      */
-      mysql_pool.getConnection((error, cmdb) => {
-        if (error) throw error
-        cmdb.query({
-            sql: $queries.text(),
-            nestTables: '.'
-          }).stream().pipe(require('stream').Transform({
-            objectMode: true,
-            transform: function (row, encoding, callback) {
-              let dataRow = document.createElement('tr')
-              for (let data in row) {
-                if (row[data]) {
-                  if (row[data] instanceof Date)
-                    $(dataRow).append(`<td>${row[data].toISOString().substring(0, 10)}</td>`)
-                  else
-                    $(dataRow).append(`<td>${row[data]}</td>`)
-                } else { // null or emtpy string
-                  $(dataRow).append('<td></td>')
-                }
-              }
-              $('footer tbody').append(dataRow)
-              callback()
-            }
-          }))
-          .on('finish', () => cmdb.release())
-      })
+
+      reloadData()
+      // reloadDataStream()
     }
   })
+}
+
+// refresh dataTable in memory
+function reloadData() {
+  mysql_pool.getConnection((error, cmdb) => {
+    if (error) throw error
+    cmdb.query({
+      sql: $queries.text(),
+      nestTables: '.'
+    }, (error, result, fields) => {
+      if (error) throw error
+      dataTable = []
+      for (let row of result) {
+        let dataRow = [true] // display
+        for (let data in row) {
+          if (row[data]) {
+            if (row[data] instanceof Date)
+              dataRow.push(row[data].toISOString().substring(0, 10))
+            else
+              dataRow.push(row[data].toString())
+          } else { // null or emtpy string
+            dataRow.push('')
+          }
+        }
+        dataTable.push(dataRow)
+      }
+      cmdb.release();
+      filterData()
+    })
+  })
+}
+
+// refresh dataTable in memory
+function reloadDataStream() {
+  if ($queries.length > 1) { // gap analysis
+  } else {
+    mysql_pool.getConnection((error, cmdb) => {
+      if (error) throw error
+      dataTable = []
+      cmdb.query({
+          sql: $queries.text(),
+          nestTables: '.'
+        }).stream().pipe(streamTransform({
+          objectMode: true,
+          transform: function (record, encoding, callback) {
+            let dataRow = [true] // display
+            $.each(record, (field, data) => {
+              if (data) {
+                if (data instanceof Date)
+                  dataRow.push(data.toISOString().substring(0, 10))
+                else
+                  dataRow.push(data.toString())
+              } else { // null or emtpy string
+                dataRow.push('')
+              }
+            })
+            dataTable.push(dataRow)
+            callback()
+          }
+        }))
+        .on('finish', () => {
+          cmdb.release()
+          filterData()
+        })
+    })
+  }
+}
+
+function filterData() {
+  $('#message').text('...')
+  $('tbody', footer).empty()
+  let filters = []
+  $('thead input', footer).each(function (i) {
+    if (this.value) {
+      filters.push({
+        column: i + 1,
+        filter: new RegExp(this.value.replace(/ /g, '.*'), 'im')
+      })
+      console.log(filters);
+    }
+  })
+  let counter = 0
+  let i // column index
+  switch (filters.length) {
+    case 0:
+      for (let row of dataTable) {
+        row[0] = true;
+      }
+      counter = dataTable.length;
+      break;
+    case 1:
+      i = filter[0].column
+      for (let row of dataTable) {
+        row[0] = filter[0].filter.test(row[i].replace(/\n/g, ' '));
+        counter++
+      }
+      break;
+    default:
+      i = filter[0].column
+      for (let row of dataTable) {
+        row[0] = filter[0].filter.test(row[i].replace(/\n/g, ' '));
+      }
+      let last = filters.length - 1
+      for (let f = 1; f < last; f++) {
+        i = filter[f].column
+        for (let row of dataTable) {
+          row[0] = row[0] && filter[f].filter.test(row[i].replace(/\n/g, ' '));
+        }
+      }
+      i = filter[last].column
+      for (let row of dataTable) {
+        row[0] = row[0] && filter[last].filter.test(row[i].replace(/\n/g, ' '));
+        counter++
+      }
+      break;
+  }
+  $('#message').text(counter)
+  displayData()
+}
+
+function displayData() {
+  let tbody = document.createElement('tbody')
+  for (let row of dataTable) {
+    if (row[0]) {
+      let dataRow = rowTemplate.cloneNode(true)
+      $(dataRow).children().each(function (i) {
+        $(this).text(row[i + 1])
+      })
+      tbody.appendChild(dataRow)
+    }
+  }
+  $('tbody', footer).replaceWith(tbody)
 }

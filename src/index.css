@@ -31,12 +31,12 @@ h1 {
   line-height: var(--header-height);
   padding-left: 0.5em;
   background-color: var(--light-background);
+  white-space: nowrap;
 }
 
 h1>span {
   font-size: larger;
   display: inline-block;
-  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -1,3 +1,37 @@
+h1>span:first-child {
+  width: calc(100% - 4em);
+}
+
+#message {
+  width: 3em;
+  text-align: right;
+}
+
+#tool {
+  cursor: pointer;
+}
+
+#tools {
+  position: absolute;
+  top: calc(var(--header-height) - 5px);
+  right: 0;
+  line-height: 1;
+  background-color: white;
+  border: groove thick tan;
+  border-radius: 5px;
+}
+
+#tools span {
+  display: block;
+  padding: 3px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#tools span:hover {
+  background-color: wheat;
+}
+
 table {
   margin-right: 1px;
   table-layout: fixed;
@@ -34,7 +68,9 @@ thead td {
 
 td {
   border: solid thin lightgray;
+  vertical-align: top;
   padding-left: 0.5em;
+  padding-right: 0.5em;
 }
 
 tbody td {
