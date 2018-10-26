@@ -1,13 +1,14 @@
 function loadTask(file) {
-  let $article = $('main>section>article')
-  $article.empty()
+  let $header = $('main>article>header')
+  let $scrollbox = $('main>article>div')
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
     const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
       $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
-    $article.append(`<h1><span>${$(xmlDoc).find('task').attr('title')}</span></h1>`)
+    $header.html(`<h1>${$(xmlDoc).find('task').attr('title')}</h1>`)
+    $scrollbox.empty();
     $(xmlDoc).find('task').children().each(function () {
-      appendSubTask(this, $article[0])
+      appendSubTask(this, $scrollbox[0])
     })
   })
 }

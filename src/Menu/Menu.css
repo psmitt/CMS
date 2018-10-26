@@ -1,21 +1,25 @@
+:root {
+  --menu-padding: 5px;
+}
+
 nav>header {
-  padding: 2px;
+  text-align: center;
 }
 
 #search {
+  height: calc(100% - 2 * var(--menu-padding));
+  width: calc(100% - 2 * var(--menu-padding));
+  border-radius: var(--menu-padding);
+  padding-left: 1.75em;
   background-image: url('magnifier_glass.svg');
   background-size: auto 61.8%;
   background-position: 7px center;
   background-repeat: no-repeat;
-  border-radius: 5px;
-  padding: 5px;
-  padding-left: 2em;
 }
 
 #menu {
-  font-size: larger;
-  height: calc(100% - var(--header-height));
-  overflow-y: auto;
+  padding-left: calc(var(--menu-padding) - 2px);
+  padding-right: var(--menu-padding);
 }
 
 #menu div {
@@ -30,7 +34,7 @@ nav>header {
   line-height: 2;
   width: 100%;
   padding-left: 1em;
-  border-radius: 5px;
+  border-radius: var(--menu-padding);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -43,19 +47,20 @@ nav>header {
 
 #menu span.hit {
   background-color: #d4d4f7; /* dark lavender */
-  background-image: url('triangle_right.svg');
-  background-size: auto 61.8%;
-  background-position: right center;
-  background-repeat: no-repeat;
+  white-space: normal;
+}
+
+#menu mark {
+  background-color: lavender;
 }
 
 #menu .branch {
-  margin-left: -10px;
-  width: calc(100% + 10px);
-  background-size: auto 61.8%;
-  background-position: 12px center;
+  margin-left: calc(-2 * var(--menu-padding));
+  width: calc(100% + 2 * var(--menu-padding));
+  background-size: auto 50%;
+  background-position: 0.5em center;
   background-repeat: no-repeat;
-  padding-left: 43px;
+  padding-left: 1.8em;
 }
 
 #menu .collapsed {
@@ -66,8 +71,4 @@ nav>header {
 }
 #menu .filtered {
   background-image: url('triangle_down_right.svg');
-}
-
-#menu mark {
-  background-color: lavender;
 }

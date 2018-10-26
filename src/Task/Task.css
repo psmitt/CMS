@@ -1,19 +1,19 @@
-article > div {
-  padding-right: 35px; /* scroll bar */
+article .scrollbox {
+  padding-right: 50px; /* line wrap before the scroll bar */
 }
 
-article div div {
+article .scrollbox div {
   margin-left: 1.5em;
 }
 
 article input {
   height: 1em;
   width: 1em;
-  margin: 0.5em;
+  margin: 0.6em;
   vertical-align: top;
 }
 
-article div span {
+article span {
   display: inline-block;
   line-height: 1.5;
   padding-top: 0.3em;
@@ -21,6 +21,12 @@ article div span {
 }
 
 article button {
+  font-family: inherit;
+  font-size: large;
+  font-weight: bold;
+  height: 1.75em;
   margin-left: 1em;
-  vertical-align: text-top;
+  padding-bottom: 4px;
+  vertical-align:text-top;
+  border-radius: 5px;
 }

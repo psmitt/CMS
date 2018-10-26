@@ -1,7 +1,7 @@
 :root {
-  --font-size: large;
-  --nav-width: 20em;
-  --header-height: 2.5em;
+  --font-size: x-large;
+  --nav-width: 15em;
+  --header-height: 2em;
   --aside-width: 10em;
   --light-background: white;
   --light-color: black;
@@ -23,11 +23,8 @@ header {
   z-index: 1;
   position: sticky;
   top: 0;
-  left: 0;
-  margin: 0;
   height: var(--header-height);
   line-height: var(--header-height);
-  background-color: var(--light-background);
   white-space: nowrap;
 }
 
@@ -35,9 +32,21 @@ header>h1 {
   font-size: larger;
   display: inline-block;
   margin: 0;
+  margin-left: 0.25em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+div.scrollbox {
+  box-sizing: border-box;
+  position: absolute;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 table {
@@ -47,6 +56,7 @@ table {
 }
 
 input {
+  height: 100%;
   width: 100%;
   border-color: lightgray;
   border-style: solid;
@@ -64,62 +74,54 @@ input:focus {
 
 nav {
   box-sizing: border-box;
-  position: fixed;
+  position  : fixed;
+  left: 0;
   top: 0;
   bottom: 0;
-  left: 0;
   width: var(--nav-width);
-  padding-left: 5px;
+}
+
+body>header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: var(--nav-width);
+  background-color: brown;
 }
 
 main {
   box-sizing: border-box;
-  background-color: orange;
   position: fixed;
-  top: 0;
-  bottom: 0;
   right: 0;
-  width: calc(100% - var(--nav-width));
+  bottom: 0;
+  top: var(--header-height);
+  left: var(--nav-width);
+  background-color: orange;
 }
 
-main>header {
-  background-color: brown;
+main>article {
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 50%;
+  right: var(--aside-width);
+  min-width: 50%;
+  background-color: lightblue;
+  white-space: nowrap;
 }
 
 main>section {
   box-sizing: border-box;
   position: absolute;
-  top: var(--header-height);
-  bottom: 0;
-  width: 100%;
-  background-color: lightyellow;
-}
-
-main>section>article {
-  box-sizing: border-box;
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 50%;
-  width: calc(100% - var(--aside-width));
-  min-width: 50%;
-  background-color: lightblue;
-  white-space: nowrap;
-  overflow-x: hidden;
-}
-
-main>section>footer {
-  box-sizing: border-box;
-  position: absolute;
   left: 0;
   bottom: 0;
+  right: var(--aside-width);
   height: 50%;
-  width: calc(100% - var(--aside-width));
   min-width: 50%;
-  overflow: auto;
 }
 
-main>section>aside {
+main>aside {
   box-sizing: border-box;
   position: absolute;
   right: 0;
@@ -128,5 +130,4 @@ main>section>aside {
   background-color: lightgreen;
   width: var(--aside-width);
   max-width: 50%;
-  overflow-y: auto;
 }
