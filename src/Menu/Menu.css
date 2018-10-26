@@ -1,32 +1,35 @@
+nav>header {
+  padding: 2px;
+}
+
 #search {
-  width: 100%;
   background-image: url('magnifier_glass.svg');
   background-size: auto 61.8%;
   background-position: 7px center;
   background-repeat: no-repeat;
-
   border-radius: 5px;
-
-  padding: 10px;
-  padding-left: 40px;
+  padding: 5px;
+  padding-left: 2em;
 }
 
 #menu {
   font-size: larger;
+  height: calc(100% - var(--header-height));
+  overflow-y: auto;
 }
 
 #menu div {
   line-height: 0;
-  margin-left: 10px;
+  margin-left: 0.5em;
   cursor: pointer;
 }
 
 #menu span {
-  display: inline-block;
   box-sizing: border-box;
+  display: inline-block;
   line-height: 2;
   width: 100%;
-  padding-left: 24px;
+  padding-left: 1em;
   border-radius: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
