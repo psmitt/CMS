@@ -1,49 +1,59 @@
 function loadMenuFiles(folder) {
-  $('#menu').empty()
+  // remove previous menu
+  let menu = document.getElementById('menu')
+  while (menu.firstChild)
+    menu.removeChild(menu.firstChild)
+  // load new menu
   fs.readdir(folder, (error, files) => {
     if (error) throw error
     for (let file of files) {
       if (fs.statSync(path.join(folder, file)).isFile()) {
         let xmlString = fs.readFileSync(path.join(folder, file), 'utf8')
-        const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-          $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
-        $(xmlDoc).children().each(function () {
-          appendSubMenu($(this), document.getElementById('menu'))
-        })
+        const xmlDoc = new DOMParser().parseFromString(
+          xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+          xmlString.substring(1) : xmlString, 'text/xml')
+        for (let subMenu of xmlDoc.children) {
+          appendSubMenu(subMenu, menu)
+        }
       }
     }
-    $Menu = $('.branch, .item')
   })
 }
 
 // append submenu to root node
-function appendSubMenu($submenu, parent) {
+function appendSubMenu(subMenu, parentMenu) {
   let node = document.createElement('div')
-  if ($submenu.children().length) {
-    node.innerHTML = `<span class="branch expanded">${$submenu.attr('title')}</span>`
-    $submenu.children().each(function () {
-      appendSubMenu($(this), node)
-    })
+  if (subMenu.children.length) {
+    node.innerHTML = `<span class="branch expanded">${subMenu.attributes.title.value}</span>`
+    for (let item of subMenu.children) {
+      appendSubMenu(item, node)
+    }
   } else {
     let onclick = 'onclick='
-    switch ($submenu.attr('class')) {
+    if (subMenu.attributes.class) switch (subMenu.attributes.class.value) {
       case 'task':
-        onclick += `"loadTask('${path.join(rootDir, 'Task', $submenu.attr('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+        onclick += `"loadTask('${path.join(rootDir, 'Task', subMenu.attributes.order.value + '.xml').replace(/\\/g, '\\\\')}')"`
+        break;
       case 'view':
-        onclick += `"loadView('${path.join(rootDir, 'View', $submenu.attr('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+        onclick += `"loadView('${path.join(rootDir, 'View', subMenu.attributes.order.value + '.xml').replace(/\\/g, '\\\\')}')"`
+        break;
+    } else {
+      onclick = ''
     }
-    node.innerHTML = `<span class="item" ${onclick}>${$submenu.attr('title')}</span>`
+    node.innerHTML = `<span class="item" ${onclick}>${subMenu.attributes.title.value}</span>`
   }
-  parent.appendChild(node)
+  parentMenu.appendChild(node)
 }
 
-$('#search').on('input', function () {
-  $('.hit').removeClass('hit')
+document.getElementById('search').addEventListener('input', function () {
+  for (let hit of document.getElementsByClassName('hit')) {
+    hit.classList.remove('hit')
+  }
   let term = $(this).val().trim()
   if (term) {
     let words = term.split(' ').map(word => new RegExp(word, 'i'))
     let pattern = new RegExp('(' + term.replace(/ /g, '|') + ')', 'ig')
-    $Menu.each(function (i) {
+    $('.branch, .item').each(function (i) {
       let text = this.textContent
       let hit = true
       for (let word of words) {
@@ -55,7 +65,7 @@ $('#search').on('input', function () {
     $('#menu div').not(':has(mark)').hide()
     $($('.item:has(mark)')[0]).addClass('hit')
   } else {
-    $Menu.each(function (i) {
+    $('.branch, .item').each(function (i) {
       this.innerHTML = this.textContent
     })
     $('#menu div').show()

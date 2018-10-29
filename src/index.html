@@ -102,8 +102,17 @@
       </div>
     </article>
     <section>
-      <header><h1>Table</h1></header>
-      <div class="scrollbox">
+      <header>
+        <h1 title="Table">Table</h1>
+        <span id="message"></span>
+        <span id="tool" title="Tools">&#9776;</span>
+        <div id="tools">
+          <span>Reload Data</span>
+          <span>Export XLSX</span>
+          <span>Clear Filters</span>
+        </div>
+      </header>
+      <div class="scrollbox horizontal">
         <table style="width:750px">
           <colgroup>
             <col style="width:200px">
@@ -210,6 +219,9 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="scrollbox vertical">
+        <div class="empty"></div>
       </div>
     </section>
     <aside>

@@ -1,32 +1,35 @@
-const streamTransform = require('stream').Transform
-
-const footer = $('main>section>footer')[0]
+const title = $('main>section>header>h1')[0]
+const $table = $('main>section>div.scrollbox>table')
+const $colgroup = $('main>section>div.scrollbox>table>colgroup')
+const $thead = $('main>section>div.scrollbox>table>thead')
+const $tbody = $('main>section>div.scrollbox>table>tbody')
 
 let $queries // actual XML queries
 let dataTable // memory array of data rows with display property
 let rowTemplate // empty row template
 
 function loadView(file) {
-  footer.innerHTML = fs.readFileSync('src/View/View.html', 'utf8') // emtpy template
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
     const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
       $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
 
-    $('h1>span:first-child')[0].title = $(xmlDoc).find('view').attr('title')
-    $('h1>span:first-child').text($(xmlDoc).find('view').attr('title'))
+    title.textContent = title.title = $(xmlDoc).find('view').attr('title')
+    $colgroup.empty()
+    $thead.empty()
+    $tbody.empty()
 
     $queries = $(xmlDoc).find('query')
     rowTemplate = document.createElement('tr')
     let $columns = $(xmlDoc).find('column')
 
     if ($queries.length > 1) { // gap analysis
-      $('table', footer).css('width', '1000px')
-      $('colgroup', footer).append(`
+      $table.css('width', '1000px')
+      $colgroup.append(`
         ${'<col width="200"/>'.repeat(2)}
         ${'<col width="300"/>'.repeat(2)}
       `)
-      $('thead', footer).append(`
+      $thead.append(`
         <tr>${'<th><input type="search"></th>'.repeat(4)}</tr>
         <tr>
           <td>${$columns[0].getAttribute('title')}</td>
@@ -35,7 +38,7 @@ function loadView(file) {
           <td>${$queries[1].getAttribute('title')}</td>
         </tr>
       `)
-      tableRow.innerHTML = `
+      rowTemplate.innerHTML = `
         <td style="font-weight:bold"></td>
         <td style="font-style:italic"></td>
         <td></td><td></td>`
@@ -64,12 +67,12 @@ function loadView(file) {
         width = $(this).attr('width') || width
 
         tableWidth += parseInt(width)
-        $('footer colgroup').append(`<col width="${width}">`)
+        $colgroup.append(`<col width="${width}">`)
         $(rowTemplate).append(`<td${font}${align}></td>`)
       })
-      $('footer table').css('width', tableWidth + 'px')
-      $('footer thead').append(`<tr>${'<th><input type="search"></th>'.repeat($columns.length)}</tr>`)
-      $('footer thead').append(titleRow)
+      $table.css('width', tableWidth + 'px')
+      $thead.append(`<tr>${'<th><input type="search"></th>'.repeat($columns.length)}</tr>`)
+      $thead.append(titleRow)
 
       reloadData()
       // reloadDataStream()
@@ -107,47 +110,11 @@ function reloadData() {
   })
 }
 
-// refresh dataTable in memory
-function reloadDataStream() {
-  if ($queries.length > 1) { // gap analysis
-  } else {
-    mysql_pool.getConnection((error, cmdb) => {
-      if (error) throw error
-      dataTable = []
-      cmdb.query({
-          sql: $queries.text(),
-          nestTables: '.'
-        }).stream().pipe(streamTransform({
-          objectMode: true,
-          transform: function (record, encoding, callback) {
-            let dataRow = [true] // display
-            $.each(record, (field, data) => {
-              if (data) {
-                if (data instanceof Date)
-                  dataRow.push(data.toISOString().substring(0, 10))
-                else
-                  dataRow.push(data.toString())
-              } else { // null or emtpy string
-                dataRow.push('')
-              }
-            })
-            dataTable.push(dataRow)
-            callback()
-          }
-        }))
-        .on('finish', () => {
-          cmdb.release()
-          filterData()
-        })
-    })
-  }
-}
-
 function filterData() {
   $('#message').text('...')
-  $('tbody', footer).empty()
+  $tbody.empty()
   let filters = []
-  $('thead input', footer).each(function (i) {
+  $('input', $thead).each(function (i) {
     if (this.value) {
       filters.push({
         column: i + 1,
@@ -194,21 +161,38 @@ function filterData() {
   displayData()
 }
 
+
+let firstRowIndex // dataTable index of the first row in tbody
+let lastRowIndex // dataTable index of the last row in tbody
+function virtualScroll() {
+  let boxTop = document.querySelector('section>div.scrollbox.horizontal')
+}
+
 function displayData() {
-  let tbody = document.createElement('tbody')
-  let countRows = 0
-  for (let row of dataTable) {
-    if (row[0]) {
+  let start = new Date().getTime();
+  $tbody.empty()
+  let fragment = document.createDocumentFragment()
+  let row = 0
+  while (row < dataTable.length) {
+    while (row < dataTable.length && !dataTable[row][0]) {
+      row++
+    }
+    if (row >= dataTable.length) {
+      break
+    } else {
       let dataRow = rowTemplate.cloneNode(true)
-      $(dataRow).children().each(function (i) {
-        $(this).text(row[i + 1])
-      })
-      tbody.appendChild(dataRow)
-      if (countRows++ > 100)
-        break;
+      let node = dataRow.firstChild
+      let columns = $colgroup.children().length
+      for (let i = 1; i <= columns; i++) {
+        node.innerHTML = dataTable[row][i]
+        node = node.nextSibling
+      }
+      fragment.appendChild(dataRow)
+      row++
     }
   }
-  $('tbody', footer).replaceWith(tbody)
+  $tbody[0].appendChild(fragment)
+  console.log(title.title, (new Date().getTime()) - start);
 }
 
 $(document.body).on('click', '#tool', function () {
@@ -217,3 +201,9 @@ $(document.body).on('click', '#tool', function () {
 })
 
 $(document.body).on('input', 'main>section>footer input[type="search"]', filterData)
+
+$('section>div.scrollbox.horizontal').on('scroll', function () {
+  let posS = this.parentNode.getBoundingClientRect()
+  let posT = $table[0].getBoundingClientRect()
+  console.log(posT.top - posS.top, posT.bottom - posS.bottom);
+})

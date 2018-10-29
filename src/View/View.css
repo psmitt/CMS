@@ -1,19 +1,19 @@
-
-h1, thead th, thead td {
-  z-index: 1;
-  transform: translate3d(0,0,0);
-}
-
-h1>span:first-child {
+section>header>h1 {
   width: calc(100% - 4em);
 }
 
 #message {
+  position: absolute;
+  right: 1em;
   width: 3em;
   text-align: right;
+  vertical-align: top;
 }
 
 #tool {
+  position: absolute;
+  top: 0;
+  right: 0;
   cursor: pointer;
   user-select: none;
 }
@@ -41,46 +41,41 @@ h1>span:first-child {
   background-color: wheat;
 }
 
-table {
-  margin-right: 1px;
-  table-layout: fixed;
+section>div.scrollbox.horizontal {
+  overflow-x: auto;
+  padding-right: var(--scrollbar-width);
 }
 
-:root {
-  --row-height: 1.5em;
+section>div.scrollbox.vertical {
+  width: var(--scrollbar-width);
+  left: auto;
 }
 
-thead th { /* filter row */
+section>div.scrollbox>div.empty {
+  height: 100%;
+  border: solid; /* ensure minimal width to be scrollable */
+}
+
+section thead th, /* filter row */
+section thead td {/* title row */
+  z-index: 1;
+  transform: translate3d(0,0,0);
   position: sticky;
-  top: var(--header-height);
-  height: var(--row-height);
   background-color: var(--light-background);
+  height: 1.5em;
+  top: 0;
 }
 
-thead td { /* title row */
-  position: sticky;
-  height: var(--row-height);
-  top: calc(var(--header-height) + var(--row-height) + 3px);
-  background-color: var(--light-background);
+section thead td {/* title row */
+  top: 1.55em;
   border: none;
-}
-
-thead input {
-  margin: 1px;
-  width: 100%;
-}
-
-thead td {
   font-weight: bold;
 }
 
-td {
+section tbody td {
   border: solid thin lightgray;
   vertical-align: top;
   padding-left: 0.5em;
   padding-right: 0.5em;
-}
-
-tbody td {
   white-space: pre-wrap;
 }
