@@ -1,20 +1,35 @@
+:root {
+  --article-margin: 0.5em;
+  --div-margin: 1.6em;
+  --input-margin: 0.6em; /* aligned to line-height */
+}
+
 article .scrollbox {
-  padding-right: 50px; /* line wrap before the scroll bar */
+  white-space: normal;
+  margin-left: var(--article-margin);
 }
 
 article .scrollbox div {
-  margin-left: 1.5em;
+  position: relative;
+  white-space: nowrap;
+}
+
+article .scrollbox div div {
+  margin-left: var(--div-margin);
 }
 
 article input {
   height: 1em;
   width: 1em;
-  margin: 0.6em;
+  margin: var(--input-margin);
+  margin-left: 0.3em; /* aligned to article margin */
   vertical-align: top;
 }
 
 article span {
   display: inline-block;
+  position: relative;
+  width: calc(100% - var(--div-margin) - var(--input-margin));
   line-height: 1.5;
   padding-top: 0.3em;
   white-space: normal;
@@ -25,8 +40,12 @@ article button {
   font-size: large;
   font-weight: bold;
   height: 1.75em;
-  margin-left: 1em;
   padding-bottom: 4px;
   vertical-align: text-top;
   border-radius: 5px;
+}
+
+article h2 {
+  font-size: larger;
+  font-style: italic;
 }

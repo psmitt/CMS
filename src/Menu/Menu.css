@@ -25,7 +25,6 @@ nav>header {
 #menu div {
   line-height: 0;
   margin-left: 0.5em;
-  cursor: pointer;
 }
 
 #menu span {
@@ -38,6 +37,7 @@ nav>header {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 #menu span:hover {

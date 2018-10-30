@@ -1,47 +1,58 @@
 function loadTask(file) {
-  let $header = $('main>article>header')
-  let $scrollbox = $('main>article>div')
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
-    const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-      $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
-    $header.html(`<h1>${$(xmlDoc).find('task').attr('title')}</h1>`)
-    $scrollbox.empty();
-    $(xmlDoc).find('task').children().each(function () {
-      appendSubTask(this, $scrollbox[0])
-    })
+    const xmlDoc = new DOMParser().parseFromString(
+      xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+      xmlString.substring(1) : xmlString, 'text/xml')
+    document.querySelector('main>article>header').innerHTML =
+      `<h1>${xmlDoc.querySelector('task').attributes['title'].value}</h1>`
+    let scrollbox = document.querySelector('main>article>div.scrollbox')
+    while (scrollbox.firstChild)
+      scrollbox.removeChild(scrollbox.firstChild)
+    $(scrollbox).scrollTop()
+    for (let steps of xmlDoc.querySelector('task').children) {
+      appendSteps(steps, scrollbox)
+    }
   })
 }
 
-// append subtask to root node
-function appendSubTask(step, parent) {
-  let node = document.createElement('div')
-  if (step.tagName === 'option')
-    node.innerHTML = '<input type="radio"/>'
-  else
-    node.innerHTML = '<input type="checkbox"/>'
+function appendSteps(step, parent) {
+  let node // to append
   switch (step.tagName) {
     case 'comment':
-      if ($('Comment', parent).length === 0)
-        $(parent).append('<h2 class="Comments">Comments</h2>')
-      $(parent).append('<p class="comment">${step}</p>')
-      break;
-    case 'verification':
-      $(parent).append('<h2 class="Verification">Verification</h2>')
-    default:
-      if (step.tagName !== 'verification') { // action, decision, option
-        let span = `<span>${step.firstElementChild.textContent}` // todo, question, answer
-        $(step).children('button').each(function () {
-          span += `<button>${$(this).attr('title')}</button>`
-        })
-        $(node).append(span + '</span>')
+      if (!parent.querySelector('.Comments')) {
+        node = document.createElement('h2')
+        node.className = node.textContent = 'Comments'
+        parent.appendChild(node);
       }
-      $(step).children('option').each(function () {
-        appendSubTask(this, node)
-      })
-      $(step).children('action, decision').each(function () {
-        appendSubTask(this, node)
-      })
+      node = document.createElement('p')
+      node.innerHTML = step.textContent
+      break
+    case 'verification':
+      node = document.createElement('h2')
+      node.className = node.textContent = 'Verification'
+      parent.appendChild(node);
+      for (let each of step.children) {
+        appendSteps(each, parent)
+      }
+      return
+    default: // action, decision, option
+      node = document.createElement('div')
+      if (step.tagName === 'option')
+        node.innerHTML = '<input type="radio"/>'
+      else
+        node.innerHTML = '<input type="checkbox"/>'
+      let span = document.createElement('span')
+      let child = step.firstElementChild // todo, question, answer
+      let text = child.textContent
+      while ((child = child.nextElementSibling) && child.tagName === 'button')
+        text += `&ensp;<button>${child.attributes['title'].value}</button>`
+      span.innerHTML = text
+      node.appendChild(span)
+      while (child) {
+        appendSteps(child, node)
+        child = child.nextElementSibling
+      }
   }
   parent.appendChild(node);
 }

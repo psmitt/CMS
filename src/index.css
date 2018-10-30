@@ -73,6 +73,10 @@ input:focus {
   border-color: deepskyblue;
 }
 
+button {
+  white-space: nowrap;
+}
+
 nav {
   box-sizing: border-box;
   position  : fixed;
