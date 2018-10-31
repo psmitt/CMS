@@ -1,78 +1,100 @@
-const title = $('main>section>header>h1')[0]
-const $table = $('main>section>div.scrollbox>table')
-const $colgroup = $('main>section>div.scrollbox>table>colgroup')
-const $thead = $('main>section>div.scrollbox>table>thead')
-const $tbody = $('main>section>div.scrollbox>table>tbody')
+const title = document.querySelector('main>section>header>h1')
+const table = document.querySelector('main>section>div.scrollbox>table')
+const colgroup = document.querySelector('main>section>div.scrollbox>table>colgroup')
+const thead = document.querySelector('main>section>div.scrollbox>table>thead')
+const tbody = document.querySelector('main>section>div.scrollbox>table>tbody')
 
-let $queries // actual XML queries
+let queries // actual XML queries
 let dataTable // memory array of data rows with display property
 let rowTemplate // empty row template
 
 function loadView(file) {
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
-    const xmlDoc = xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-      $.parseXML(xmlString.substring(1)) : $.parseXML(xmlString)
+    const xmlDoc = new DOMParser().parseFromString(
+      xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+      xmlString.substring(1) : xmlString, 'text/xml')
+    title.textContent = title.title =
+      xmlDoc.querySelector('view').attributes['title'].value
+    while (colgroup.firstChild)
+      colgroup.removeChild(colgroup.firstChild)
+    while (thead.firstChild)
+      thead.removeChild(thead.firstChild)
+    while (tbody.firstChild)
+      tbody.removeChild(tbody.firstChild)
 
-    title.textContent = title.title = $(xmlDoc).find('view').attr('title')
-    $colgroup.empty()
-    $thead.empty()
-    $tbody.empty()
+    let columns = xmlDoc.querySelectorAll('column')
 
-    $queries = $(xmlDoc).find('query')
+    let filterRow = document.createElement('tr')
+    let filterCell = document.createElement('th')
+    let filter = document.createElement('input')
+    filter.type = 'search'
+    filterCell.appendChild(filter)
+
+    let titleRow = document.createElement('tr')
+
+    queries = xmlDoc.querySelectorAll('query')
     rowTemplate = document.createElement('tr')
-    let $columns = $(xmlDoc).find('column')
 
-    if ($queries.length > 1) { // gap analysis
-      $table.css('width', '1000px')
-      $colgroup.append(`
-        ${'<col width="200"/>'.repeat(2)}
-        ${'<col width="300"/>'.repeat(2)}
-      `)
-      $thead.append(`
-        <tr>${'<th><input type="search"></th>'.repeat(4)}</tr>
-        <tr>
-          <td>${$columns[0].getAttribute('title')}</td>
+    if (queries.length > 1) { // gap analysis
+
+      table.style.width = '1000px'
+      colgroup.innerHTML = `${'<col width="200"/>'.repeat(2)}
+                            ${'<col width="300"/>'.repeat(2)}`
+
+      for (let col = 0; col < 4; col++)
+        filterRow.appendChild(filterCell.cloneNode(true))
+      thead.appendChild(filterRow)
+
+      titleRow.innerHTML = `
+          <td>${columns[0].attributes['title'].value}</td>
           <td data-title="Data">Data</td>
-          <td>${$queries[0].getAttribute('title')}</td>
-          <td>${$queries[1].getAttribute('title')}</td>
-        </tr>
-      `)
-      rowTemplate.innerHTML = `
-        <td style="font-weight:bold"></td>
-        <td style="font-style:italic"></td>
-        <td></td><td></td>`
+          <td>${queries[0].attributes['title'].value}</td>
+          <td>${queries[1].attributes['title'].value}</td>`
+      thead.appendChild(titleRow)
+
+      rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
+                               <td style="font-style:italic"></td>
+                               <td></td><td></td>`
+
     } else { // simple or compound view
+
       let tableWidth = 0
-      let titleRow = document.createElement('tr')
-      $columns.each(function (i) {
-        $(titleRow).append(`<td>${$(this).attr('title')}</td>`)
-        let align = $(this).attr('type') === 'number' ? 'right' : ''
+      for (let column of columns) {
+        const get = attribute => // read attribute
+          column.attributes[attribute] ?
+          column.attributes[attribute].value : null
+
+        filterRow.appendChild(filterCell.cloneNode(true))
+
+        let title = document.createElement('td')
+        title.textContent = get('title')
+        titleRow.appendChild(title)
+
+        let datacell = document.createElement('td')
+        let align = get('type') === 'number' ? 'right' : ''
         let font = ''
         let width = '170'
-        switch ($(this).attr('type')) {
+        switch (get('type')) {
           case 'date':
           case 'time':
           case 'datetime':
             align = 'center'
           case 'number':
-            font = ' class="mono"'
+            font = 'mono'
             width = '110'
         }
-        align = $(this).attr('align') || align
-        if (align)
-          align = ` style="text-align:${align}"`
-        if ($(this).attr('font') === 'mono')
-          font = ' class="mono"'
-        width = $(this).attr('width') || width
+        datacell.style.textAlign = get('align') || align
+        datacell.className = font
+        rowTemplate.appendChild(datacell)
 
-        tableWidth += parseInt(width)
-        $colgroup.append(`<col width="${width}">`)
-        $(rowTemplate).append(`<td${font}${align}></td>`)
-      })
-      $table.css('width', tableWidth + 'px')
-      $thead.append(`<tr>${'<th><input type="search"></th>'.repeat($columns.length)}</tr>`)
-      $thead.append(titleRow)
+        let col = document.createElement('col')
+        tableWidth += parseInt(col.style.width = (get('width') || width) + 'px')
+        colgroup.appendChild(col)
+      }
+      table.style.width = tableWidth + 'px'
+      thead.appendChild(filterRow)
+      thead.appendChild(titleRow)
 
       reloadData()
       // reloadDataStream()
@@ -85,7 +107,7 @@ function reloadData() {
   mysql_pool.getConnection((error, cmdb) => {
     if (error) throw error
     cmdb.query({
-      sql: $queries.text(),
+      sql: queries[0].textContent,
       nestTables: '.'
     }, (error, result, fields) => {
       if (error) throw error
@@ -112,15 +134,13 @@ function reloadData() {
 
 function filterData() {
   $('#message').text('...')
-  $tbody.empty()
   let filters = []
-  $('input', $thead).each(function (i) {
-    if (this.value) {
+  thead.querySelectorAll('input').forEach((input, index) => {
+    if (input.value)
       filters.push({
-        column: i + 1,
-        filter: new RegExp(this.value.replace(/ /g, '.*'), 'im')
+        column: index + 1,
+        filter: new RegExp(input.value.replace(/ /g, '.*'), 'im')
       })
-    }
   })
   let counter = 0
   let i // column index
@@ -170,7 +190,8 @@ function virtualScroll() {
 
 function displayData() {
   let start = new Date().getTime();
-  $tbody.empty()
+  while (tbody.firstChild)
+    tbody.removeChild(tbody.firstChild)
   let fragment = document.createDocumentFragment()
   let row = 0
   while (row < dataTable.length) {
@@ -182,7 +203,7 @@ function displayData() {
     } else {
       let dataRow = rowTemplate.cloneNode(true)
       let node = dataRow.firstChild
-      let columns = $colgroup.children().length
+      let columns = colgroup.children.length
       for (let i = 1; i <= columns; i++) {
         node.innerHTML = dataTable[row][i]
         node = node.nextSibling
@@ -191,7 +212,7 @@ function displayData() {
       row++
     }
   }
-  $tbody[0].appendChild(fragment)
+  tbody.appendChild(fragment)
   console.log(title.title, (new Date().getTime()) - start);
 }
 
@@ -204,6 +225,6 @@ $(document.body).on('input', 'main>section>footer input[type="search"]', filterD
 
 $('section>div.scrollbox.horizontal').on('scroll', function () {
   let posS = this.parentNode.getBoundingClientRect()
-  let posT = $table[0].getBoundingClientRect()
+  let posT = table.getBoundingClientRect()
   console.log(posT.top - posS.top, posT.bottom - posS.bottom);
 })

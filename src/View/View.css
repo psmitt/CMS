@@ -79,3 +79,8 @@ section tbody td {
   padding-right: 0.5em;
   white-space: pre-wrap;
 }
+
+.mono {
+  font-family: monospace;
+  width: 500px;
+}
