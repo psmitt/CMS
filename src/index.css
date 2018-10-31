@@ -101,7 +101,6 @@ main {
   bottom: 0;
   top: var(--header-height);
   left: var(--nav-width);
-  background-color: orange;
 }
 
 main>article {

@@ -1,8 +1,15 @@
-const title = document.querySelector('main>section>header>h1')
-const table = document.querySelector('main>section>div.scrollbox>table')
-const colgroup = document.querySelector('main>section>div.scrollbox>table>colgroup')
-const thead = document.querySelector('main>section>div.scrollbox>table>thead')
-const tbody = document.querySelector('main>section>div.scrollbox>table>tbody')
+const header = document.querySelector('main>section>header')
+const title = header.querySelector('h1')
+const message = header.querySelector('.message')
+const tool = header.querySelector('.tool')
+const tools = header.querySelector('.tools')
+
+const scrollbox = document.querySelector('main>section>div.scrollbox.horizontal')
+const scrollbar = document.querySelector('main>section>div.scrollbox.vertical')
+const table = scrollbox.querySelector('table')
+const colgroup = table.querySelector('colgroup')
+const thead = table.querySelector('thead')
+const tbody = table.querySelector('tbody')
 
 let queries // actual XML queries
 let dataTable // memory array of data rows with display property
@@ -97,7 +104,6 @@ function loadView(file) {
       thead.appendChild(titleRow)
 
       reloadData()
-      // reloadDataStream()
     }
   })
 }
@@ -133,7 +139,7 @@ function reloadData() {
 }
 
 function filterData() {
-  $('#message').text('...')
+  message.textContent = '...'
   let filters = []
   thead.querySelectorAll('input').forEach((input, index) => {
     if (input.value)
@@ -146,50 +152,126 @@ function filterData() {
   let i // column index
   switch (filters.length) {
     case 0:
-      for (let row of dataTable) {
+      for (let row of dataTable)
         row[0] = true;
-      }
       counter = dataTable.length;
-      break;
+      break
     case 1:
       i = filters[0].column
-      for (let row of dataTable) {
+      for (let row of dataTable)
         if (row[0] = filters[0].filter.test(row[i].replace(/\n/g, ' ')))
           counter++
-      }
-      break;
+      break
     default:
       i = filters[0].column
-      for (let row of dataTable) {
-        row[0] = filters[0].filter.test(row[i].replace(/\n/g, ' '));
-      }
+      for (let row of dataTable)
+        row[0] = filters[0].filter.test(row[i].replace(/\n/g, ' '))
       let last = filters.length - 1
       for (let f = 1; f < last; f++) {
         i = filters[f].column
-        for (let row of dataTable) {
-          row[0] = row[0] && filters[f].filter.test(row[i].replace(/\n/g, ' '));
-        }
+        for (let row of dataTable)
+          row[0] = row[0] && filters[f].filter.test(row[i].replace(/\n/g, ' '))
       }
       i = filters[last].column
-      for (let row of dataTable) {
+      for (let row of dataTable)
         if (row[0] = row[0] && filters[last].filter.test(row[i].replace(/\n/g, ' ')))
           counter++
-      }
-      break;
+      break
   }
-  $('#message').text(counter)
+  message.textContent = counter
   displayData()
+  console.log(scrollbox.getBoundingClientRect());
+  console.log(thead.getBoundingClientRect());
 }
-
 
 let firstRowIndex // dataTable index of the first row in tbody
 let lastRowIndex // dataTable index of the last row in tbody
 function virtualScroll() {
-  let boxTop = document.querySelector('section>div.scrollbox.horizontal')
+  if (tbody.children.lenght <= 1)
+    return
+  // when table has multiple rows...
+  let viewPort = scrollbox.getBoundingClientRect()
+  viewPort.top += thead.getBoundingClientRect().height
+  if (viewPort.top > viewPort.bottom)
+    viewPort.top = viewPort.bottom
+  // fill down
+  let bottomRow = tbody.lastElementChild.getBoundingClientRect()
+  let lastIndex = lastRowIndex
+  while (bottomRow.top <= viewPort.bottom) {
+    while (++lastIndex < dataTable.length) {
+      if (dataTable[lastIndex][0])
+        break
+    }
+    if (dataTable[lastIndex][0]) {
+      let newRow = rowTemplate.cloneNode(true)
+      newRow.dataset.index = lastRowIndex = lastIndex
+      newRow.children.forEach((cell, index) => {
+        cell.innerHTML = dataTable[lastIndex][index + 1]
+      })
+      tbody.appendChild(newNode)
+      bottomRow = tbody.lastElementChild.getBoundingClientRect()
+    } else {
+      // fill up
+      topRow = tbody.firstElementChild.getBoundingClientRect()
+      firstIndex = firstRowIndex
+      while (bottomRow.bottom < viewPort.bottom) {
+        while (firstIndex > 0) {
+          if (dataTable[--firstIndex][0])
+            break
+        }
+        if (dataTable[firstIndex][0]) {
+          let newRow = rowTemplate.cloneNode(true)
+          newRow.dataset.index = firstRowIndex = firstIndex
+          newRow.children.forEach((cell, index) => {
+            cell.innerHTML = dataTable[firstIndex][index + 1]
+          })
+          tbody.insertBefore(newNode, tbody.firstElementChild)
+          topRow = tbody.firstElementChild.getBoundingClientRect()
+        } else {
+          // table.height < scrollbox.height => no more scrolling
+          return
+        }
+      }
+      // scroll to bottom
+      scrollbox.scrollTop = bottomRow.bottom - viewPort.bottom
+      break
+    }
+  }
+  // adjust top padding rows
+  let secondRow = tbody.firstElementChild.nextSibling.getBoundingClientRect()
+  while (secondRow.bottom < viewPort.top) { // remove top padding rows
+    tbody.removeChild(tbody.firstElementChild)
+    firstRowIndex = tbody.firstElementChild.dataset.index
+    secondRow = tbody.firstElementChild.nextSibling.getBoundingClientRect()
+    // adjust scrolling?
+  }
+  if (secondRow.top >= viewPort.top) { // insert top padding row
+    let firstIndex = firstRowIndex
+    while (firstIndex > 0) {
+      if (dataTable[--firstIndex][0])
+        break
+    }
+    if (dataTable[firstIndex][0]) {
+      let newRow = rowTemplate.cloneNode(true)
+      newRow.dataset.index = firstRowIndex = firstIndex
+      newRow.children.forEach((cell, index) => {
+        cell.innerHTML = dataTable[firstIndex][index + 1]
+      })
+      tbody.insertBefore(newNode, tbody.firstElementChild)
+      // adjust scrolling?
+    }
+  }
+  // adjust (remove) bottom padding rows
+  secondRow = tbody.lastElementChild.previousSibling.getBoundingClientRect()
+  while (secondRow.bottom > viewPort.bottom) {
+    tbody.removeChild(tbody.lastElementChild)
+    lastRowIndex = tbody.lastElementChild.dataset.index
+    secondRow = tbody.lastElementChild.previousSibling.getBoundingClientRect()
+    // adjust scrolling?
+  }
 }
 
 function displayData() {
-  let start = new Date().getTime();
   while (tbody.firstChild)
     tbody.removeChild(tbody.firstChild)
   let fragment = document.createDocumentFragment()
@@ -213,18 +295,17 @@ function displayData() {
     }
   }
   tbody.appendChild(fragment)
-  console.log(title.title, (new Date().getTime()) - start);
 }
 
-$(document.body).on('click', '#tool', function () {
-  let tools = document.getElementById('tools')
+tool.addEventListener('click', _ => {
   tools.style.display = tools.style.display !== 'block' ? 'block' : 'none'
 })
 
-$(document.body).on('input', 'main>section>footer input[type="search"]', filterData)
+thead.addEventListener('input', event => {
+  if (event.target.matches('input'))
+    filterData()
+})
 
-$('section>div.scrollbox.horizontal').on('scroll', function () {
-  let posS = this.parentNode.getBoundingClientRect()
-  let posT = table.getBoundingClientRect()
-  console.log(posT.top - posS.top, posT.bottom - posS.bottom);
+scrollbox.addEventListener('scroll', event => {
+  console.log(event);
 })
