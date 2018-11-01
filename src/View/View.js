@@ -180,55 +180,73 @@ function filterData() {
   }
   message.textContent = counter
   displayData()
-  console.log(scrollbox.getBoundingClientRect());
-  console.log(thead.getBoundingClientRect());
 }
 
 let firstRowIndex // dataTable index of the first row in tbody
 let lastRowIndex // dataTable index of the last row in tbody
+function displayData() {
+  lastRowIndex = -1
+  appendRow()
+  firstRowIndex = lastRowIndex
+  appendRow()
+  virtualScroll()
+}
+
+function appendRow() {
+  let lastIndex = lastRowIndex
+  while (++lastIndex < dataTable.length)
+    if (dataTable[lastIndex][0])
+      break
+  if (dataTable[lastIndex][0]) {
+    let newRow = rowTemplate.cloneNode(true)
+    newRow.dataset.index = lastRowIndex = lastIndex
+    newRow.children.forEach((cell, i) => {
+      cell.innerHTML = dataTable[index][i + 1]
+    })
+    tbody.appendChild(newNode)
+    return true
+  }
+  return false
+}
+
+function prependRow() { // return success
+  let firstIndex = firstRowIndex
+  while (firstIndex > 0)
+    if (dataTable[--firstIndex][0])
+      break
+  if (dataTable[firstIndex][0]) {
+    let newRow = rowTemplate.cloneNode(true)
+    newRow.dataset.index = firstRowIndex = firstIndex
+    newRow.children.forEach((cell, i) => {
+      cell.innerHTML = dataTable[index][i + 1]
+    })
+    tbody.insertBefore(newNode, tbody.firstElementChild)
+    return true
+  }
+  return false
+}
+
 function virtualScroll() {
   if (tbody.children.lenght <= 1)
     return
   // when table has multiple rows...
   let viewPort = scrollbox.getBoundingClientRect()
   viewPort.top += thead.getBoundingClientRect().height
-  if (viewPort.top > viewPort.bottom)
-    viewPort.top = viewPort.bottom
+  if (viewPort.top >= viewPort.bottom)
+    return
   // fill down
   let bottomRow = tbody.lastElementChild.getBoundingClientRect()
-  let lastIndex = lastRowIndex
   while (bottomRow.top <= viewPort.bottom) {
-    while (++lastIndex < dataTable.length) {
-      if (dataTable[lastIndex][0])
-        break
-    }
-    if (dataTable[lastIndex][0]) {
-      let newRow = rowTemplate.cloneNode(true)
-      newRow.dataset.index = lastRowIndex = lastIndex
-      newRow.children.forEach((cell, index) => {
-        cell.innerHTML = dataTable[lastIndex][index + 1]
-      })
-      tbody.appendChild(newNode)
+    if (appendRow()) {
       bottomRow = tbody.lastElementChild.getBoundingClientRect()
     } else {
       // fill up
       topRow = tbody.firstElementChild.getBoundingClientRect()
-      firstIndex = firstRowIndex
       while (bottomRow.bottom < viewPort.bottom) {
-        while (firstIndex > 0) {
-          if (dataTable[--firstIndex][0])
-            break
-        }
-        if (dataTable[firstIndex][0]) {
-          let newRow = rowTemplate.cloneNode(true)
-          newRow.dataset.index = firstRowIndex = firstIndex
-          newRow.children.forEach((cell, index) => {
-            cell.innerHTML = dataTable[firstIndex][index + 1]
-          })
-          tbody.insertBefore(newNode, tbody.firstElementChild)
+        if (prependRow()) {
           topRow = tbody.firstElementChild.getBoundingClientRect()
         } else {
-          // table.height < scrollbox.height => no more scrolling
+          // table.height < scrollbox.height => no need for scrolling
           return
         }
       }
@@ -246,20 +264,8 @@ function virtualScroll() {
     // adjust scrolling?
   }
   if (secondRow.top >= viewPort.top) { // insert top padding row
-    let firstIndex = firstRowIndex
-    while (firstIndex > 0) {
-      if (dataTable[--firstIndex][0])
-        break
-    }
-    if (dataTable[firstIndex][0]) {
-      let newRow = rowTemplate.cloneNode(true)
-      newRow.dataset.index = firstRowIndex = firstIndex
-      newRow.children.forEach((cell, index) => {
-        cell.innerHTML = dataTable[firstIndex][index + 1]
-      })
-      tbody.insertBefore(newNode, tbody.firstElementChild)
-      // adjust scrolling?
-    }
+    prependRow()
+    // adjust scrolling?
   }
   // adjust (remove) bottom padding rows
   secondRow = tbody.lastElementChild.previousSibling.getBoundingClientRect()
@@ -271,6 +277,7 @@ function virtualScroll() {
   }
 }
 
+/*
 function displayData() {
   while (tbody.firstChild)
     tbody.removeChild(tbody.firstChild)
@@ -296,6 +303,7 @@ function displayData() {
   }
   tbody.appendChild(fragment)
 }
+*/
 
 tool.addEventListener('click', _ => {
   tools.style.display = tools.style.display !== 'block' ? 'block' : 'none'
