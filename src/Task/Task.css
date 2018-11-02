@@ -1,12 +1,12 @@
 :root {
-  --article-margin: 0.5em;
+  --article-padding: 0.5em;
   --div-margin: 1.6em;
   --input-margin: 0.6em; /* aligned to line-height */
 }
 
 article .scrollbox {
   white-space: normal;
-  margin-left: var(--article-margin);
+  padding-left: var(--article-padding);
 }
 
 article .scrollbox div {

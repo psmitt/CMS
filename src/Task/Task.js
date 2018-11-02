@@ -1,12 +1,14 @@
+const article = document.querySelector('main>section>.content>article')
+
 function loadTask(file) {
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
     const xmlDoc = new DOMParser().parseFromString(
       xmlString.charCodeAt(0) === 0xFEFF ? // BOM
       xmlString.substring(1) : xmlString, 'text/xml')
-    document.querySelector('main>article>header').innerHTML =
+    article.querySelector('header').innerHTML =
       `<h1>${xmlDoc.querySelector('task').attributes['title'].value}</h1>`
-    let scrollbox = document.querySelector('main>article>div.scrollbox')
+    let scrollbox = article.querySelector('div.scrollbox')
     while (scrollbox.firstChild)
       scrollbox.removeChild(scrollbox.firstChild)
     $(scrollbox).scrollTop()

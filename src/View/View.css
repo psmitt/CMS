@@ -2,22 +2,22 @@
   --grid-color: lightgray;
 }
 
-section>header>h1 {
+footer>header>h1 {
   width: calc(100% - 4em); /* give space to message and tools */
 }
 
 span.message {
   position: absolute;
-  right: 1em;
+  right: 2em;
   width: 3em;
   text-align: right;
   vertical-align: top;
 }
 
-span.tool {
+svg.tool {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 8px;
   cursor: pointer;
   user-select: none;
 }
@@ -45,23 +45,29 @@ div.tools span:hover {
   background-color: wheat;
 }
 
-section>div.scrollbox.horizontal {
+footer>div.scrollbox {
   overflow-x: auto;
-  padding-right: var(--scrollbar-width);
+  overflow-y: scroll;
+  width: calc(100% + var(--scrollbar-width));
 }
 
-section>div.scrollbox.vertical {
-  width: var(--scrollbar-width);
-  left: auto;
+footer th:last-child,
+footer td:last-child {
+  z-index: 1;
+  position: sticky;
+  padding: 0;
+  right: 0;
+  overflow: visible;
+  background-color: lightgreen;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border:none;
 }
 
-section>div.scrollbox>div.empty {
-  height: 100%;
-  border: solid; /* ensure minimal width to be scrollable */
-}
-
-section thead th, /* filter row */
-section thead td {/* title row */
+footer thead th, /* filter row */
+footer thead td {/* title row */
   background-color: var(--grid-color);
   z-index: 1;
   transform: translate3d(0,0,0);
@@ -70,27 +76,27 @@ section thead td {/* title row */
   top: 0;
 }
 
-section thead th:last-child,
-section thead td:last-child {
-  border-right: solid thin var(--grid-color);
+footer thead th:last-child,
+footer thead td:last-child {
+  z-index: 2;
 }
 
-section thead td {/* title row */
+footer thead td {/* title row */
   top: 1.55em;
   font-weight: bold;
   padding-left: 0.5em;
+  white-space: nowrap;
 }
 
-section input {
+footer input {
   font-size: smaller;
   padding-left: 0.5em;
 }
 
-section tbody td {
+footer tbody td {
   border: solid thin var(--grid-color);
   vertical-align: top;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
+  padding: 0.25em;
   white-space: pre-wrap;
 }
 

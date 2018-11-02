@@ -12,12 +12,6 @@
 </head>
 
 <body>
-  <nav>
-    <header>
-      <input id="search" type="search" placeholder="Search" />
-    </header>
-    <div class="scrollbox" id="menu">Menu</div>
-  </nav>
   <main>
     <header class="tabs">
       tabs
@@ -108,10 +102,7 @@
           <header>
             <h1 title="Table">Table</h1>
             <span class="message"></span>
-            <svg class="tool" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-             <g><rect fill="none" height="32" width="32" y="-1" x="-1"/></g>
-             <g><path fill="lightgray" d="m0.064167,4.372176c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0zm0,10.772067c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0zm0,10.772067c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0z"/></g>
-            </svg>
+            <span class="tool" title="Tools">&#9776;</span>
             <div class="tools">
               <span>Reload Data</span>
               <span>Export XLSX</span>
@@ -119,25 +110,22 @@
             </div>
           </header>
           <div class="scrollbox horizontal">
-            <table style="width:800px">
+            <table style="width:750px">
               <colgroup>
                 <col style="width:200px" class="mono">
                 <col style="width:200px">
                 <col style="width:350px">
-                <col style="width:44px">
               </colgroup>
               <thead>
                 <tr>
                   <th><input type="search" /></th>
                   <th><input type="search" /></th>
                   <th><input type="search" /></th>
-                  <th></th>
                 </tr>
                 <tr>
                   <td>Name</td>
                   <td>Color</td>
                   <td>Description</td>
-                  <td><span>A</span></td>
                 </tr>
               </thead>
               <tbody>
@@ -145,106 +133,95 @@
                   <td>Apple</td>
                   <td>Red</td>
                   <td>These are red.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Pear</td>
                   <td>Green</td>
                   <td>These are green.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Grape</td>
                   <td>Purple / Green</td>
                   <td>These are purple and green.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Orange</td>
                   <td>Orange</td>
                   <td>These are orange.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Banana</td>
                   <td>Yellow</td>
                   <td>These are yellow.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Kiwi</td>
                   <td>Green</td>
                   <td>These are green.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Plum</td>
                   <td>Purple</td>
                   <td>These are Purple</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Watermelon</td>
                   <td>Red</td>
                   <td>These are red.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Tomato</td>
                   <td>Red</td>
                   <td>These are red.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Cherry</td>
                   <td>Red</td>
                   <td>These are red.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Cantelope</td>
                   <td>Orange</td>
                   <td>These are orange inside.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Honeydew</td>
                   <td>Green</td>
                   <td>These are green inside.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Papaya</td>
                   <td>Green</td>
                   <td>These are green.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Raspberry</td>
                   <td>Red</td>
                   <td>These are red.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Blueberry</td>
                   <td>Blue</td>
                   <td>These are blue.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Mango</td>
                   <td>Orange</td>
                   <td>These are orange.</td>
-                  <td>&gt;</td>
                 </tr>
                 <tr>
                   <td>Passion Fruit</td>
                   <td>Green</td>
                   <td>These are green.</td>
-                  <td>&gt;</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="scrollbox vertical head">
+            <div class="empty"></div>
+          </div>
+          <div class="scrollbox vertical body">
+            <div class="empty"></div>
           </div>
         </footer>
       </div>
@@ -562,6 +539,5 @@
     if (window.module) module = window.module;
   </script>
 </body>
-
 
 </html>

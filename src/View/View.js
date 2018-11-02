@@ -1,11 +1,11 @@
-const header = document.querySelector('main>section>header')
+const header = document.querySelector('main>section>.content>footer>header')
 const title = header.querySelector('h1')
 const message = header.querySelector('.message')
 const tool = header.querySelector('.tool')
 const tools = header.querySelector('.tools')
 
-const scrollbox = document.querySelector('main>section>div.scrollbox.horizontal')
-const scrollbar = document.querySelector('main>section>div.scrollbox.vertical')
+const scrollbox = document.querySelector('main>section>.content>footer>div.scrollbox.horizontal')
+const scrollbar = document.querySelector('main>section>.content>footer>div.scrollbox.vertical')
 const table = scrollbox.querySelector('table')
 const colgroup = table.querySelector('colgroup')
 const thead = table.querySelector('thead')
@@ -46,23 +46,28 @@ function loadView(file) {
     if (queries.length > 1) { // gap analysis
 
       table.style.width = '1000px'
-      colgroup.innerHTML = `${'<col width="200"/>'.repeat(2)}
-                            ${'<col width="300"/>'.repeat(2)}`
+      colgroup.innerHTML = `${'<col style="width:200px"/>'.repeat(2)}
+                            ${'<col style="width:300px"/>'.repeat(2)}
+                            <col style="width:44px">`
 
       for (let col = 0; col < 4; col++)
         filterRow.appendChild(filterCell.cloneNode(true))
+      let scrollUpTool = document.createElement('th')
+      scrollupTool.textContent = 'A'
+      filterRow.appendChild(scrollUpTool)
       thead.appendChild(filterRow)
 
       titleRow.innerHTML = `
           <td>${columns[0].attributes['title'].value}</td>
           <td data-title="Data">Data</td>
           <td>${queries[0].attributes['title'].value}</td>
-          <td>${queries[1].attributes['title'].value}</td>`
+          <td>${queries[1].attributes['title'].value}</td>
+          <td>V</td>`
       thead.appendChild(titleRow)
 
       rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
                                <td style="font-style:italic"></td>
-                               <td></td><td></td>`
+                               <td></td><td></td><td>&gt;</td>`
 
     } else { // simple or compound view
 
@@ -99,9 +104,26 @@ function loadView(file) {
         tableWidth += parseInt(col.style.width = (get('width') || width) + 'px')
         colgroup.appendChild(col)
       }
+      let col = document.createElement('col')
+      tableWidth += parseInt(col.style.width = '44px')
+      colgroup.appendChild(col)
+
       table.style.width = tableWidth + 'px'
+
+      let scrollUpTool = document.createElement('th')
+      scrollUpTool.textContent = 'A'
+      filterRow.appendChild(scrollUpTool)
       thead.appendChild(filterRow)
+
+      let scrollDownTool = document.createElement('td')
+      scrollDownTool.textContent = 'V'
+      titleRow.appendChild(scrollDownTool)
       thead.appendChild(titleRow)
+
+
+      let rowEditTool = document.createElement('td')
+      rowEditTool.textContent = '>'
+      rowTemplate.appendChild(rowEditTool)
 
       reloadData()
     }
@@ -188,8 +210,12 @@ function displayData() {
   lastRowIndex = -1
   appendRow()
   firstRowIndex = lastRowIndex
-  appendRow()
-  virtualScroll()
+  /*
+    appendRow()
+    virtualScroll()
+  */
+  for (let row = 1; row < 2; row++)
+    appendRow()
 }
 
 function appendRow() {
@@ -197,13 +223,12 @@ function appendRow() {
   while (++lastIndex < dataTable.length)
     if (dataTable[lastIndex][0])
       break
-  if (dataTable[lastIndex][0]) {
+  if (lastIndex < dataTable.length && dataTable[lastIndex][0]) {
     let newRow = rowTemplate.cloneNode(true)
     newRow.dataset.index = lastRowIndex = lastIndex
-    newRow.children.forEach((cell, i) => {
-      cell.innerHTML = dataTable[index][i + 1]
-    })
-    tbody.appendChild(newNode)
+    for (let cell = 0; cell < newRow.children.length - 1; cell++)
+      newRow.children[cell].innerHTML = dataTable[lastIndex][cell + 1]
+    tbody.appendChild(newRow)
     return true
   }
   return false
@@ -211,16 +236,15 @@ function appendRow() {
 
 function prependRow() { // return success
   let firstIndex = firstRowIndex
-  while (firstIndex > 0)
-    if (dataTable[--firstIndex][0])
+  while (--firstIndex >= 0)
+    if (dataTable[firstIndex][0])
       break
-  if (dataTable[firstIndex][0]) {
+  if (firstIndex >= 0 && dataTable[firstIndex][0]) {
     let newRow = rowTemplate.cloneNode(true)
     newRow.dataset.index = firstRowIndex = firstIndex
-    newRow.children.forEach((cell, i) => {
-      cell.innerHTML = dataTable[index][i + 1]
-    })
-    tbody.insertBefore(newNode, tbody.firstElementChild)
+    for (let cell = 0; cell < newRow.children.length; cell++)
+      newRow.children[cell].innerHTML = dataTable[firstIndex][cell + 1]
+    tbody.insertBefore(newRow, tbody.firstElementChild)
     return true
   }
   return false
@@ -251,10 +275,11 @@ function virtualScroll() {
         }
       }
       // scroll to bottom
-      scrollbox.scrollTop = bottomRow.bottom - viewPort.bottom
+      scrollbox.scrollTop = scrollbox.scrollHeight - scrollbox.clientHeight
       break
     }
   }
+  return
   // adjust top padding rows
   let secondRow = tbody.firstElementChild.nextSibling.getBoundingClientRect()
   while (secondRow.bottom < viewPort.top) { // remove top padding rows
@@ -275,6 +300,7 @@ function virtualScroll() {
     secondRow = tbody.lastElementChild.previousSibling.getBoundingClientRect()
     // adjust scrolling?
   }
+  console.log(firstRowIndex, lastRowIndex, tbody.children.length);
 }
 
 /*
@@ -314,6 +340,10 @@ thead.addEventListener('input', event => {
     filterData()
 })
 
+let prevScrollTop = 0
 scrollbox.addEventListener('scroll', event => {
-  console.log(event);
+  if (scrollbox.scrollTop - prevScrollTop > 0)
+    appendRow()
+  prevScrollTop = scrollbox.scrollTop
+  console.log(tbody.children.length);
 })

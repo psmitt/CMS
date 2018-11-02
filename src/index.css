@@ -1,5 +1,4 @@
 :root {
-  --font-size: x-large;
   --nav-width: 15em;
   --header-height: 2em;
   --aside-width: 10em;
@@ -8,9 +7,68 @@
   --light-color: black;
   --dark-background: black;
   --dark-color: white;
+  --font-size: x-large;
 }
 
-::-webkit-scrollbar {
+html, body {
+ height: 100%;
+ width: 100%;
+ margin: 0;
+ padding: 0;
+ overflow: hidden;
+}
+
+body {
+  display: flex;
+}
+
+nav {
+  width: var(--nav-width);
+  position: relative; /* for positioning children */
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+main>header {
+  background-color: brown;
+}
+
+main>section {
+  flex: 1;
+  display: flex;
+}
+
+main>section>.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 50%;
+}
+
+main>section>.content>article {
+  flex: 1;
+  background-color: lightblue;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative; /* for positioning children */
+}
+
+main>section>.content>footer {
+  height: 50%;
+  overflow: hidden;
+  position: relative; /* for positioning children */
+}
+
+main>section>aside {
+  width: 200px;
+  background-color: lightgreen;
+  max-width: 50%;
+  overflow: hidden;
+  position: relative; /* for positioning children */
 }
 
 body, input {
@@ -42,10 +100,10 @@ header>h1 {
 div.scrollbox {
   box-sizing: border-box;
   position: absolute;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
+  width: 100%;
+  height: 100%;
   bottom: 0;
+  height: calc(100% - var(--header-height));
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -75,63 +133,4 @@ input:focus {
 
 button {
   white-space: nowrap;
-}
-
-nav {
-  box-sizing: border-box;
-  position  : fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--nav-width);
-}
-
-body>header {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: var(--nav-width);
-  background-color: brown;
-}
-
-main {
-  box-sizing: border-box;
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  top: var(--header-height);
-  left: var(--nav-width);
-}
-
-main>article {
-  box-sizing: border-box;
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 50%;
-  right: var(--aside-width);
-  min-width: 50%;
-  background-color: lightblue;
-  white-space: nowrap;
-}
-
-main>section {
-  box-sizing: border-box;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  right: var(--aside-width);
-  height: 50%;
-  min-width: 50%;
-}
-
-main>aside {
-  box-sizing: border-box;
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: lightgreen;
-  width: var(--aside-width);
-  max-width: 50%;
 }
