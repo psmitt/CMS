@@ -175,19 +175,26 @@ Search.addEventListener('blur', _ => {
 
 Search.addEventListener('focus', _ => {
   maximizeNavigationBar()
-  if (Search.value.trim())
+  if (Search.value.trim()) {
+    Search.selectionStart = Search.selectionEnd = Search.value.length
     Search.dispatchEvent(new Event('input'))
+  }
 })
 
 function minimizeNavigationBar() {
+  Search.style.cursor = 'pointer'
+  Search.style.color = 'rgba(0,0,0,0)'
   Search.placeholder = ''
-  Search.style.padding = '0'
+  Search.style.paddingLeft = '0'
   nav.width = nav.minWidth = '2em'
+  Search.type = 'text'
 }
 
 function maximizeNavigationBar() {
+  Search.type = 'search'
   nav.width = nav.minWidth = nav.maxWidth = '15em'
-  console.log(nav);
   Search.style.paddingLeft = '1.75em'
   Search.placeholder = 'Search'
+  Search.style.color = ''
+  Search.style.cursor = ''
 }

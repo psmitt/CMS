@@ -1,8 +1,9 @@
-function loadTask(file, article) {
-  if (!article) {
-    let section = createSection()
-    article = section.querySelector('div.content>article')
+function loadTask(file, sectionID) {
+  if (!sectionID) {
+    id = createSection().id
+    Sections[id].footer.style.display = 'none'
   }
+  article = Sections[id].article
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
     const xmlDoc = new DOMParser().parseFromString(

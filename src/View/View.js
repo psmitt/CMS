@@ -2,29 +2,41 @@
 const footer = document.querySelector('main>section>div.content>footer')
 
 const header = footer.querySelector('header')
-const title = header.querySelector('h1')
 const message = header.querySelector('span.message')
 const tool = header.querySelector('svg.tool')
 const tools = header.querySelector('div.tools')
 
 const table = footer.querySelector('div.scrollbox>table')
-const colgroup = table.querySelector('colgroup')
-const thead = table.querySelector('thead')
-const tbody = table.querySelector('tbody')
 
 let cols // column number
 let queries // actual XML queries
 let dataTable // memory array of data rows with display property
-let rowTemplate // empty row template
 */
-function loadView(file) {
+function loadView(file, sectionID) {
+  if (!sectionID) {
+    id = createSection().id
+    Sections[id].article.style.display = 'none'
+    Sections[id].footer.style.height = '100%'
+  }
+  footer = Sections[id].footer
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
-    message.textContent = '...'
+
+    Sections[id].message.textContent = '...'
+
     const xmlDoc = new DOMParser().parseFromString(
       xmlString.charCodeAt(0) === 0xFEFF ? // BOM
       xmlString.substring(1) : xmlString, 'text/xml')
-    title.textContent = title.title =
+
+    let {
+      view,
+      table,
+      colgroup,
+      thead,
+      tbody
+    } = Sections[id]
+
+    view.title = view.textContent =
       xmlDoc.querySelector('view').attributes['title'].value
     while (colgroup.firstChild)
       colgroup.removeChild(colgroup.firstChild)
@@ -50,15 +62,15 @@ function loadView(file) {
     let scrollToBottom = document.createElement('td')
     scrollToBottom.textContent = 'V'
 
-    queries = xmlDoc.querySelectorAll('query')
-    rowTemplate = document.createElement('tr')
+    Sections[id].queries = xmlDoc.querySelectorAll('query')
+    Sections[id].rowTemplate = document.createElement('tr')
     let rowEditTool = document.createElement('td')
     rowEditTool.textContent = '>'
 
-    if (queries.length > 1) { // gap analysis
+    if (Sections[id].queries.length > 1) { // gap analysis
 
       table.style.width = '1044px'
-      cols = 4
+      Sections[id].cols = 4
       colgroup.innerHTML = `${'<col style="width:200px"/>'.repeat(2)}
                             ${'<col style="width:300px"/>'.repeat(2)}`
 
@@ -71,14 +83,14 @@ function loadView(file) {
           <td>${queries[0].attributes['title'].value}</td>
           <td>${queries[1].attributes['title'].value}</td>`
 
-      rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
+      Sections[id].rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
                                <td style="font-style:italic"></td>
                                <td></td><td></td>`
 
     } else { // simple or compound view
 
       let tableWidth = 44
-      cols = columns.length
+      Sections[id].cols = columns.length
       for (let column of columns) {
         const get = attribute => // read attribute
           column.attributes[attribute] ?
@@ -105,7 +117,7 @@ function loadView(file) {
         }
         datacell.style.textAlign = get('align') || align
         datacell.className = font
-        rowTemplate.appendChild(datacell)
+        Sections[id].rowTemplate.appendChild(datacell)
 
         let col = document.createElement('col')
         tableWidth += parseInt(col.style.width = (get('width') || width) + 'px')
@@ -118,22 +130,22 @@ function loadView(file) {
     thead.appendChild(filterRow)
     titleRow.appendChild(scrollToBottom)
     thead.appendChild(titleRow)
-    rowTemplate.appendChild(rowEditTool)
-    reloadData()
+    Sections[id].rowTemplate.appendChild(rowEditTool)
+    reloadData(id)
   })
 }
 
 // refresh dataTable in memory
-function reloadData() {
+function reloadData(id) {
   mysql_pool.getConnection((error, cmdb) => {
     if (error) throw error
     cmdb.query({
-      sql: queries[0].textContent,
+      sql: Sections[id].queries[0].textContent,
       nestTables: '.'
     }, (error, result, fields) => {
       if (error) throw error
-      message.textContent = '...'
-      dataTable = []
+      Sections[id].message.textContent = '...'
+      Sections[id].dataTable = []
       for (let row of result) {
         let dataRow = []
         for (let data in row) {
@@ -147,18 +159,18 @@ function reloadData() {
           }
         }
         dataRow.push(true) // display
-        dataTable.push(dataRow)
+        Sections[id].dataTable.push(dataRow)
       }
       cmdb.release();
-      filterData()
+      filterData(id)
     })
   })
 }
 
-function filterData() {
-  message.textContent = '...'
+function filterData(id) {
+  Sections[id].message.textContent = '...'
   let filters = []
-  thead.querySelectorAll('input').forEach((input, index) => {
+  Sections[id].thead.querySelectorAll('input').forEach((input, index) => {
     if (input.value)
       filters.push({
         column: index,
@@ -166,76 +178,62 @@ function filterData() {
       })
   })
   let counter = 0
-  for (let row of dataTable)
+  let cols = Sections[id].cols
+  let data = Sections[id].dataTable
+  for (let row of data)
     row[cols] = true;
   for (let f = 1; f < filters.length - 1; f++) {
     i = filters[f].column
-    for (let row of dataTable)
+    for (let row of data)
       row[cols] = row[cols] && filters[f].filter.test(row[i].replace(/\n/g, ' '))
   }
   if (filters.length) {
     i = filters[filters.length - 1].column
-    for (let row of dataTable)
+    for (let row of data)
       counter += row[cols] = row[cols] && filters[f].filter.test(row[i].replace(/\n/g, ' '))
   } else {
-    counter = dataTable.length
+    counter = data.length
   }
-  message.textContent = counter
-  displayData()
+  Sections[id].message.textContent = counter
+  displayData(id)
 }
 
-let firstRowIndex // dataTable index of the first row in tbody
-let lastRowIndex // dataTable index of the last row in tbody
-function displayData() {
-  lastRowIndex = -1
-  appendRow()
-  firstRowIndex = lastRowIndex
+function displayData(id) {
+  Sections[id].prevScrollTop = 0
+  Sections[id].lastRowIndex = -1
+  appendRow(id)
+  Sections[id].firstRowIndex = Sections[id].lastRowIndex
   for (let row = 1; row < 20; row++)
-    appendRow()
+    appendRow(id)
 }
 
-function appendRow() {
-  let lastIndex = lastRowIndex
-  while (++lastIndex < dataTable.length)
-    if (dataTable[lastIndex][cols])
+function appendRow(id) {
+  let lastIndex = Sections[id].lastRowIndex
+  let cols = Sections[id].cols
+  let data = Sections[id].dataTable
+  while (++lastIndex < data.length)
+    if (data[lastIndex][cols])
       break
-  if (lastIndex < dataTable.length && dataTable[lastIndex][cols]) {
-    let newRow = rowTemplate.cloneNode(true)
-    newRow.dataset.index = lastRowIndex = lastIndex
+  if (lastIndex < data.length && data[lastIndex][cols]) {
+    let newRow = Sections[id].rowTemplate.cloneNode(true)
+    newRow.dataset.index = Sections[id].lastRowIndex = lastIndex
     for (let cell = 0; cell < cols; cell++)
-      newRow.children[cell].innerHTML = dataTable[lastIndex][cell]
-    tbody.appendChild(newRow)
+      newRow.children[cell].innerHTML = data[lastIndex][cell]
+    Sections[id].tbody.appendChild(newRow)
     return true
   }
   return false
 }
 
-function prependRow() { // return success
+function prependRow() { // return ;urn success
 }
-/*
-tool.addEventListener('click', _ => {
-  tools.style.display = tools.style.display !== 'block' ? 'block' : 'none'
-})
-
-thead.addEventListener('input', event => {
-  if (event.target.matches('input'))
-    filterData()
-})
-
-let prevScrollTop = 0
-footer.querySelector('div.scrollbox').addEventListener('scroll', function () {
-  if (this.scrollTop - prevScrollTop > 0)
-    appendRow()
-  prevScrollTop = this.scrollTop
-  console.log(tbody.children.length);
-})
-
-*/
 
 function showFooter(header) {
   minimizeNavigationBar()
   let footer = header.parentNode
-  if (footer.style.height === 'auto')
+  if (footer.previousElementSibling.style.display === 'none')
+    footer.style.height = '100%'
+  else if (footer.style.height === 'auto')
     footer.style.height = '50%'
   else
     footer.style.height = 'calc(100% - var(--header-height))'
