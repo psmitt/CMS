@@ -10,7 +10,6 @@ nav>header {
   height: calc(100% - 2 * var(--menu-padding));
   width: calc(100% - 2 * var(--menu-padding));
   border-radius: var(--menu-padding);
-  padding-left: 1.75em;
   background-image: url('magnifier_glass.svg');
   background-size: auto 61.8%;
   background-position: 7px center;

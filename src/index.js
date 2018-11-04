@@ -41,27 +41,69 @@ function changeRoot(folder) {
   }
 }
 
-if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastpath.txt'))) {
-  changeRoot(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastpath.txt'), 'utf8'))
-} else {
-  fs.mkdir(path.join(os.homedir(), '.cms'), (error) => {
-    if (error) throw error
-  })
-  changeRoot()
-}
-
 ipc.on('Change Root', changeRoot)
+
+$(document).ready(_ => {
+  if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastpath.txt'))) {
+    changeRoot(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastpath.txt'), 'utf8'))
+  } else {
+    fs.mkdir(path.join(os.homedir(), '.cms'), (error) => {
+      if (error) throw error
+    })
+    changeRoot()
+  }
+})
 
 $(document).on('keypress', event => {
   if (event.ctrlKey && event.originalEvent.code === 'KeyF')
     $('#search').focus()
 });
 
-/*
-var mysql_pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'cmdb_mine',
-  database: 'hun'
+const main = document.querySelector('main')
+const tabs = main.querySelector('header')
+
+function showTab(tab) {
+  tabs.querySelectorAll('div').forEach(div => {
+    div.classList.remove('highlight')
+  })
+  tab.classList.add('highlight')
+  main.querySelectorAll('section').forEach(section => {
+    section.style.display = 'none'
+    if (section.id === tab.dataset.id)
+      section.style.display = ''
+  })
+}
+
+tabs.addEventListener('click', event => {
+  let target = event.target
+  let tab = target.matches('div') ? target : target.parentNode
+  if (target.matches('.close')) {
+    let section = document.getElementById(tab.dataset.id)
+    let display = (section.style.display !== 'none')
+    main.removeChild(section)
+    tabs.removeChild(target.parentNode)
+    if (display && tabs.firstChild)
+      showTab(tabs.firstChild)
+  } else {
+    showTab(tab)
+  }
 })
-*/
+
+function createSection() {
+  let id = new Date().getTime()
+  if (document.getElementById(id)) // not unique id
+    id = new Date().getTime()
+
+  let newSection = document.createElement('section')
+  newSection.id = id
+  newSection.innerHTML = fs.readFileSync('src/section.html', 'utf8')
+
+  let tab = document.createElement('div')
+  tab.dataset.id = id
+  tab.innerHTML = `<span>${id}</span><span class="close">&#128473;</span>`
+
+  tabs.appendChild(tab)
+  main.appendChild(newSection)
+  showTab(tab)
+  return newSection
+}

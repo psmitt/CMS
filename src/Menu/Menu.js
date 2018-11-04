@@ -1,3 +1,4 @@
+const nav = document.body.firstElementChild.style
 const Menu = document.getElementById('menu')
 const Search = document.getElementById('search')
 
@@ -173,6 +174,20 @@ Search.addEventListener('blur', _ => {
 })
 
 Search.addEventListener('focus', _ => {
+  maximizeNavigationBar()
   if (Search.value.trim())
     Search.dispatchEvent(new Event('input'))
 })
+
+function minimizeNavigationBar() {
+  Search.placeholder = ''
+  Search.style.padding = '0'
+  nav.width = nav.minWidth = '2em'
+}
+
+function maximizeNavigationBar() {
+  nav.width = nav.minWidth = nav.maxWidth = '15em'
+  console.log(nav);
+  Search.style.paddingLeft = '1.75em'
+  Search.placeholder = 'Search'
+}

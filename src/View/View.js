@@ -1,3 +1,4 @@
+/*
 const footer = document.querySelector('main>section>div.content>footer')
 
 const header = footer.querySelector('header')
@@ -15,7 +16,7 @@ let cols // column number
 let queries // actual XML queries
 let dataTable // memory array of data rows with display property
 let rowTemplate // empty row template
-
+*/
 function loadView(file) {
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
@@ -211,7 +212,7 @@ function appendRow() {
 
 function prependRow() { // return success
 }
-
+/*
 tool.addEventListener('click', _ => {
   tools.style.display = tools.style.display !== 'block' ? 'block' : 'none'
 })
@@ -228,3 +229,14 @@ footer.querySelector('div.scrollbox').addEventListener('scroll', function () {
   prevScrollTop = this.scrollTop
   console.log(tbody.children.length);
 })
+
+*/
+
+function showFooter(header) {
+  minimizeNavigationBar()
+  let footer = header.parentNode
+  if (footer.style.height === 'auto')
+    footer.style.height = '50%'
+  else
+    footer.style.height = 'calc(100% - var(--header-height))'
+}

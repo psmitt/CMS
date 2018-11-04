@@ -1,6 +1,8 @@
-const article = document.querySelector('main>section>.content>article')
-
-function loadTask(file) {
+function loadTask(file, article) {
+  if (!article) {
+    let section = createSection()
+    article = section.querySelector('div.content>article')
+  }
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
     const xmlDoc = new DOMParser().parseFromString(
@@ -57,4 +59,16 @@ function appendSteps(step, parent) {
       }
   }
   parent.appendChild(node);
+}
+
+function showArticle(header) {
+  minimizeNavigationBar()
+  // decrease footer if exists
+  let footer = header.parentNode.nextElementSibling
+  if (footer) {
+    if (footer.style.height === 'calc(100% - var(--header-height))')
+      footer.style.height = '50%'
+    else
+      footer.style.height = 'auto'
+  }
 }
