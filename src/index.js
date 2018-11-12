@@ -9,8 +9,12 @@ const ipc = require('electron').ipcRenderer
 const dialog = remote.dialog
 const currentWindow = remote.getCurrentWindow()
 
+/* ROOT DIRECTORY AND DATABASE */
+
 var rootDir
 var mysql_pool
+
+ipc.on('Change Root', _ => (changeRoot()))
 
 function changeRoot(folder) {
   if (!folder) {
@@ -22,58 +26,71 @@ function changeRoot(folder) {
       folder = folders[0]
     }
   }
+
   rootDir = folder
   if (!rootDir)
     currentWindow.close()
-  else {
-    fs.writeFile(path.join(os.homedir(), '.cms', 'lastpath.txt'), rootDir, 'utf8', (error) => {
-      if (error) throw error
-    })
-    fs.readFile(path.join(rootDir, 'cmdb'), 'utf8', (error, cmdb) => {
-      if (error) throw error
-      let server = JSON.parse(cmdb)
-      server.user = server.database.toUpperCase() + '_Admin'
-      server.password = md5(server.user)
-      server.supportBigNumbers = true
-      mysql_pool = mysql.createPool(server)
-    })
-    loadMenuFiles(path.join(rootDir, 'Menu'))
-  }
+  else
+    fs.writeFileSync(path.join(os.homedir(), '.cms', 'lastRoot.txt'), rootDir, 'utf8')
+
+  loadMenuFiles(path.join(rootDir, 'Menu'))
 }
 
-ipc.on('Change Root', changeRoot)
+ipc.on('Change Database', _ => (changeDatabase()))
 
-$(document).ready(_ => {
-  if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastpath.txt'))) {
-    changeRoot(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastpath.txt'), 'utf8'))
-  } else {
-    fs.mkdir(path.join(os.homedir(), '.cms'), (error) => {
-      if (error) throw error
-    })
-    changeRoot()
-  }
-})
+function changeDatabase(server) {
+  if (!server)
+    server = prompt("Please enter the name of database server", "Server Name:");
+  if (server)
+    fs.writeFileSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt'), server, 'utf8')
+  mysql_pool = mysql.createPool({
+    "host": server,
+    "database": rootDir,
+    "user": `${rootDir}_Admin`,
+    "password": md5(`${rootDir}_Admin`),
+    "supportBigNumbers": true
+  })
+}
 
-$(document).on('keypress', event => {
-  if (event.ctrlKey && event.originalEvent.code === 'KeyF')
-    $('#search').focus()
-});
+/* SECTIONS AND TABS */
 
 const main = document.querySelector('main')
 const tabs = main.querySelector('header')
 let Sections = [] // array of sections
 
-function createSection() {
+function createSection(title) {
   let id = new Date().getTime()
   if (document.getElementById(id)) // not unique id
     id = new Date().getTime()
 
   let newSection = document.createElement('section')
   newSection.id = id
-  newSection.innerHTML = fs.readFileSync('src/section.html', 'utf8')
+  newSection.innerHTML = `<article>
+                            <iframe class="Task"></iframe>
+                            <iframe class="View"></iframe>
+                          </article>
+                          <iframe class="Form"></iframe>`
 
-  // Section Constants
-  Sections[id] = {}
+  let tab = document.createElement('div')
+  tab.dataset.id = id
+  tab.innerHTML = `<span>${title}</span><span class="close">&#128473;</span>`
+
+  tabs.appendChild(tab)
+  main.appendChild(newSection) // iframes gets contentDocument here
+
+  for (let iframe of ['Task', 'View', 'Form']) {
+    let doc = new DOMParser().parseFromString(fs.readFileSync(`src/${iframe}/${iframe}.html`, 'utf8'), 'text/html')
+    newSection.querySelector(`.${iframe}`).contentDocument.head.innerHTML = doc.head.innerHTML
+    newSection.querySelector(`.${iframe}`).contentDocument.body.innerHTML = doc.body.innerHTML
+    Sections[id] = {}
+    Sections[id][iframe] = newSection.querySelector(`.${iframe}`).contentDocument.body
+  }
+
+  showTab(tab)
+  return id
+}
+
+/*
   Sections[id].article = newSection.querySelector('div.content>article')
   Sections[id].footer = newSection.querySelector('div.content>footer')
 
@@ -105,16 +122,7 @@ function createSection() {
     if (event.target.matches('input'))
       filterData(id)
   })
-
-  let tab = document.createElement('div')
-  tab.dataset.id = id
-  tab.innerHTML = `<span>${id}</span><span class="close">&#128473;</span>`
-
-  tabs.appendChild(tab)
-  main.appendChild(newSection)
-  showTab(tab)
-  return newSection
-}
+*/
 
 function showTab(tab) {
   tabs.querySelectorAll('div').forEach(div => {
@@ -128,6 +136,8 @@ function showTab(tab) {
   })
 }
 
+// Show section on clicking tab
+// Remove section on closing tab
 tabs.addEventListener('click', event => {
   let target = event.target
   let tab = target.matches('div') ? target : target.parentNode

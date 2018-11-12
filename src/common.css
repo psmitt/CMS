@@ -1,0 +1,65 @@
+:root {
+  --header-height: 2em;
+  --scrollbar-width: 20px;
+  --font-size: x-large;
+}
+
+body, input {
+  font-family: 'Barlow Semi Condensed', sans-serif;
+  font-size: var(--font-size);
+}
+
+header {
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  height: var(--header-height);
+  line-height: var(--header-height);
+  white-space: nowrap;
+}
+
+header>h1 { /* title */
+  font-size: larger;
+  display: inline-block;
+  margin: 0;
+  margin-left: 0.25em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+footer { /* scrollbox */
+  box-sizing: border-box;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  height: calc(100% - var(--header-height));
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+table {
+  transform: translate3d(0, 0, 0); /* optimize scrolling */
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+input {
+  height: 100%;
+  width: 100%;
+  border: solid thin lightgray;
+}
+
+input:hover {
+  border-color: skyblue;
+}
+
+input:focus {
+  outline: none;
+  border-color: deepskyblue;
+}
+
+button {
+  white-space: nowrap;
+}

@@ -1,23 +1,27 @@
-function loadTask(file, sectionID) {
-  if (!sectionID) {
-    id = createSection().id
-    Sections[id].footer.style.display = 'none'
-  }
-  article = Sections[id].article
+function loadTask(file) {
+  Sections[id].viewFrame.style.display = 'none'
   fs.readFile(file, 'utf8', (error, xmlString) => {
     if (error) throw error
     const xmlDoc = new DOMParser().parseFromString(
       xmlString.charCodeAt(0) === 0xFEFF ? // BOM
       xmlString.substring(1) : xmlString, 'text/xml')
-    article.querySelector('header').innerHTML =
+
+    let link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'src/Task/Task.css'
+    Sections[id].taskFrame.contentDocument.head.appendChild(link)
+
+    let header = document.createElement('header')
+    header.addEventListener('click', showTask)
+    header.innerHTML =
       `<h1>${xmlDoc.querySelector('task').attributes['title'].value}</h1>`
-    let scrollbox = article.querySelector('div.scrollbox')
-    while (scrollbox.firstChild)
-      scrollbox.removeChild(scrollbox.firstChild)
-    $(scrollbox).scrollTop()
+    Sections[id].taskFrame.contentDocument.body.appendChild(header)
+
+    let footer = document.createElement('footer')
     for (let steps of xmlDoc.querySelector('task').children) {
-      appendSteps(steps, scrollbox)
+      appendSteps(steps, footer)
     }
+    Sections[id].taskFrame.contentDocument.body.appendChild(footer)
   })
 }
 
@@ -62,14 +66,17 @@ function appendSteps(step, parent) {
   parent.appendChild(node);
 }
 
-function showArticle(header) {
-  minimizeNavigationBar()
-  // decrease footer if exists
-  let footer = header.parentNode.nextElementSibling
-  if (footer) {
-    if (footer.style.height === 'calc(100% - var(--header-height))')
-      footer.style.height = '50%'
-    else
-      footer.style.height = 'auto'
-  }
+function showTask() {
+  console.log(parent);
+  /*
+    parent.minimizeNavigationBar()
+    // decrease view's height if exists
+    let view = parent.parentNode.nextElementSibling
+    if (footer) {
+      if (footer.style.height === 'calc(100% - var(--header-height))')
+        footer.style.height = '50%'
+      else
+        footer.style.height = 'auto'
+    }
+  */
 }

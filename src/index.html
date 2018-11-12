@@ -5,10 +5,8 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="Font/Barlow.css" />
   <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="common.css" />
   <link rel="stylesheet" href="Menu/Menu.css" />
-  <link rel="stylesheet" href="Task/Task.css" />
-  <link rel="stylesheet" href="View/View.css" />
-  <link rel="stylesheet" href="Form/Form.css" />
   <title>CMS</title>
 </head>
 
@@ -17,27 +15,13 @@
     <header>
       <input id="search" type="search" placeholder="Search" />
     </header>
-    <div class="scrollbox" id="menu">Menu</div>
+    <footer id="menu">Menu</footer>
   </nav>
   <main>
     <header class="tabs"></header>
   </main>
-  <script>
-    if (typeof module === 'object') {
-      window.module = module;
-      module = undefined;
-    }
-  </script>
-  <script src="../node_modules/jquery/dist/jquery.min.js"></script>
   <script src="index.js"></script>
   <script src="Menu/Menu.js"></script>
-  <script src="Task/Task.js"></script>
-  <script src="View/View.js"></script>
-  <script src="Form/Form.js"></script>
-  <script>
-    if (window.module) module = window.module;
-    maximizeNavigationBar()
-  </script>
 </body>
 
 

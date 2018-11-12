@@ -2,6 +2,28 @@ const nav = document.body.firstElementChild.style
 const Menu = document.getElementById('menu')
 const Search = document.getElementById('search')
 
+/* NAV SIZING */
+
+function minimizeNavigationBar() {
+  Search.style.cursor = 'pointer'
+  Search.style.color = 'rgba(0,0,0,0)'
+  Search.placeholder = ''
+  Search.style.paddingLeft = '0'
+  nav.width = nav.minWidth = '2em'
+  Search.type = 'text'
+}
+
+function maximizeNavigationBar() {
+  Search.type = 'search'
+  nav.width = nav.minWidth = nav.maxWidth = '15em'
+  Search.style.paddingLeft = '1.75em'
+  Search.placeholder = 'Search'
+  Search.style.color = ''
+  Search.style.cursor = ''
+}
+
+/* MENU DISPLAY */
+
 function loadMenuFiles(folder) {
   while (Menu.firstChild)
     Menu.removeChild(Menu.firstChild)
@@ -33,10 +55,12 @@ function appendSubMenu(subMenu, parentMenu) {
     let onclick = 'onclick='
     if (subMenu.attributes.class) switch (menu('class')) {
       case 'task':
-        onclick += `"loadTask('${path.join(rootDir, 'Task', menu('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+        //        onclick += `"openIframe('${path.join(rootDir, 'Task', menu('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+        onclick += `"openIframe('Task', '${menu('order')}')"`
         break;
       case 'view':
-        onclick += `"loadView('${path.join(rootDir, 'View', menu('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+        //        onclick += `"loadView('${path.join(rootDir, 'View', menu('order') + '.xml').replace(/\\/g, '\\\\')}')"`
+        onclick += `"openIframe('View', '${menu('order')}')"`
         break;
     } else {
       onclick = ''
@@ -65,13 +89,25 @@ function setBranchIcons(root) {
   }
 }
 
-// .hover esetén a touch-csal van gond
-$('#menu').on('mouseleave', 'span', function (event) { // prevent false positive bug
-  if (!event.relatedTarget && !event.toElement) {
-    console.log('HAPPENED');
-  }
-})
+function openIframe(folder, file) {
+  let currentSection =
+    (folder === 'Form' && tabs.querySelector('.highlight')) ?
+    tabs.querySelector('.highlight').dataset.id :
+    createSection(file)
 
+  switch (folder) {
+    case 'Form':
+      break;
+    case 'Task':
+      break;
+    default: // Table, Tree, View
+      break;
+  }
+}
+
+/* EVENTS */
+
+// Maximize NAV on click
 Menu.addEventListener('click', event => {
   let node = event.target
   if (node.matches('span') && window.getSelection().type !== 'Range') {
@@ -90,19 +126,7 @@ Menu.addEventListener('click', event => {
   }
 })
 
-// Prevent text selection on double click
-Menu.addEventListener('dblclick', event => {
-  if (event.target.matches('span')) {
-    if (document.selection && document.selection.empty) {
-      document.selection.empty();
-    } else if (window.getSelection) {
-      sel = window.getSelection();
-      if (sel && sel.removeAllRanges)
-        sel.removeAllRanges();
-    }
-  }
-})
-
+// Search Menu on input
 Search.addEventListener('input', _ => {
   const all = selector => Menu.querySelectorAll(selector)
   for (let div of all('div'))
@@ -136,6 +160,7 @@ Search.addEventListener('input', _ => {
   setBranchIcons(Menu)
 })
 
+// Navigate up and down among hits
 Search.addEventListener('keydown', event => {
   switch (event.code) {
     case 'ArrowDown':
@@ -167,12 +192,14 @@ Search.addEventListener('keydown', event => {
   }
 })
 
+// Release hits on blur
 Search.addEventListener('blur', _ => {
   if (Menu.querySelector('.hit'))
     Menu.querySelector('.hit').classList.remove('hit')
   Menu.querySelectorAll('.item').forEach(item => item.innerHTML = item.textContent)
 })
 
+// Restore hits on focus
 Search.addEventListener('focus', _ => {
   maximizeNavigationBar()
   if (Search.value.trim()) {
@@ -181,20 +208,51 @@ Search.addEventListener('focus', _ => {
   }
 })
 
-function minimizeNavigationBar() {
-  Search.style.cursor = 'pointer'
-  Search.style.color = 'rgba(0,0,0,0)'
-  Search.placeholder = ''
-  Search.style.paddingLeft = '0'
-  nav.width = nav.minWidth = '2em'
-  Search.type = 'text'
-}
+// Set root directory and database on startup
+document.addEventListener('DOMContentLoaded', _ => {
+  if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastRoot.txt')))
+    changeRoot(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastRoot.txt'), 'utf8'))
+  else
+    fs.mkdir(path.join(os.homedir(), '.cms'), changeRoot)
 
-function maximizeNavigationBar() {
-  Search.type = 'search'
-  nav.width = nav.minWidth = nav.maxWidth = '15em'
-  Search.style.paddingLeft = '1.75em'
-  Search.placeholder = 'Search'
-  Search.style.color = ''
-  Search.style.cursor = ''
-}
+  if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt')))
+    changeDatabase(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt'), 'utf8'))
+  else
+    fs.mkdir(path.join(os.homedir(), '.cms'), changeDatabase)
+
+  maximizeNavigationBar()
+});
+
+
+
+
+/* BUGS */
+
+// .hover esetén a touch-csal van gond
+Menu.addEventListener('mouseleave', event => {
+  if (!event.relatedTarget && !event.toElement) { // false positive bug
+    console.log('HAPPENED');
+  }
+})
+
+// Prevent text selection on double click
+Menu.addEventListener('dblclick', event => {
+  if (event.target.matches('span')) {
+    if (document.selection && document.selection.empty) {
+      document.selection.empty();
+    } else if (window.getSelection) {
+      sel = window.getSelection();
+      if (sel && sel.removeAllRanges)
+        sel.removeAllRanges();
+    }
+  }
+})
+
+
+
+/*
+$(document).on('keypress', event => {
+  if (event.ctrlKey && event.originalEvent.code === 'KeyF')
+    $('#search').focus()
+});
+*/

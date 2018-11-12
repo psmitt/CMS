@@ -1,13 +1,8 @@
 :root {
-  --header-height: 2em;
   --aside-width: 10em;
-  --scrollbar-width: 20px;
-  --light-background: white;
-  --light-color: black;
-  --dark-background: black;
-  --dark-color: white;
-  --font-size: x-large;
 }
+
+/* SCREEN LAYOUT */
 
 html, body {
  height: 100%;
@@ -31,11 +26,37 @@ main {
   flex-direction: column;
 }
 
-main>header {
-  background-color: brown;
+main>section {
+  flex: 1;
+  display: flex;
 }
 
-main>header>div { /* tab */
+main>section>article {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 50%;
+}
+
+main>section>article>iframe.Task {
+  z-index: 2;
+  flex: 1;
+}
+
+main>section>article>iframe.View {
+  z-index: 4;
+  height: 50%;
+}
+
+main>section>iframe.Form {
+  z-index: 6;
+  min-width: var(--aside-width);
+  max-width: 50%;
+}
+
+/* TABS */
+
+.tab {
   position: relative;
   display: inline-block;
   width: 5em;
@@ -51,11 +72,11 @@ main>header>div { /* tab */
   cursor: pointer;
 }
 
-main>header>div.highlight { /* tab */
+.tab.highlight { /* active tab */
   background-color: pink;
 }
 
-main>header>div>span:first-child { /* tab title */
+.tab:first-child { /* tab title */
   display: inline-block;
   width: 4em;
   white-space: nowrap;
@@ -63,107 +84,8 @@ main>header>div>span:first-child { /* tab title */
   text-overflow: ellipsis;
 }
 
-main>header>div>span:last-child { /* tab close */
+.tab:last-child { /* tab close */
   position: absolute;
   right: 5px;
   top: 1px;
-}
-
-main>section {
-  flex: 1;
-  display: flex;
-}
-
-main>section>.content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 50%;
-}
-
-main>section>.content>article {
-  flex: 1;
-  background-color: lightblue;
-  white-space: nowrap;
-  overflow: hidden;
-  position: relative; /* for positioning children */
-}
-
-main>section>.content>footer {
-  height: 50%;
-  overflow: hidden;
-  position: relative; /* for positioning children */
-}
-
-main>section>aside {
-  background-color: lightgreen;
-  width: var(--aside-width);
-  min-width: var(--aside-width);
-  max-width: 50%;
-  overflow: hidden;
-  position: relative; /* for positioning children */
-}
-
-body, input {
-  font-family: 'Barlow Semi Condensed', sans-serif;
-  font-size: var(--font-size);
-  overflow: hidden;
-}
-
-header {
-  box-sizing: border-box;
-  z-index: 1;
-  position: sticky;
-  top: 0;
-  height: var(--header-height);
-  line-height: var(--header-height);
-  white-space: nowrap;
-}
-
-header>h1 {
-  font-size: larger;
-  display: inline-block;
-  margin: 0;
-  margin-left: 0.25em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-div.scrollbox {
-  box-sizing: border-box;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  bottom: 0;
-  height: calc(100% - var(--header-height));
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-table {
-  transform: translate3d(0, 0, 0); /* optimize scrolling */
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-input {
-  height: 100%;
-  width: 100%;
-  border-color: lightgray;
-  border-style: solid;
-  border-width: thin;
-}
-
-input:hover {
-  border-color: skyblue;
-}
-
-input:focus {
-  outline: none;
-  border-color: deepskyblue;
-}
-
-button {
-  white-space: nowrap;
 }
