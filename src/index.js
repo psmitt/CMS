@@ -78,12 +78,13 @@ function createSection(title) {
   tabs.appendChild(tab)
   main.appendChild(newSection) // iframes gets contentDocument here
 
+  Sections[id] = {}
   for (let iframe of ['Task', 'View', 'Form']) {
     let doc = new DOMParser().parseFromString(fs.readFileSync(`src/${iframe}/${iframe}.html`, 'utf8'), 'text/html')
-    newSection.querySelector(`.${iframe}`).contentDocument.head.innerHTML = doc.head.innerHTML
-    newSection.querySelector(`.${iframe}`).contentDocument.body.innerHTML = doc.body.innerHTML
-    Sections[id] = {}
-    Sections[id][iframe] = newSection.querySelector(`.${iframe}`).contentDocument.body
+    let iDoc = newSection.querySelector(`.${iframe}`).contentDocument
+    iDoc.head.innerHTML = doc.head.innerHTML
+    iDoc.body.innerHTML = doc.body.innerHTML
+    Sections[id][iframe] = iDoc.body
   }
 
   showTab(tab)

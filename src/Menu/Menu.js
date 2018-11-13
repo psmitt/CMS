@@ -27,20 +27,39 @@ function maximizeNavigationBar() {
 function loadMenuFiles(folder) {
   while (Menu.firstChild)
     Menu.removeChild(Menu.firstChild)
-  fs.readdir(folder, (error, files) => {
-    if (error) throw error
-    for (let file of files) {
-      if (fs.statSync(path.join(folder, file)).isFile()) {
-        let xmlString = fs.readFileSync(path.join(folder, file), 'utf8')
-        const xmlDoc = new DOMParser().parseFromString(
-          xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-          xmlString.substring(1) : xmlString, 'text/xml')
-        for (let subMenu of xmlDoc.children) {
-          appendSubMenu(subMenu, Menu)
+  if (typeof fs !== 'undefined' && folder) {
+    fs.readdir(folder, (error, files) => {
+      if (error) throw error
+      for (let file of files) {
+        if (fs.statSync(path.join(folder, file)).isFile()) {
+          let xmlString = fs.readFileSync(path.join(folder, file), 'utf8')
+          const xmlDoc = new DOMParser().parseFromString(
+            xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+            xmlString.substring(1) : xmlString, 'text/xml')
+          for (let subMenu of xmlDoc.children) {
+            appendSubMenu(subMenu, Menu)
+          }
+        }
+      }
+    })
+  } else { // load menus files from server
+    let httpRequest = new XMLHttpRequest()
+    httpRequest.onreadystatechange = function () {
+      if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+        for (let xmlString of JSON.parse(httpRequest.responseText)) {
+          const xmlDoc = new DOMParser().parseFromString(
+            xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+            xmlString.substring(1) : xmlString, 'text/xml')
+          for (let subMenu of xmlDoc.children) {
+            appendSubMenu(subMenu, Menu)
+          }
         }
       }
     }
-  })
+    httpRequest.open('POST', '/AJAX/Menu.php')
+    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    httpRequest.send('menu_load_files=all')
+  }
 }
 
 function appendSubMenu(subMenu, parentMenu) {
@@ -210,15 +229,19 @@ Search.addEventListener('focus', _ => {
 
 // Set root directory and database on startup
 document.addEventListener('DOMContentLoaded', _ => {
-  if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastRoot.txt')))
-    changeRoot(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastRoot.txt'), 'utf8'))
-  else
-    fs.mkdir(path.join(os.homedir(), '.cms'), changeRoot)
+  if (typeof fs !== 'undefined') {
+    if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastRoot.txt')))
+      changeRoot(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastRoot.txt'), 'utf8'))
+    else
+      fs.mkdir(path.join(os.homedir(), '.cms'), changeRoot)
 
-  if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt')))
-    changeDatabase(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt'), 'utf8'))
-  else
-    fs.mkdir(path.join(os.homedir(), '.cms'), changeDatabase)
+    if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt')))
+      changeDatabase(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt'), 'utf8'))
+    else
+      fs.mkdir(path.join(os.homedir(), '.cms'), changeDatabase)
+  } else { // load menu files from server
+    loadMenuFiles()
+  }
 
   maximizeNavigationBar()
 });
