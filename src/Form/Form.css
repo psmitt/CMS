@@ -2,8 +2,6 @@ aside>header>h1 {
   width: calc(100% - 1em);
 }
 
-aside>header>span {
-  position: absolute;
-  right: 0;
-  cursor: pointer;
+aside>footer {
+  position: relative;
 }

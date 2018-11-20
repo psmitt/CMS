@@ -27,39 +27,31 @@ function maximizeNavigationBar() {
 function loadMenuFiles(folder) {
   while (Menu.firstChild)
     Menu.removeChild(Menu.firstChild)
-  if (typeof fs !== 'undefined' && folder) {
-    fs.readdir(folder, (error, files) => {
-      if (error) throw error
-      for (let file of files) {
-        if (fs.statSync(path.join(folder, file)).isFile()) {
-          let xmlString = fs.readFileSync(path.join(folder, file), 'utf8')
-          const xmlDoc = new DOMParser().parseFromString(
-            xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-            xmlString.substring(1) : xmlString, 'text/xml')
-          for (let subMenu of xmlDoc.children) {
-            appendSubMenu(subMenu, Menu)
-          }
-        }
-      }
-    })
-  } else { // load menus files from server
-    let httpRequest = new XMLHttpRequest()
-    httpRequest.onreadystatechange = function () {
-      if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-        for (let xmlString of JSON.parse(httpRequest.responseText)) {
-          const xmlDoc = new DOMParser().parseFromString(
-            xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-            xmlString.substring(1) : xmlString, 'text/xml')
-          for (let subMenu of xmlDoc.children) {
-            appendSubMenu(subMenu, Menu)
-          }
-        }
-      }
+  let files = listDirectory('Menu')
+  for (let filename of files) {
+    let xmlDoc = readXMLFile('Menu', filename)
+    for (let subMenu of xmlDoc.children) {
+      appendSubMenu(subMenu, Menu)
     }
-    httpRequest.open('POST', '/AJAX/Menu.php')
-    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    httpRequest.send('menu_load_files=all')
   }
+  /*
+      let httpRequest = new XMLHttpRequest()
+      httpRequest.onreadystatechange = function () {
+        if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+          for (let xmlString of JSON.parse(httpRequest.responseText)) {
+            const xmlDoc = new DOMParser().parseFromString(
+              xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+              xmlString.substring(1) : xmlString, 'text/xml')
+            for (let subMenu of xmlDoc.children) {
+              appendSubMenu(subMenu, Menu)
+            }
+          }
+        }
+      }
+      httpRequest.open('POST', '/AJAX/Menu.php')
+      httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+      httpRequest.send('menu_load_files=all')
+  */
 }
 
 function appendSubMenu(subMenu, parentMenu) {
@@ -105,22 +97,6 @@ function setBranchIcons(root) {
       branch.classList.add('expanded')
     else
       branch.classList.add('filtered')
-  }
-}
-
-function openIframe(folder, file) {
-  let currentSection =
-    (folder === 'Form' && tabs.querySelector('.highlight')) ?
-    tabs.querySelector('.highlight').dataset.id :
-    createSection(file)
-
-  switch (folder) {
-    case 'Form':
-      break;
-    case 'Task':
-      break;
-    default: // Table, Tree, View
-      break;
   }
 }
 
@@ -227,28 +203,6 @@ Search.addEventListener('focus', _ => {
   }
 })
 
-// Set root directory and database on startup
-document.addEventListener('DOMContentLoaded', _ => {
-  if (typeof fs !== 'undefined') {
-    if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastRoot.txt')))
-      changeRoot(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastRoot.txt'), 'utf8'))
-    else
-      fs.mkdir(path.join(os.homedir(), '.cms'), changeRoot)
-
-    if (fs.existsSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt')))
-      changeDatabase(fs.readFileSync(path.join(os.homedir(), '.cms', 'lastDatabase.txt'), 'utf8'))
-    else
-      fs.mkdir(path.join(os.homedir(), '.cms'), changeDatabase)
-  } else { // load menu files from server
-    loadMenuFiles()
-  }
-
-  maximizeNavigationBar()
-});
-
-
-
-
 /* BUGS */
 
 // .hover esetén a touch-csal van gond
@@ -270,8 +224,6 @@ Menu.addEventListener('dblclick', event => {
     }
   }
 })
-
-
 
 /*
 $(document).on('keypress', event => {

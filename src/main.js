@@ -5,6 +5,7 @@ require('electron-reload')(__dirname)
 const {
   app,
   BrowserWindow,
+  ipcMain,
   globalShortcut,
   Menu,
   shell
@@ -13,20 +14,21 @@ const {
 const menu = Menu.buildFromTemplate([{
   label: 'Window',
   submenu: [{
-    label: 'New',
-    accelerator: 'Ctrl+N'
+    label: 'New Window',
+    accelerator: 'Ctrl+N',
+    click: createWindow
   }, {
     label: 'Change Root',
     accelerator: 'Ctrl+O',
     click: (item, window) => {
       window.webContents.send('Change Root')
-    },
+    }
   }, {
     label: 'Change Database',
     accelerator: 'Ctrl+D',
     click: (item, window) => {
       window.webContents.send('Change Database')
-    },
+    }
   }, {
     label: 'Force Reload',
     role: 'forceReload',
@@ -86,20 +88,20 @@ const menu = Menu.buildFromTemplate([{
 }])
 Menu.setApplicationMenu(menu)
 
-let mainWindow = null
+let windows = []
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
+function createWindow(folder, file) {
+  let window = new BrowserWindow({
     show: false
   })
-  mainWindow.loadFile('src/index.html')
-  mainWindow.webContents.on('did-finish-load', function () {
-    mainWindow.maximize();
+  window.loadFile('src/index.html')
+  window.webContents.on('did-finish-load', function () {
+    window.maximize();
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null
-  })
+  window.on('closed', _ => windows.splice(windows.indexOf(window), 1))
+
+  windows.push(window)
 }
 
 app.on('ready', () => {
@@ -121,7 +123,7 @@ app.on('will-quit', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
+  if (!windows.length) {
     createWindow()
   }
 })

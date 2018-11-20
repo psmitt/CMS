@@ -5,8 +5,10 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="Font/Barlow.css" />
   <link rel="stylesheet" href="index.css" />
-  <link rel="stylesheet" href="common.css" />
   <link rel="stylesheet" href="Menu/Menu.css" />
+  <link rel="stylesheet" href="Task/Task.css" />
+  <link rel="stylesheet" href="View/View.css" />
+  <link rel="stylesheet" href="Form/Form.css" />
   <title>CMS</title>
 </head>
 
@@ -18,10 +20,45 @@
     <footer id="menu">Menu</footer>
   </nav>
   <main>
-    <header class="tabs"></header>
+    <article>
+      <header>
+        <h1>Task</h1>
+        <span class="close">&#128473;</span>
+      </header>
+      <footer></footer>
+    </article>
+    <section>
+      <header>
+        <h1 title="View">View</h1>
+        <span class="message"></span>
+        <svg class="tool" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+         <g><rect fill="none" height="32" width="32" y="-1" x="-1"/></g>
+         <g><path fill="lightgray" d="m0.064167,4.372176c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0zm0,10.772067c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0zm0,10.772067c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0z"/></g>
+        </svg>
+        <div class="tools">
+          <span>Reload Data</span>
+          <span>Export XLSX</span>
+          <span>Clear Filters</span>
+        </div>
+      </header>
+      <footer>
+        data
+      </footer>
+    </section>
   </main>
-  <script src="index.js"></script>
-  <script src="Menu/Menu.js"></script>
+  <aside>
+    <header>
+      <h1>Form</h1>
+      <span class="close">&#128473;</span>
+    </header>
+    <footer>
+      <form></form>
+    </footer>
+  </aside>
+
+<script src="Electron.js"></script>
+<script src="Menu/Menu.js"></script>
+
 </body>
 
 

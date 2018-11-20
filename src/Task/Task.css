@@ -4,76 +4,30 @@
   --input-margin: 0.6em; /* aligned to line-height */
 }
 
-header>h1 {
-  font-size: larger;
-  display: inline-block;
-  margin: 0;
-  margin-left: 0.25em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-footer { /* scrollbox */
-  box-sizing: border-box;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  bottom: 0;
-  height: calc(100% - var(--header-height));
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-table {
-  transform: translate3d(0, 0, 0); /* optimize scrolling */
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-input {
-  height: 100%;
-  width: 100%;
-  border-color: lightgray;
-  border-style: solid;
-  border-width: thin;
-}
-
-input:hover {
-  border-color: skyblue;
-}
-
-input:focus {
-  outline: none;
-  border-color: deepskyblue;
-}
-
-button {
-  white-space: nowrap;
-}
-
-
-body {
+article {
   background-color: lightblue;
   white-space: nowrap;
-  overflow: hidden;
 }
 
-footer {
+article>header>h1 {
+  width: calc(100% - 1em);
+}
+
+article>footer {
   white-space: normal;
   padding-left: var(--article-padding);
 }
 
-footer div {
+article>footer div {
   position: relative;
   white-space: nowrap;
 }
 
-footer div div {
+article>footer div div {
   margin-left: var(--div-margin);
 }
 
-footer input {
+article>footer input {
   height: 1em;
   width: 1em;
   margin: var(--input-margin);
@@ -81,7 +35,7 @@ footer input {
   vertical-align: top;
 }
 
-footer span {
+article>footer span {
   display: inline-block;
   position: relative;
   width: calc(100% - var(--div-margin) - var(--input-margin));
@@ -90,7 +44,7 @@ footer span {
   white-space: normal;
 }
 
-footer button {
+article>footer button {
   font-family: inherit;
   font-size: large;
   font-weight: bold;
@@ -100,7 +54,7 @@ footer button {
   border-radius: 5px;
 }
 
-footer h2 {
+article>footer h2 {
   font-size: larger;
   font-style: italic;
 }

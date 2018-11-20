@@ -1,5 +1,8 @@
 :root {
   --aside-width: 10em;
+  --header-height: 2em;
+  --scrollbar-width: 20px;
+  --font-size: x-large;
 }
 
 /* SCREEN LAYOUT */
@@ -14,78 +17,103 @@ html, body {
 
 body {
   display: flex;
+  z-index: 0;
 }
 
 nav {
   position: relative; /* for positioning children */
+  z-index: 2;
 }
 
 main {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-main>section {
-  flex: 1;
-  display: flex;
-}
-
-main>section>article {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   min-width: 50%;
 }
 
-main>section>article>iframe.Task {
-  z-index: 2;
+main>article {
+  position: relative; /* for positioning children */
   flex: 1;
-}
-
-main>section>article>iframe.View {
   z-index: 4;
+}
+
+main>section {
+  position: relative; /* for positioning children */
+  bottom: 0;
   height: 50%;
-}
-
-main>section>iframe.Form {
   z-index: 6;
-  min-width: var(--aside-width);
+}
+
+aside {
+  width: var(--aside-width);
   max-width: 50%;
+  z-index: 8;
 }
 
-/* TABS */
+/* SCREEN STYLE */
 
-.tab {
-  position: relative;
-  display: inline-block;
-  width: 5em;
-  border: solid thin;
-  border-bottom: none;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-  padding-top: 2px;
-  padding-left: 5px;
-  margin-right: 5px;
-  line-height: 1.5em;
+body, input {
+  font-family: 'Barlow Semi Condensed', sans-serif;
+  font-size: var(--font-size);
+}
+
+header {
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  height: var(--header-height);
+  line-height: var(--header-height);
   white-space: nowrap;
-  cursor: pointer;
 }
 
-.tab.highlight { /* active tab */
-  background-color: pink;
-}
-
-.tab:first-child { /* tab title */
+header>h1 { /* title */
+  font-size: larger;
   display: inline-block;
-  width: 4em;
+  margin: 0;
+  margin-left: 0.25em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.tab:last-child { /* tab close */
+footer { /* scrollbox */
+  box-sizing: border-box;
   position: absolute;
-  right: 5px;
-  top: 1px;
+  bottom: 0;
+  height: calc(100% - var(--header-height));
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+table {
+  transform: translate3d(0, 0, 0); /* optimize scrolling */
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+input {
+  height: 100%;
+  width: 100%;
+  border: solid thin lightgray;
+}
+
+input:hover {
+  border-color: skyblue;
+}
+
+input:focus {
+  outline: none;
+  border-color: deepskyblue;
+}
+
+button {
+  white-space: nowrap;
+}
+
+span.close {
+  position: absolute;
+  right: 0.5em;
+  cursor: pointer;
 }
