@@ -21,13 +21,13 @@ const menu = Menu.buildFromTemplate([{
     label: 'Change Root',
     accelerator: 'Ctrl+O',
     click: (item, window) => {
-      window.webContents.send('Change Root')
+      window.webContents.send('Change XML Root Directory')
     }
   }, {
     label: 'Change Database',
     accelerator: 'Ctrl+D',
     click: (item, window) => {
-      window.webContents.send('Change Database')
+      window.webContents.send('Change MySQL Database')
     }
   }, {
     label: 'Force Reload',
