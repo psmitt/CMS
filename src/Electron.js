@@ -9,7 +9,7 @@ var MySQL_Pool // CMDB connection pool
 
 document.addEventListener('DOMContentLoaded', _ => {
   Profile = path.join(os.homedir(), '.cms')
-  if (!fs.statSync(Profile).isDirectory())
+  if (!fs.existsSync(Profile) || !fs.statSync(Profile).isDirectory())
     fs.mkdirSync(Profile)
 
   let lastXMLRootDirectory = path.join(Profile, 'lastXMLRootDirectory.txt')
@@ -31,9 +31,8 @@ ipc.on('Change XML Root Directory', _ => (changeXMLRootDirectory()))
 function changeXMLRootDirectory(folder) {
   folder = folder || dialog.showOpenDialog(currentWindow, {
     title: 'Select Country Folder for CMS',
-    properties: ['openDirectory'],
-    multiSelections: false
-  })
+    properties: ['openDirectory']
+  })[0]
 
   if (!folder && !XMLRootDirectory) {
     currentWindow.close()
@@ -41,7 +40,7 @@ function changeXMLRootDirectory(folder) {
   }
 
   XMLRootDirectory = folder
-  fs.writeFileSync(path.join(Profile, 'lastXMLRoot.txt'), XMLRootDirectory, 'utf8')
+  fs.writeFileSync(path.join(Profile, 'lastXMLRootDirectory.txt'), XMLRootDirectory, 'utf8')
 
   let lastDatabaseServer = path.join(Profile, 'lastDatabaseServer.txt')
   changeMySQLDatabase(!MySQL_Pool && fs.existsSync(lastDatabaseServer) ?
@@ -50,29 +49,44 @@ function changeXMLRootDirectory(folder) {
 }
 
 const mysql = require('mysql')
+const prompt = require('electron-prompt')
 
 ipc.on('Change MySQL Database', _ => (changeMySQLDatabase()))
 
 function changeMySQLDatabase(server) {
-  let basename = path.basename(XMLRootDirectory)
-  let connectionObject = {
-    host: server || prompt("Please enter the name of MySQL database server", "Server Name:"),
-    database: basename,
-    user: `${basename}_Admin`,
-    password: require('md5')(`${basename}_Admin`),
-    supportBigNumbers: true,
-    multipleStatements: true
+  if (server)
+    resetConnectionPool(server)
+  else
+    prompt({
+      title: 'Server Name',
+      label: 'Enter the name of MySQL database server:'
+    }, currentWindow)
+    .then(server => {
+      if (server) resetConnectionPool(server)
+    })
+    .catch(console.error)
+
+  function resetConnectionPool(server) {
+    let basename = path.basename(XMLRootDirectory)
+    let connectionObject = {
+      host: server,
+      database: basename,
+      user: `${basename}_Admin`,
+      password: require('md5')(`${basename}_Admin`),
+      supportBigNumbers: true,
+      multipleStatements: true
+    }
+    mysql.createConnection(connectionObject).connect(error => {
+      if (error) throw error
+      let oldPool = Boolean(MySQL_Pool)
+      if (oldPool)
+        MySQL_Pool.end()
+      MySQL_Pool = mysql.createPool(connectionObject)
+      fs.writeFileSync(path.join(Profile, 'lastDatabaseServer.txt'), connectionObject.host, 'utf8')
+      if (oldPool)
+        currentWindow.loadFile('src/index.html')
+    })
   }
-  mysql.createConnection(connectionObject).connect(error => {
-    if (error) throw error
-    let oldPool = new Boolean(MySQL_Pool)
-    if (oldPool)
-      MySQL_Pool.end()
-    MySQL_Pool = mysql.createPool(connectionObject)
-    fs.writeFileSync(path.join(Profile, 'lastDatabaseServer.txt'), connectionObject.host, 'utf8')
-    if (oldPool)
-      currentWindow.loadFile('src/index.html')
-  })
 }
 
 function openNewWindow(folder, filename) {
