@@ -1,31 +1,16 @@
-function loadTask(file) {
-  Sections[id].viewFrame.style.display = 'none'
-  fs.readFile(file, 'utf8', (error, xmlString) => {
-    if (error) throw error
-    const xmlDoc = new DOMParser().parseFromString(
-      xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-      xmlString.substring(1) : xmlString, 'text/xml')
+const TaskTitle = document.getElementById('task')
+const Procedure = document.querySelector('article>footer')
 
-    let link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = 'src/Task/Task.css'
-    Sections[id].taskFrame.contentDocument.head.appendChild(link)
-
-    let header = document.createElement('header')
-    header.addEventListener('click', showTask)
-    header.innerHTML =
-      `<h1>${xmlDoc.querySelector('task').attributes['title'].value}</h1>`
-    Sections[id].taskFrame.contentDocument.body.appendChild(header)
-
-    let footer = document.createElement('footer')
-    for (let steps of xmlDoc.querySelector('task').children) {
-      appendSteps(steps, footer)
-    }
-    Sections[id].taskFrame.contentDocument.body.appendChild(footer)
-  })
+function load_task(taskname) { // taskname is filename without file extension
+  while (Procedure.firstChild)
+    Procedure.removeChild(Procedure.firstChild)
+  let xmlDoc = readXMLFile('Task', taskname + '.xml')
+  TaskTitle.textContent = xmlDoc.querySelector('task').attributes['title'].value
+  for (let step of xmlDoc.querySelector('task').children)
+    appendStep(step, Procedure)
 }
 
-function appendSteps(step, parent) {
+function appendStep(step, parent) {
   let node // to append
   switch (step.tagName) {
     case 'comment':
@@ -42,7 +27,7 @@ function appendSteps(step, parent) {
       node.className = node.textContent = 'Verification'
       parent.appendChild(node);
       for (let each of step.children) {
-        appendSteps(each, parent)
+        appendStep(each, parent)
       }
       return
     default: // action, decision, option
@@ -59,7 +44,7 @@ function appendSteps(step, parent) {
       span.innerHTML = text
       node.appendChild(span)
       while (child) {
-        appendSteps(child, node)
+        appendStep(child, node)
         child = child.nextElementSibling
       }
   }
@@ -67,16 +52,7 @@ function appendSteps(step, parent) {
 }
 
 function showTask() {
-  console.log(parent);
-  /*
-    parent.minimizeNavigationBar()
-    // decrease view's height if exists
-    let view = parent.parentNode.nextElementSibling
-    if (footer) {
-      if (footer.style.height === 'calc(100% - var(--header-height))')
-        footer.style.height = '50%'
-      else
-        footer.style.height = 'auto'
-    }
-  */
+  closeForm()
+  minimizeNavigationBar()
+  decreaseView()
 }

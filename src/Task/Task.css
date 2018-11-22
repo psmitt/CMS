@@ -1,50 +1,49 @@
 :root {
-  --article-padding: 0.5em;
-  --div-margin: 1.6em;
-  --input-margin: 0.6em; /* aligned to line-height */
+  --div-margin: 1.5em;
+  --input-margin: 0.5em;
 }
 
 article {
-  background-color: lightblue;
+  background-color: #dbe4f0; /* 90% lightsteelblue */
   white-space: nowrap;
 }
 
-article>header>h1 {
+#task { /* title */
   width: calc(100% - 1em);
 }
 
-article>footer {
+#procedure {
   white-space: normal;
-  padding-left: var(--article-padding);
+  padding-left: var(--title-padding);
+  width: calc(100% + var(--scrollbar-width));
 }
 
-article>footer div {
+#procedure div {
   position: relative;
   white-space: nowrap;
 }
 
-article>footer div div {
+#procedure div div {
   margin-left: var(--div-margin);
 }
 
-article>footer input {
+#procedure input {
   height: 1em;
   width: 1em;
   margin: var(--input-margin);
-  margin-left: 0.3em; /* aligned to article margin */
   vertical-align: top;
 }
 
-article>footer span {
+#procedure span {
   display: inline-block;
   position: relative;
   width: calc(100% - var(--div-margin) - var(--input-margin));
+  padding: 1px;
   line-height: 1.5;
-  padding-top: 0.3em;
   white-space: normal;
 }
 
-article>footer button {
+#procedure button {
   font-family: inherit;
   font-size: large;
   font-weight: bold;
@@ -54,7 +53,7 @@ article>footer button {
   border-radius: 5px;
 }
 
-article>footer h2 {
+#procedure h2 {
   font-size: larger;
   font-style: italic;
 }

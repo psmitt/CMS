@@ -60,7 +60,8 @@ function changeMySQLDatabase(server) {
   else
     prompt({
       title: 'Server Name',
-      label: 'Enter the name of MySQL database server:'
+      label: 'Enter the name of MySQL database server:',
+      height: 150
     }, currentWindow)
     .then(server => {
       if (server) resetConnectionPool(server)
@@ -113,7 +114,7 @@ function readXMLFile(folder, filename) {
     xmlString.substring(1) : xmlString, 'text/xml')
 }
 
-function runSQLQueries(queries, output, dsn = '', user = '', pass = '') {
+function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
   if (!dsn || !user || !pass) { // MySQL queries
     MySQL_Pool.getConnection((error, cmdb) => {
       if (error) throw error
@@ -122,21 +123,7 @@ function runSQLQueries(queries, output, dsn = '', user = '', pass = '') {
         nestTables: '.'
       }, (error, result, fields) => {
         if (error) throw error
-        for (let row of result[result.length - 1]) {
-          let dataRow = []
-          for (let data in row) {
-            if (row[data]) {
-              if (row[data] instanceof Date)
-                dataRow.push(row[data].toISOString().substring(0, 10))
-              else
-                dataRow.push(row[data].toString())
-            } else { // null or emtpy string
-              dataRow.push('')
-            }
-          }
-          dataRow.push(true) // display flag
-          output.push(dataRow)
-        }
+        callback(result)
         cmdb.release()
       })
     })

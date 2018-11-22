@@ -22,26 +22,26 @@
   <main>
     <article>
       <header>
-        <h1>Task</h1>
+        <h1 id="task">Task</h1>
         <span class="close">&#128473;</span>
       </header>
-      <footer></footer>
+      <footer id="procedure"></footer>
     </article>
     <section>
       <header>
-        <h1 title="View">View</h1>
-        <span class="message"></span>
-        <svg class="tool" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+        <h1 id="view">View</h1>
+        <span id="message"></span>
+        <svg id="tool" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
          <g><rect fill="none" height="32" width="32" y="-1" x="-1"/></g>
          <g><path fill="lightgray" d="m0.064167,4.372176c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0zm0,10.772067c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0zm0,10.772067c0,-1.487313 1.061043,-2.693017 2.38929,-2.693017l25.034035,0c1.319566,0 2.38929,1.195336 2.38929,2.693017c0,1.487313 -1.061043,2.693017 -2.38929,2.693017l-25.034035,0c-1.319566,0 -2.38929,-1.195336 -2.38929,-2.693017l0,0z"/></g>
         </svg>
-        <div class="tools">
+        <div id="tools">
           <span>Reload Data</span>
           <span>Export XLSX</span>
           <span>Clear Filters</span>
         </div>
       </header>
-      <footer>
+      <footer id="data">
         data
       </footer>
     </section>
@@ -58,6 +58,8 @@
 
 <script src="Electron.js"></script>
 <script src="Menu/Menu.js"></script>
+<script src="Task/Task.js"></script>
+<script src="View/View.js"></script>
 
 </body>
 

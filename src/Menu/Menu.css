@@ -43,7 +43,7 @@ nav>header {
 }
 
 #menu span:hover {
-  background-color: #d4d4f7; /* dark lavender */
+  background-color: #c9d7e8; /* 85% lightsteelblue */
   white-space: normal;
 }
 
@@ -53,7 +53,7 @@ nav>header {
 }
 
 #menu span.hit {
-  background-color: #d4d4f7; /* dark lavender */
+  background-color: #c9d7e8; /* 85% lightsteelblue */
   white-space: normal;
 }
 

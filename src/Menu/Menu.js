@@ -187,7 +187,3 @@ function maximizeNavigationBar() {
   Search.style.color = ''
   Search.style.cursor = ''
 }
-
-function load_task(filename) {
-  console.log(filename);
-}

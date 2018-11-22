@@ -2,11 +2,11 @@
   --grid-color: lightgray;
 }
 
-footer>header>h1 {
+#view {
   width: calc(100% - 4em); /* give space to message and tools */
 }
 
-span.message {
+#message {
   position: absolute;
   right: 2em;
   width: 3em;
@@ -14,7 +14,7 @@ span.message {
   vertical-align: top;
 }
 
-svg.tool {
+#tool {
   position: absolute;
   top: 10px;
   right: 8px;
@@ -22,7 +22,7 @@ svg.tool {
   user-select: none;
 }
 
-div.tools {
+#tools {
   display: none;
   position: absolute;
   top: var(--header-height);
@@ -33,7 +33,7 @@ div.tools {
   border-radius: 5px;
 }
 
-div.tools span {
+#tools span {
   display: block;
   font-weight: normal;
   padding: 3px;
@@ -41,18 +41,18 @@ div.tools span {
   cursor: pointer;
 }
 
-div.tools span:hover {
+#tools span:hover {
   background-color: wheat;
 }
 
-footer>div.scrollbox {
+#data {
   overflow-x: auto;
   overflow-y: scroll;
   width: calc(100% + var(--scrollbar-width));
 }
 
-footer th:last-child,
-footer td:last-child {
+#data th:last-child,
+#data td:last-child {
   z-index: 1;
   position: sticky;
   padding: 0;
@@ -66,8 +66,8 @@ footer td:last-child {
   border:none;
 }
 
-footer thead th, /* filter row */
-footer thead td {/* title row */
+#data thead th, /* filter row */
+#data thead td {/* title row */
   background-color: var(--grid-color);
   z-index: 1;
   transform: translate3d(0,0,0);
@@ -76,31 +76,31 @@ footer thead td {/* title row */
   top: 0;
 }
 
-footer thead th:last-child,
-footer thead td:last-child {
+#data thead th:last-child,
+#data thead td:last-child {
   z-index: 2;
 }
 
-footer thead td {/* title row */
+#data thead td {/* title row */
   top: 1.55em;
   font-weight: bold;
   padding-left: 0.5em;
   white-space: nowrap;
 }
 
-footer input {
+#data input {
   font-size: smaller;
   padding-left: 0.5em;
 }
 
-footer tbody td {
+#data tbody td {
   border: solid thin var(--grid-color);
   vertical-align: top;
   padding: 0.25em;
   white-space: pre-wrap;
 }
 
-.mono {
+#data .mono {
   font-family: monospace;
   font-weight: bold;
   font-size: larger;

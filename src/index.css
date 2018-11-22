@@ -1,6 +1,7 @@
 :root {
   --aside-width: 10em;
   --header-height: 2em;
+  --title-padding: 0.25em;
   --scrollbar-width: 20px;
   --font-size: x-large;
 }
@@ -71,7 +72,7 @@ header>h1 { /* title */
   font-size: larger;
   display: inline-block;
   margin: 0;
-  margin-left: 0.25em;
+  margin-left: var(--title-padding);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
