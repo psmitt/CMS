@@ -15,23 +15,23 @@ nav>header {
   background-size: auto 61.8%;
   background-position: 7px center;
   background-repeat: no-repeat;
-  padding-left: 1.5em;
 }
 
 #menu {
-  padding-left: calc(var(--menu-padding) - 2px);
+  padding-left: var(--menu-padding);
   padding-right: var(--menu-padding);
+  width: calc(100% + var(--scrollbar-width) - var(--menu-padding) + 1px);
 }
 
 #menu div {
   line-height: 0;
-  margin-left: 0.5em;
+  margin-left: calc(2 * var(--menu-padding));
 }
 
 #menu span {
   box-sizing: border-box;
   display: inline-block;
-  line-height: 2;
+  line-height: 1.75em;
   width: 100%;
   padding-left: 1em;
   border-radius: var(--menu-padding);
@@ -39,9 +39,15 @@ nav>header {
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
+  user-select: none; /* prevent text selection on double click */
 }
 
 #menu span:hover {
+  background-color: #d4d4f7; /* dark lavender */
+  white-space: normal;
+}
+
+#menu span.clicked {
   background-color: #e9dbc8;
   white-space: normal;
 }
@@ -58,10 +64,10 @@ nav>header {
 #menu .branch {
   margin-left: calc(-2 * var(--menu-padding));
   width: calc(100% + 2 * var(--menu-padding));
-  background-size: auto 50%;
-  background-position: 0.5em center;
+  background-size: auto 1em;
+  background-position: 0.5em 0.35em;
   background-repeat: no-repeat;
-  padding-left: 1.9em;
+  padding-left: 1.8em;
 }
 
 #menu .collapsed {

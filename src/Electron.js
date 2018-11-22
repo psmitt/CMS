@@ -41,6 +41,7 @@ function changeXMLRootDirectory(folder) {
 
   XMLRootDirectory = folder
   fs.writeFileSync(path.join(Profile, 'lastXMLRootDirectory.txt'), XMLRootDirectory, 'utf8')
+  loadMenuFiles()
 
   let lastDatabaseServer = path.join(Profile, 'lastDatabaseServer.txt')
   changeMySQLDatabase(!MySQL_Pool && fs.existsSync(lastDatabaseServer) ?
@@ -77,14 +78,17 @@ function changeMySQLDatabase(server) {
       multipleStatements: true
     }
     mysql.createConnection(connectionObject).connect(error => {
-      if (error) throw error
-      let oldPool = Boolean(MySQL_Pool)
-      if (oldPool)
-        MySQL_Pool.end()
-      MySQL_Pool = mysql.createPool(connectionObject)
-      fs.writeFileSync(path.join(Profile, 'lastDatabaseServer.txt'), connectionObject.host, 'utf8')
-      if (oldPool)
-        currentWindow.loadFile('src/index.html')
+      if (error) {
+        alert(error)
+      } else {
+        let oldPool = Boolean(MySQL_Pool)
+        if (oldPool)
+          MySQL_Pool.end()
+        MySQL_Pool = mysql.createPool(connectionObject)
+        fs.writeFileSync(path.join(Profile, 'lastDatabaseServer.txt'), connectionObject.host, 'utf8')
+        if (oldPool)
+          currentWindow.loadFile('src/index.html')
+      }
     })
   }
 }

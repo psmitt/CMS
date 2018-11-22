@@ -1,26 +1,5 @@
-const nav = document.body.firstElementChild.style
 const Menu = document.getElementById('menu')
 const Search = document.getElementById('search')
-
-/* NAV SIZING */
-
-function minimizeNavigationBar() {
-  Search.style.cursor = 'pointer'
-  Search.style.color = 'rgba(0,0,0,0)'
-  Search.placeholder = ''
-  Search.style.paddingLeft = '0'
-  nav.width = nav.minWidth = '2em'
-  Search.type = 'text'
-}
-
-function maximizeNavigationBar() {
-  Search.type = 'search'
-  nav.width = nav.minWidth = nav.maxWidth = '15em'
-  Search.style.paddingLeft = '1.75em'
-  Search.placeholder = 'Search'
-  Search.style.color = ''
-  Search.style.cursor = ''
-}
 
 /* MENU DISPLAY */
 
@@ -34,24 +13,7 @@ function loadMenuFiles(folder) {
       appendSubMenu(subMenu, Menu)
     }
   }
-  /*
-      let httpRequest = new XMLHttpRequest()
-      httpRequest.onreadystatechange = function () {
-        if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-          for (let xmlString of JSON.parse(httpRequest.responseText)) {
-            const xmlDoc = new DOMParser().parseFromString(
-              xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-              xmlString.substring(1) : xmlString, 'text/xml')
-            for (let subMenu of xmlDoc.children) {
-              appendSubMenu(subMenu, Menu)
-            }
-          }
-        }
-      }
-      httpRequest.open('POST', '/AJAX/Menu.php')
-      httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-      httpRequest.send('menu_load_files=all')
-  */
+  maximizeNavigationBar();
 }
 
 function appendSubMenu(subMenu, parentMenu) {
@@ -63,20 +25,9 @@ function appendSubMenu(subMenu, parentMenu) {
       appendSubMenu(item, node)
     }
   } else {
-    let onclick = 'onclick='
-    if (subMenu.attributes.class) switch (menu('class')) {
-      case 'task':
-        //        onclick += `"openIframe('${path.join(rootDir, 'Task', menu('order') + '.xml').replace(/\\/g, '\\\\')}')"`
-        onclick += `"openIframe('Task', '${menu('order')}')"`
-        break;
-      case 'view':
-        //        onclick += `"loadView('${path.join(rootDir, 'View', menu('order') + '.xml').replace(/\\/g, '\\\\')}')"`
-        onclick += `"openIframe('View', '${menu('order')}')"`
-        break;
-    } else {
-      onclick = ''
-    }
-    node.innerHTML = `<span class="item" ${onclick}>${menu('title')}</span>`
+    node.innerHTML = `<span class="item"${subMenu.attributes.class ?
+      'onclick="load_' + menu('class') + "('" + menu('order') + '\')"' : ''
+      }>${menu('title')}</span>`
   }
   parentMenu.appendChild(node)
 }
@@ -102,10 +53,16 @@ function setBranchIcons(root) {
 
 /* EVENTS */
 
+var lastClickedMenuItem = document.body // just to have an initial node value
+
 // Maximize NAV on click
 Menu.addEventListener('click', event => {
   let node = event.target
-  if (node.matches('span') && window.getSelection().type !== 'Range') {
+  if (node.matches('span')) {
+    lastClickedMenuItem.classList.remove('clicked')
+    lastClickedMenuItem = node
+    lastClickedMenuItem.classList.add('clicked')
+
     if (node.classList.contains('expanded')) {
       node.classList.replace('expanded', 'collapsed')
       while (node = node.nextElementSibling) {
@@ -124,10 +81,8 @@ Menu.addEventListener('click', event => {
 // Search Menu on input
 Search.addEventListener('input', _ => {
   const all = selector => Menu.querySelectorAll(selector)
-  for (let div of all('div'))
-    div.style.display = 'none'
-  for (let span of all('span'))
-    span.classList.remove('hit')
+  all('div').forEach(div => div.style.display = 'none')
+  all('span').forEach(span => span.classList.remove('hit'))
   let term = Search.value.trim()
   if (term) {
     let words = term.split(' ').map(word => new RegExp(word, 'i'))
@@ -191,37 +146,16 @@ Search.addEventListener('keydown', event => {
 Search.addEventListener('blur', _ => {
   if (Menu.querySelector('.hit'))
     Menu.querySelector('.hit').classList.remove('hit')
-  Menu.querySelectorAll('.item').forEach(item => item.innerHTML = item.textContent)
+  Menu.querySelectorAll('span').forEach(item => item.innerHTML = item.textContent)
 })
 
 // Restore hits on focus
 Search.addEventListener('focus', _ => {
+  lastClickedMenuItem.classList.remove('clicked')
   maximizeNavigationBar()
   if (Search.value.trim()) {
     Search.selectionStart = Search.selectionEnd = Search.value.length
     Search.dispatchEvent(new Event('input'))
-  }
-})
-
-/* BUGS */
-
-// .hover esetén a touch-csal van gond
-Menu.addEventListener('mouseleave', event => {
-  if (!event.relatedTarget && !event.toElement) { // false positive bug
-    console.log('HAPPENED');
-  }
-})
-
-// Prevent text selection on double click
-Menu.addEventListener('dblclick', event => {
-  if (event.target.matches('span')) {
-    if (document.selection && document.selection.empty) {
-      document.selection.empty();
-    } else if (window.getSelection) {
-      sel = window.getSelection();
-      if (sel && sel.removeAllRanges)
-        sel.removeAllRanges();
-    }
   }
 })
 
@@ -231,3 +165,29 @@ $(document).on('keypress', event => {
     $('#search').focus()
 });
 */
+
+/* NAV SIZING */
+
+const nav = document.body.firstElementChild.style
+
+function minimizeNavigationBar() {
+  Search.style.cursor = 'pointer'
+  Search.style.color = 'rgba(0,0,0,0)'
+  Search.placeholder = ''
+  Search.style.paddingLeft = '0'
+  nav.width = nav.minWidth = '2em'
+  Search.type = 'text'
+}
+
+function maximizeNavigationBar() {
+  Search.type = 'search'
+  nav.width = nav.minWidth = nav.maxWidth = '15em'
+  Search.style.paddingLeft = '1.75em'
+  Search.placeholder = 'Search'
+  Search.style.color = ''
+  Search.style.cursor = ''
+}
+
+function load_task(filename) {
+  console.log(filename);
+}
