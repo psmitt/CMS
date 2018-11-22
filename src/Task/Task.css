@@ -1,6 +1,6 @@
 :root {
   --div-margin: 1.5em;
-  --input-margin: 0.5em;
+  --input-margin: 9px;
 }
 
 article {
@@ -15,6 +15,7 @@ article {
 #procedure {
   white-space: normal;
   padding-left: var(--title-padding);
+  padding-right: var(--title-padding);
   width: calc(100% + var(--scrollbar-width));
 }
 
@@ -38,7 +39,7 @@ article {
   display: inline-block;
   position: relative;
   width: calc(100% - var(--div-margin) - var(--input-margin));
-  padding: 1px;
+  padding: 2px;
   line-height: 1.5;
   white-space: normal;
 }
