@@ -7,7 +7,7 @@ const DataPanel = document.getElementById('data')
 /* TABULAR REPORT */
 
 var table, colgroup, thead, tbody, cols, queries, dataArray, rowTemplate
-const rightColumnWidth = 44
+const rightColumnWidth = 47
 
 function load_view(viewname) {
   Message.textContent = '...'
@@ -37,16 +37,16 @@ function load_view(viewname) {
   filterCell.appendChild(filter)
 
   let scrollToTop = document.createElement('th')
-  scrollToTop.textContent = 'A'
+  scrollToTop.textContent = '⭱'
 
   let titleRow = document.createElement('tr')
   let scrollToBottom = document.createElement('td')
-  scrollToBottom.textContent = 'V'
+  scrollToBottom.textContent = '⭳'
 
   queries = xmlDoc.querySelectorAll('query')
   rowTemplate = document.createElement('tr')
   let rowEditCell = document.createElement('td')
-  rowEditCell.textContent = '>'
+  rowEditCell.textContent = '✐'
 
   if (queries.length > 1) { // gap analysis
 
@@ -86,7 +86,7 @@ function load_view(viewname) {
       let datacell = document.createElement('td')
       let align = get('type') === 'number' ? 'right' : ''
       let font = ''
-      let width = '170'
+      let width = '200'
       switch (get('type')) {
         case 'date':
         case 'time':
@@ -94,14 +94,14 @@ function load_view(viewname) {
           align = 'center'
         case 'number':
           font = 'mono'
-          width = '110'
+          width = '128'
       }
       datacell.style.textAlign = get('align') || align
       datacell.className = font
       rowTemplate.appendChild(datacell)
 
       let col = document.createElement('col')
-      tableWidth += parseInt(col.style.width = (get('width') || width) + 'px')
+      tableWidth += parseInt(col.style.width = (get('width') * 1.163 || width) + 'px')
       colgroup.appendChild(col)
     }
     table.style.width = tableWidth + 'px'

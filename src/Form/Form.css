@@ -1,8 +1,11 @@
+aside {
+  background-color: #e9dbc8;
+}
+
 aside>header>h1 {
   width: calc(100% - 1em);
 }
 
 aside>footer {
   position: relative;
-  background-color: white;
 }

@@ -25,8 +25,9 @@ function appendSubMenu(subMenu, parentMenu) {
       appendSubMenu(item, node)
     }
   } else {
-    node.innerHTML = `<span class="item"${subMenu.attributes.class ?
-      'onclick="load_' + menu('class') + "('" + menu('order') + '\')"' : ''
+    node.innerHTML = `<span class="item${subMenu.attributes.class ?
+      ' ' + menu('class') +
+      '" onclick="load_' + menu('class') + "('" + menu('order') + '\')"' : ''
       }>${menu('title')}</span>`
   }
   parentMenu.appendChild(node)
@@ -63,18 +64,20 @@ Menu.addEventListener('click', event => {
     lastClickedMenuItem = node
     lastClickedMenuItem.classList.add('clicked')
 
-    if (node.classList.contains('expanded')) {
-      node.classList.replace('expanded', 'collapsed')
-      while (node = node.nextElementSibling) {
-        node.style.display = 'none'
-      } // div
-    } else { // collapsed or filtered branch
-      node.classList.remove('collapsed', 'filtered')
-      node.classList.add('expanded')
-      while (node = node.nextElementSibling) // div
-        node.style.display = 'block'
+    if (node.classList.contains('branch')) {
+      if (node.classList.contains('expanded')) {
+        node.classList.replace('expanded', 'collapsed')
+        while (node = node.nextElementSibling) {
+          node.style.display = 'none'
+        } // div
+      } else { // collapsed or filtered branch
+        node.classList.remove('collapsed', 'filtered')
+        node.classList.add('expanded')
+        while (node = node.nextElementSibling) // div
+          node.style.display = 'block'
+      }
+      setBranchIcons(event.target.parentNode) // node has changed!
     }
-    setBranchIcons(event.target.parentNode) // node has changed!
   }
 })
 
@@ -117,6 +120,7 @@ Search.addEventListener('keydown', event => {
     case 'ArrowUp':
     case 'Enter':
       event.preventDefault(); // stop cursor move in input field
+      lastClickedMenuItem.classList.remove('clicked')
       let items = Array.from(Menu.querySelectorAll('.item')).filter(item => item.querySelector('mark'))
       for (let i = 0; i < items.length; i++) {
         if (items[i].classList.contains('hit')) {

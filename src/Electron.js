@@ -129,3 +129,7 @@ function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
     })
   }
 }
+
+function load_link(URL) {
+  require("electron").shell.openExternal(URL)
+}

@@ -2,6 +2,10 @@
   --grid-color: lightgray;
 }
 
+section {
+  background-color: WhiteSmoke;
+}
+
 #view {
   width: calc(100% - 4em); /* give space to message and tools */
 }
@@ -49,6 +53,7 @@
   overflow-x: auto;
   overflow-y: scroll;
   width: calc(100% + var(--scrollbar-width));
+  font-size: smaller;
 }
 
 #data th:last-child,
@@ -58,7 +63,7 @@
   padding: 0;
   right: 0;
   overflow: visible;
-  background-color: lightgreen;
+  background-color: #e9dbc8;
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
@@ -82,9 +87,9 @@
 }
 
 #data thead td {/* title row */
-  top: 1.55em;
+  top: 32px;
   font-weight: bold;
-  padding-left: 0.5em;
+  padding-left: var(--title-padding);
   white-space: nowrap;
 }
 

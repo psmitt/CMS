@@ -1,7 +1,7 @@
 :root {
   --aside-width: 10em;
-  --header-height: 2em;
-  --title-padding: 0.25em;
+  --header-height: 48px;
+  --title-padding: 8px;
   --scrollbar-width: 20px;
   --font-size: x-large;
 }
@@ -85,7 +85,7 @@ footer { /* scrollbox */
   height: calc(100% - var(--header-height));
   width: 100%;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 table {
