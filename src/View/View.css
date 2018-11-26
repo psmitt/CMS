@@ -110,7 +110,7 @@ section {
 #data tbody td {
   border: solid thin var(--grid-color);
   vertical-align: top;
-  padding: 0.25em;
+  padding: calc(var(--title-padding) - 2px);
   white-space: pre-wrap;
 }
 
@@ -118,5 +118,6 @@ section {
   font-family: monospace;
   font-weight: bold;
   font-size: larger;
-  padding-top: 5px;
+  padding-top: 10px;
+  padding-bottom: 0;
 }

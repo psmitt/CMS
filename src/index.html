@@ -22,14 +22,14 @@
   <main>
     <article>
       <header>
-        <h1 id="task">Task</h1>
+        <h1 id="task" onclick="showTask()">Task</h1>
         <span class="close">&#128473;</span>
       </header>
       <footer id="procedure"></footer>
     </article>
     <section>
       <header>
-        <h1 id="view">View</h1>
+        <h1 id="view" onclick="showView()">View</h1>
         <span id="message"></span>
         <svg id="tool" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
          <g><rect fill="none" height="32" width="32" y="-1" x="-1"/></g>
@@ -48,7 +48,7 @@
   </main>
   <aside>
     <header>
-      <h1>Form</h1>
+      <h1 id="form">Form</h1>
       <span class="close">&#128473;</span>
     </header>
     <footer>
@@ -60,6 +60,7 @@
 <script src="Menu/Menu.js"></script>
 <script src="Task/Task.js"></script>
 <script src="View/View.js"></script>
+<script src="Form/Form.js"></script>
 
 </body>
 

@@ -1,9 +1,14 @@
 const aside = document.querySelector('aside')
 
-$('header>h1', aside).on('click', function () {
+aside.querySelector('header>h1').addEventListener('click', function () {
   console.log('form title clicked');
 })
 
-$('header>span', aside).on('click', event => {
+aside.querySelector('header>span').addEventListener('click', event => {
   console.log('form close clicked');
+  closeForm()
 })
+
+function closeForm() {
+  aside.style.width = 0
+}

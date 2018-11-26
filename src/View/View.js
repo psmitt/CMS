@@ -97,14 +97,14 @@ function load_view(viewname) {
             align = 'center'
           case 'number':
             font = 'mono'
-            width = '128'
+            width = '133'
         }
         datacell.style.textAlign = get('align') || align
         datacell.className = font
         rowTemplate.appendChild(datacell)
 
         let col = document.createElement('col')
-        tableWidth += parseInt(col.style.width = (get('width') * 1.163 || width) + 'px')
+        tableWidth += parseInt(col.style.width = (get('width') * 1.175 || width) + 'px')
         colgroup.appendChild(col)
       }
       table.style.width = tableWidth + 'px'
@@ -200,7 +200,7 @@ function appendRow() {
   return false
 }
 
-function prependRow() { // return ;urn success
+function prependRow() { // return success
 }
 
 function showView(header) {
