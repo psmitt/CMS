@@ -8,7 +8,9 @@ and $_SESSION['role'] != 'Agent')
 $settings = json_decode(file_get_contents("$profile/Settings.json"), true);
 $test     = strtolower($_SERVER['HTTP_HOST']) == 'cms4test' ? ' TEST' : '';
 
-echo str_replace('<script src="Electron.js"></script>',
-                 '<script src="IIS.js"></script>',
+echo str_replace(['href="Font/Barlow.css"',
+                  '<script src="Electron.js"></script>'],
+                 ['href="https://fonts.googleapis.com/css?family=Barlow+Semi+Condensed"',
+                  '<script src="IIS.js"></script>'],
                  file_get_contents('index.html'));
 ?>

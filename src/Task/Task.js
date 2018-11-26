@@ -4,10 +4,13 @@ const Procedure = document.querySelector('article>footer')
 function load_task(taskname) { // taskname is filename without file extension
   while (Procedure.firstChild)
     Procedure.removeChild(Procedure.firstChild)
-  let xmlDoc = readXMLFile('Task', taskname + '.xml')
-  TaskTitle.textContent = xmlDoc.querySelector('task').attributes['title'].value
-  for (let step of xmlDoc.querySelector('task').children)
-    appendStep(step, Procedure)
+  readXMLFile('Task', taskname + '.xml', loadTask)
+
+  function loadTask(xmlDoc) {
+    TaskTitle.textContent = xmlDoc.querySelector('task').attributes['title'].value
+    for (let step of xmlDoc.querySelector('task').children)
+      appendStep(step, Procedure)
+  }
 }
 
 function appendStep(step, parent) {

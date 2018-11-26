@@ -58,7 +58,7 @@ section {
 
 #data th:last-child,
 #data td:last-child {
-  z-index: 7;
+  z-index: 6;
   transform: translate3d(0,0,0);
   position: sticky;
   padding: 0;
@@ -73,7 +73,10 @@ section {
 }
 
 #data th:last-child:hover,
-#data td:last-child:hover {
+#data td:last-child:hover,
+#data th:last-child:active,
+#data td:last-child:active {
+  background-color: gray;
   color: white;
 }
 

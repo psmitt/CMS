@@ -13,106 +13,110 @@ function load_view(viewname) {
   Message.textContent = '...'
   while (DataPanel.firstChild)
     DataPanel.removeChild(DataPanel.firstChild)
-  let xmlDoc = readXMLFile('View', viewname + '.xml')
-  ViewTitle.textContent = xmlDoc.querySelector('view').attributes['title'].value
-  DataPanel.innerHTML = `<table>
-                          <colgroup></colgroup>
-                          <thead></thead>
-                          <tbody></tbody>
-                         </table>`
 
-  table = DataPanel.querySelector('table')
-  colgroup = table.querySelector('colgroup')
-  thead = table.querySelector('thead')
-  tbody = table.querySelector('tbody')
+  readXMLFile('View', viewname + '.xml', loadView)
 
-  let columns = xmlDoc.querySelectorAll('column')
-  let rightColumn = document.createElement('col')
-  rightColumn.style.width = rightColumnWidth + 'px'
+  function loadView(xmlDoc) {
+    ViewTitle.textContent = xmlDoc.querySelector('view').attributes['title'].value
+    DataPanel.innerHTML = `<table>
+                            <colgroup></colgroup>
+                            <thead></thead>
+                            <tbody></tbody>
+                           </table>`
 
-  let filterRow = document.createElement('tr')
-  let filterCell = document.createElement('th')
-  let filter = document.createElement('input')
-  filter.type = 'search'
-  filterCell.appendChild(filter)
+    table = DataPanel.querySelector('table')
+    colgroup = table.querySelector('colgroup')
+    thead = table.querySelector('thead')
+    tbody = table.querySelector('tbody')
 
-  let scrollToTop = document.createElement('th')
-  scrollToTop.textContent = '⭱'
+    let columns = xmlDoc.querySelectorAll('column')
+    let rightColumn = document.createElement('col')
+    rightColumn.style.width = rightColumnWidth + 'px'
 
-  let titleRow = document.createElement('tr')
-  let scrollToBottom = document.createElement('td')
-  scrollToBottom.textContent = '⭳'
+    let filterRow = document.createElement('tr')
+    let filterCell = document.createElement('th')
+    let filter = document.createElement('input')
+    filter.type = 'search'
+    filterCell.appendChild(filter)
 
-  queries = xmlDoc.querySelectorAll('query')
-  rowTemplate = document.createElement('tr')
-  let rowEditCell = document.createElement('td')
-  rowEditCell.textContent = '✐'
+    let scrollToTop = document.createElement('th')
+    scrollToTop.textContent = '⭱'
 
-  if (queries.length > 1) { // gap analysis
+    let titleRow = document.createElement('tr')
+    let scrollToBottom = document.createElement('td')
+    scrollToBottom.textContent = '⭳'
 
-    table.style.width = '1044px'
-    cols = 4
-    colgroup.innerHTML = `${'<col style="width:200px"/>'.repeat(2)}
-                          ${'<col style="width:300px"/>'.repeat(2)}`
+    queries = xmlDoc.querySelectorAll('query')
+    rowTemplate = document.createElement('tr')
+    let rowEditCell = document.createElement('td')
+    rowEditCell.textContent = '✐'
 
-    for (let col = 0; col < cols; col++)
-      filterRow.appendChild(filterCell.cloneNode(true))
+    if (queries.length > 1) { // gap analysis
 
-    titleRow.innerHTML = `
-        <td>${columns[0].attributes['title'].value}</td>
-        <td data-title="Data">Data</td>
-        <td>${queries[0].attributes['title'].value}</td>
-        <td>${queries[1].attributes['title'].value}</td>`
+      table.style.width = '1044px'
+      cols = 4
+      colgroup.innerHTML = `${'<col style="width:200px"/>'.repeat(2)}
+                            ${'<col style="width:300px"/>'.repeat(2)}`
 
-    rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
-                             <td style="font-style:italic"></td>
-                             <td></td><td></td>`
+      for (let col = 0; col < cols; col++)
+        filterRow.appendChild(filterCell.cloneNode(true))
 
-  } else { // simple or compound view
+      titleRow.innerHTML = `
+          <td>${columns[0].attributes['title'].value}</td>
+          <td data-title="Data">Data</td>
+          <td>${queries[0].attributes['title'].value}</td>
+          <td>${queries[1].attributes['title'].value}</td>`
 
-    let tableWidth = rightColumnWidth
-    cols = columns.length
-    for (let column of columns) {
-      const get = attribute => // read attribute
-        column.attributes[attribute] ?
-        column.attributes[attribute].value : null
+      rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
+                               <td style="font-style:italic"></td>
+                               <td></td><td></td>`
 
-      filterRow.appendChild(filterCell.cloneNode(true))
+    } else { // simple or compound view
 
-      let title = document.createElement('td')
-      title.textContent = get('title')
-      titleRow.appendChild(title)
+      let tableWidth = rightColumnWidth
+      cols = columns.length
+      for (let column of columns) {
+        const get = attribute => // read attribute
+          column.attributes[attribute] ?
+          column.attributes[attribute].value : null
 
-      let datacell = document.createElement('td')
-      let align = get('type') === 'number' ? 'right' : ''
-      let font = ''
-      let width = '200'
-      switch (get('type')) {
-        case 'date':
-        case 'time':
-        case 'datetime':
-          align = 'center'
-        case 'number':
-          font = 'mono'
-          width = '128'
+        filterRow.appendChild(filterCell.cloneNode(true))
+
+        let title = document.createElement('td')
+        title.textContent = get('title')
+        titleRow.appendChild(title)
+
+        let datacell = document.createElement('td')
+        let align = get('type') === 'number' ? 'right' : ''
+        let font = ''
+        let width = '200'
+        switch (get('type')) {
+          case 'date':
+          case 'time':
+          case 'datetime':
+            align = 'center'
+          case 'number':
+            font = 'mono'
+            width = '128'
+        }
+        datacell.style.textAlign = get('align') || align
+        datacell.className = font
+        rowTemplate.appendChild(datacell)
+
+        let col = document.createElement('col')
+        tableWidth += parseInt(col.style.width = (get('width') * 1.163 || width) + 'px')
+        colgroup.appendChild(col)
       }
-      datacell.style.textAlign = get('align') || align
-      datacell.className = font
-      rowTemplate.appendChild(datacell)
-
-      let col = document.createElement('col')
-      tableWidth += parseInt(col.style.width = (get('width') * 1.163 || width) + 'px')
-      colgroup.appendChild(col)
+      table.style.width = tableWidth + 'px'
     }
-    table.style.width = tableWidth + 'px'
+    colgroup.appendChild(rightColumn)
+    filterRow.appendChild(scrollToTop)
+    thead.appendChild(filterRow)
+    titleRow.appendChild(scrollToBottom)
+    thead.appendChild(titleRow)
+    rowTemplate.appendChild(rowEditCell)
+    reloadData()
   }
-  colgroup.appendChild(rightColumn)
-  filterRow.appendChild(scrollToTop)
-  thead.appendChild(filterRow)
-  titleRow.appendChild(scrollToBottom)
-  thead.appendChild(titleRow)
-  rowTemplate.appendChild(rowEditCell)
-  reloadData()
 }
 
 // refresh dataArray in memory

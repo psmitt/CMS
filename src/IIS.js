@@ -1,18 +1,65 @@
-/*
-    let httpRequest = new XMLHttpRequest()
-    httpRequest.onreadystatechange = function () {
-      if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-        for (let xmlString of JSON.parse(httpRequest.responseText)) {
-          const xmlDoc = new DOMParser().parseFromString(
-            xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-            xmlString.substring(1) : xmlString, 'text/xml')
-          for (let subMenu of xmlDoc.children) {
-            appendSubMenu(subMenu, Menu)
-          }
-        }
-      }
+document.addEventListener('DOMContentLoaded', _ => {
+  loadMenuFiles()
+})
+
+function openNewWindow(folder, filename) {
+  open('/CMS5/src/index.php', '_blank')
+}
+
+function listDirectory(folder, callback) {
+  let httpRequest = new XMLHttpRequest()
+  httpRequest.onreadystatechange = function () {
+    if (httpRequest.readyState == 4) {
+      if (httpRequest.status == 200)
+        callback(JSON.parse(httpRequest.responseText))
+      else
+        console.log('\nHTTP status: ', httpRequest.status,
+          '\nResponse: ', httpRequest.responseText)
     }
-    httpRequest.open('POST', '/AJAX/Menu.php')
-    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    httpRequest.send('menu_load_files=all')
-*/
+  }
+  httpRequest.open('POST', '/CMS5/src/IIS.php')
+  httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+  httpRequest.send(`listDirectory=${folder}`)
+}
+
+function readXMLFile(folder, filename, callback) {
+  let httpRequest = new XMLHttpRequest()
+  httpRequest.onreadystatechange = function () {
+    if (httpRequest.readyState == 4) {
+      if (httpRequest.status == 200) {
+        callback(new DOMParser().parseFromString(httpRequest.responseText, 'text/xml'))
+      } else
+        console.log('HTTP status: ', httpRequest.status,
+          '\nResponse: ', httpRequest.responseText)
+    }
+  }
+  httpRequest.open('POST', '/CMS5/src/IIS.php')
+  httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+  httpRequest.send(`readXMLFile=${folder}/${filename}`)
+}
+
+function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
+  let parameters = {
+    queries: queries,
+    dsn: dsn,
+    user: user,
+    pass: pass
+  }
+  let httpRequest = new XMLHttpRequest()
+  httpRequest.onreadystatechange = function () {
+    if (httpRequest.readyState == 4) {
+      if (httpRequest.status == 200) {
+        callback(JSON.parse(httpRequest.responseText))
+      } else
+        console.log('HTTP status: ', httpRequest.status,
+          '\nResponse: ', httpRequest.responseText)
+    }
+  }
+  httpRequest.open('POST', '/CMS5/src/IIS.php')
+  httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+  httpRequest.send(`runSQLQueries=${encodeURIComponent(JSON.stringify(parameters))}`)
+}
+
+function load_link(URL) {
+  open(URL, '_blank')
+}

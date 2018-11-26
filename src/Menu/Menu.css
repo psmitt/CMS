@@ -76,12 +76,12 @@ nav>header {
 #menu mark,
 #menu .item:hover,
 #menu .item.hit {
-  background-color: #eeeeee;
+  background-color: #dddddd;
   color: black;
 }
 
 #menu .item.clicked {
-  background-color: #dddddd;
+  background-color: #cccccc;
 }
 
 /* BRANCH COLOR THEME: tan */
@@ -91,7 +91,7 @@ nav>header {
   font-weight: bold;
 }
 
-/* TASK COLOR THEME: steelblue */
+/* TASK COLOR THEME: lightsteelblue */
 
 #menu .task {
   color: #1d3549; /* 20% */
@@ -100,12 +100,12 @@ nav>header {
 #menu .task mark,
 #menu .task:hover,
 #menu .task.hit {
-  background-color: #edf3f8;  /* 95% */
+  background-color: #dbe4f0;  /* 90% */
   color: black;
 }
 
 #menu .task.clicked {
-  background-color: #dae7f1;  /* 90% */
+  background-color: #c9d7e8;  /* 85% */
 }
 
 /* LINK COLOR THEME: seagreen */
@@ -117,11 +117,11 @@ nav>header {
 #menu .link mark,
 #menu .link:hover,
 #menu .link.hit {
-  background-color: #ecf9f1;  /* 95% */
+  background-color: #d9f2e4;  /* 90% */
   color: #20603b; /* 25% */
 }
 
 #menu .link.clicked {
-  background-color: #d9f2e4;  /* 90% */
+  background-color:  #c6ecd6;  /* 85% */
   color: #194d30; /* 20% */
 }

@@ -6,12 +6,27 @@ const Search = document.getElementById('search')
 function loadMenuFiles(folder) {
   while (Menu.firstChild)
     Menu.removeChild(Menu.firstChild)
-  let files = listDirectory('Menu')
-  for (let filename of files) {
-    let xmlDoc = readXMLFile('Menu', filename)
-    for (let subMenu of xmlDoc.children) {
+
+  var menu; // generator
+
+  listDirectory('Menu', loadFiles) // initialize the menu generator
+
+  function loadFiles(filenames) {
+    menu = (function* () {
+      yield* filenames
+    })()
+    loadNext()
+  }
+
+  function loadNext() {
+    if (next = menu.next().value)
+      readXMLFile('Menu', next, loadMenu)
+  }
+
+  function loadMenu(xmlDoc) {
+    for (let subMenu of xmlDoc.children)
       appendSubMenu(subMenu, Menu)
-    }
+    loadNext()
   }
   maximizeNavigationBar();
 }
@@ -185,7 +200,7 @@ function minimizeNavigationBar() {
 
 function maximizeNavigationBar() {
   Search.type = 'search'
-  nav.width = nav.minWidth = nav.maxWidth = '15em'
+  nav.width = nav.minWidth = nav.maxWidth = 'var(--aside-width)'
   Search.style.paddingLeft = '1.75em'
   Search.placeholder = 'Search'
   Search.style.color = ''

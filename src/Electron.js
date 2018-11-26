@@ -98,20 +98,24 @@ function openNewWindow(folder, filename) {
   ipc.send('New Window', folder, filename)
 }
 
-function listDirectory(folder) {
-  let entries = fs.readdirSync(path.join(XMLRootDirectory, folder))
-  let filenames = []
-  for (let entry of entries)
-    if (fs.statSync(path.join(XMLRootDirectory, folder, entry)).isFile())
-      filenames.push(entry)
-  return filenames
+function listDirectory(folder, callback) {
+  fs.readdir(path.join(XMLRootDirectory, folder), (error, entries) => {
+    if (error) throw error
+    let filenames = []
+    for (let entry of entries)
+      if (fs.statSync(path.join(XMLRootDirectory, folder, entry)).isFile())
+        filenames.push(entry)
+    callback(filenames)
+  })
 }
 
-function readXMLFile(folder, filename) {
-  let xmlString = fs.readFileSync(path.join(XMLRootDirectory, folder, filename), 'utf8')
-  return new DOMParser().parseFromString(
-    xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-    xmlString.substring(1) : xmlString, 'text/xml')
+function readXMLFile(folder, filename, callback) {
+  fs.readFile(path.join(XMLRootDirectory, folder, filename), 'utf8', (error, xmlString) => {
+    if (error) throw error
+    callback(new DOMParser().parseFromString(
+      xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+      xmlString.substring(1) : xmlString, 'text/xml'))
+  })
 }
 
 function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
