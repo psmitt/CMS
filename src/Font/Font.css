@@ -8,3 +8,8 @@
     font-weight: bold;
     src: url("BarlowSemiCondensed-SemiBold.otf") format("opentype");
 }
+
+@font-face {
+    font-family: "Nova Mono";
+    src: url("NovaMono.ttf") format("truetype");
+}

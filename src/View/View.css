@@ -110,14 +110,14 @@ section {
 #data tbody td {
   border: solid thin var(--grid-color);
   vertical-align: top;
-  padding: calc(var(--title-padding) - 2px);
+  padding-left: calc(var(--title-padding) - 2px);
+  padding-right: calc(var(--title-padding) - 2px);
+  padding-top: 5px;
+  padding-bottom: 5px;
   white-space: pre-wrap;
 }
 
 #data .mono {
-  font-family: monospace;
-  font-weight: bold;
-  font-size: larger;
-  padding-top: 10px;
-  padding-bottom: 0;
+  font-family: "Nova Mono", monospace;
+  padding-top: 4px;
 }

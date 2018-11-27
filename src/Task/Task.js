@@ -1,5 +1,6 @@
+const article = document.querySelector('article')
 const TaskTitle = document.getElementById('task')
-const Procedure = document.querySelector('article>footer')
+const Procedure = article.querySelector('footer')
 
 function load_task(taskname) { // taskname is filename without file extension
   while (Procedure.firstChild)
@@ -54,8 +55,25 @@ function appendStep(step, parent) {
   parent.appendChild(node);
 }
 
-function showTask() {
+const TaskPane = article.style
+
+article.querySelector('header>span').addEventListener('click', event => {
+  TaskPane.display = 'none'
+})
+
+function increaseTask() {
   closeForm()
   minimizeNavigationBar()
-  decreaseView()
+  TaskPane.display = 'block'
+  if (TaskPane.height === 'var(--header-height)')
+    TaskPane.height = '50%'
+  else
+    TaskPane.height = 'calc(100% - var(--header-height))'
+}
+
+function decreaseTask() {
+  if (TaskPane.height === 'calc(100% - var(--header-height))')
+    TaskPane.height = '50%'
+  else
+    TaskPane.height = 'var(--header-height)'
 }

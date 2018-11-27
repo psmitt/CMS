@@ -39,12 +39,14 @@ function load_view(viewname) {
     filter.type = 'search'
     filterCell.appendChild(filter)
 
-    let scrollToTop = document.createElement('th')
-    scrollToTop.textContent = '⭱'
+    let topScroller = document.createElement('th')
+    topScroller.textContent = '⭱'
+    topScroller.addEventListener('click', scrollToTop)
 
     let titleRow = document.createElement('tr')
-    let scrollToBottom = document.createElement('td')
-    scrollToBottom.textContent = '⭳'
+    let bottomScroller = document.createElement('td')
+    bottomScroller.textContent = '⭳'
+    bottomScroller.addEventListener('click', scrollToBottom)
 
     queries = xmlDoc.querySelectorAll('query')
     rowTemplate = document.createElement('tr')
@@ -97,10 +99,10 @@ function load_view(viewname) {
             align = 'center'
           case 'number':
             font = 'mono'
-            width = '133'
+            width = '128'
         }
         datacell.style.textAlign = get('align') || align
-        datacell.className = font
+        datacell.className = font || get('font')
         rowTemplate.appendChild(datacell)
 
         let col = document.createElement('col')
@@ -110,9 +112,9 @@ function load_view(viewname) {
       table.style.width = tableWidth + 'px'
     }
     colgroup.appendChild(rightColumn)
-    filterRow.appendChild(scrollToTop)
+    filterRow.appendChild(topScroller)
     thead.appendChild(filterRow)
-    titleRow.appendChild(scrollToBottom)
+    titleRow.appendChild(bottomScroller)
     thead.appendChild(titleRow)
     rowTemplate.appendChild(rowEditCell)
     reloadData()
@@ -125,13 +127,16 @@ function reloadData() {
 }
 
 function loadDataArray(result) {
+  let pad = number => number <= 9 ? '0' + number : number
+  let normalize = date => date.getFullYear() + '-' +
+    pad(date.getMonth() + 1) + '-' + pad(date.getDate())
   dataArray = []
   for (let row of result) {
     let dataRow = []
     for (let data in row) {
       if (row[data]) {
         if (row[data] instanceof Date)
-          dataRow.push(row[data].toISOString().substring(0, 10))
+          dataRow.push(normalize(row[data]))
         else
           dataRow.push(row[data].toString())
       } else { // null or emtpy string
@@ -170,13 +175,17 @@ function filterData() {
     counter = dataArray.length
   }
   Message.textContent = counter
-  displayData()
+  scrollToTop()
 }
 
-let prevScrollTop, firstRowIndex, lastRowIndex
+/* VIRTUAL SCROLLING */
 
-function displayData() {
-  prevScrollTop = 0
+let prevScrollTop, firstRowIndex, lastRowIndex;
+
+function scrollToTop() {
+  while (tbody.firstChild)
+    tbody.removeChild(tbody.firstChild)
+  DataPanel.scrollTop = prevScrollTop = 0
   lastRowIndex = -1
   appendRow()
   firstRowIndex = lastRowIndex
@@ -195,31 +204,49 @@ function appendRow() {
     for (let cell = 0; cell < cols; cell++)
       newRow.children[cell].innerHTML = dataArray[lastIndex][cell]
     tbody.appendChild(newRow)
-    return true
   }
-  return false
 }
+
+DataPanel.addEventListener('scroll', _ => {
+  if (prevScrollTop < DataPanel.scrollTop)
+    appendRow()
+  else
+    prependRow()
+  prevScrollTop = DataPanel.scrollTop
+})
 
 function prependRow() { // return success
+  let firstIndex = firstRowIndex
+  while (--firstIndex >= 0)
+    if (dataArray[firstIndex][cols])
+      break
+  if (firstIndex >= 0 && dataArray[firstIndex][cols]) {
+    let newRow = rowTemplate.cloneNode(true)
+    newRow.dataset.index = firstRowIndex = firstIndex
+    for (let cell = 0; cell < cols; cell++)
+      newRow.children[cell].innerHTML = dataArray[firstIndex][cell]
+    if (tbody.firstChild)
+      tbody.insertBefore(newRow, tbody.firstChild)
+    else
+      tbody.appendChild(newRow)
+  }
 }
 
-function showView(header) {
+function scrollToBottom() {
+  while (tbody.firstChild)
+    tbody.removeChild(tbody.firstChild)
+  DataPanel.scrollTop = prevScrollTop = 0
+  firstRowIndex = dataArray.length
+  prependRow()
+  lastRowIndex = firstRowIndex
+  for (let row = 1; row < 20; row++)
+    prependRow()
+  DataPanel.scrollTop = prevScrollTop =
+    table.offsetHeight - DataPanel.offsetHeight + 20 // horizontal scrollbar
+}
+
+function increaseView() {
   closeForm()
   minimizeNavigationBar()
-  let footer = header.parentNode
-  if (footer.previousElementSibling.style.display === 'none')
-    footer.style.height = '100%'
-  else if (footer.style.height === 'auto')
-    footer.style.height = '50%'
-  else
-    footer.style.height = 'calc(100% - var(--header-height))'
-}
-
-function decreaseView() {
-  if (footer) {
-    if (footer.style.height === 'calc(100% - var(--header-height))')
-      footer.style.height = '50%'
-    else
-      footer.style.height = 'auto'
-  }
+  decreaseTask()
 }
