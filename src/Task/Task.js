@@ -43,8 +43,13 @@ function appendStep(step, parent) {
       let span = document.createElement('span')
       let child = step.firstElementChild // todo, question, answer
       let text = child.textContent
+      if (Electron)
+        text = text.replace('src="HUN/img/',
+          'src="' + path.join(XMLRootDirectory, 'File', 'img', ' ').trimEnd())
       while ((child = child.nextElementSibling) && child.tagName === 'button')
-        text += `&ensp;<button>${child.attributes['title'].value}</button>`
+        text += `&ensp;<button onclick="load_${child.attributes['class'].value}(
+                '${child.attributes['order'].value}')"
+                >${child.attributes['title'].value}</button>`
       span.innerHTML = text
       node.appendChild(span)
       while (child) {
@@ -54,6 +59,8 @@ function appendStep(step, parent) {
   }
   parent.appendChild(node);
 }
+
+/* RESIZE FRAMES */
 
 const TaskPane = article.style
 

@@ -1,3 +1,6 @@
+const Electron = false
+const IIS = true
+
 document.addEventListener('DOMContentLoaded', _ => {
   loadMenuFiles()
 })

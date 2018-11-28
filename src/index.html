@@ -29,7 +29,7 @@
     </article>
     <section>
       <header>
-        <h1 id="view" onclick="increaseView()">View</h1>
+        <h1 id="view" onclick="if (!event.target.matches('a') && !getSelection().toString()) increaseView()">View</h1>
         <span id="message"></span>
         <svg id="tool" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
          <g><rect fill="none" height="32" width="32" y="-1" x="-1"/></g>
@@ -52,7 +52,7 @@
       <span class="close">&#128473;</span>
     </header>
     <footer>
-      <form></form>
+      <form><table></table></form>
     </footer>
   </aside>
 
@@ -61,6 +61,7 @@
 <script src="Task/Task.js"></script>
 <script src="View/View.js"></script>
 <script src="Form/Form.js"></script>
+<script src="Table/Table.js"></script>
 
 </body>
 

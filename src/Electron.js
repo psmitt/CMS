@@ -1,6 +1,10 @@
+const Electron = true
+const IIS = false
+
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
+const shell = require("electron").shell
 const ipc = require('electron').ipcRenderer
 
 var Profile // Local CMS profile folder
@@ -127,6 +131,26 @@ function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
         nestTables: '.'
       }, (error, result, fields) => {
         if (error) throw error
+
+        let pad = number => number <= 9 ? '0' + number : number
+        let normalize = date => date.getFullYear() + '-' +
+          pad(date.getMonth() + 1) + '-' + pad(date.getDate())
+
+        for (row = 0; row < result.length; row++) {
+          let packet = result[row]
+          let dataRow = []
+          for (let data in packet) {
+            if (packet[data]) {
+              if (packet[data] instanceof Date)
+                dataRow.push(normalize(packet[data]))
+              else
+                dataRow.push(packet[data].toString())
+            } else { // null or emtpy string
+              dataRow.push('')
+            }
+          }
+          result[row] = dataRow
+        }
         callback(result)
         cmdb.release()
       })
@@ -135,5 +159,8 @@ function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
 }
 
 function load_link(URL) {
-  require("electron").shell.openExternal(URL)
+  if (URL.indexOf('HUN/') >= 0)
+    shell.openItem(URL.replace('HUN', path.join(XMLRootDirectory, 'File')))
+  else
+    shell.openExternal(URL)
 }

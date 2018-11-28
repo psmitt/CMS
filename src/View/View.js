@@ -6,146 +6,138 @@ const DataPanel = document.getElementById('data')
 
 /* TABULAR REPORT */
 
-var table, colgroup, thead, tbody, cols, queries, dataArray, rowTemplate
+var table, colgroup, thead, tbody, cols, queries, dataArray, rowTemplate;
 const rightColumnWidth = 47
 
 function load_view(viewname) {
   Message.textContent = '...'
   while (DataPanel.firstChild)
     DataPanel.removeChild(DataPanel.firstChild)
-
   readXMLFile('View', viewname + '.xml', loadView)
+}
 
-  function loadView(xmlDoc) {
-    ViewTitle.textContent = xmlDoc.querySelector('view').attributes['title'].value
-    DataPanel.innerHTML = `<table>
-                            <colgroup></colgroup>
-                            <thead></thead>
-                            <tbody></tbody>
-                           </table>`
+function loadView(xmlDoc) {
+  let isTable = Boolean(xmlDoc.querySelector('table'))
+  let get = attribute =>
+    xmlDoc.querySelector(isTable ? 'table' : 'view').attributes[attribute].value
+  ViewTitle.innerHTML = get('title')
+  queries = []
+  if (isTable)
+    queries.push(tableQuery(xmlDoc))
+  else
+    xmlDoc.querySelectorAll('query').forEach(query =>
+      queries.push(query.textContent))
 
-    table = DataPanel.querySelector('table')
-    colgroup = table.querySelector('colgroup')
-    thead = table.querySelector('thead')
-    tbody = table.querySelector('tbody')
+  DataPanel.innerHTML = `<table>
+                          <colgroup></colgroup>
+                          <thead></thead>
+                          <tbody></tbody>
+                         </table>`
 
-    let columns = xmlDoc.querySelectorAll('column')
-    let rightColumn = document.createElement('col')
-    rightColumn.style.width = rightColumnWidth + 'px'
+  table = DataPanel.querySelector('table')
+  colgroup = table.querySelector('colgroup')
+  thead = table.querySelector('thead')
+  tbody = table.querySelector('tbody')
 
-    let filterRow = document.createElement('tr')
-    let filterCell = document.createElement('th')
-    let filter = document.createElement('input')
-    filter.type = 'search'
-    filterCell.appendChild(filter)
+  let columns = xmlDoc.querySelectorAll('column')
+  let rightColumn = document.createElement('col')
+  rightColumn.style.width = rightColumnWidth + 'px'
 
-    let topScroller = document.createElement('th')
-    topScroller.textContent = '⭱'
-    topScroller.addEventListener('click', scrollToTop)
+  let filterRow = document.createElement('tr')
+  let filterCell = document.createElement('th')
+  let filter = document.createElement('input')
+  filter.type = 'search'
+  filterCell.appendChild(filter)
 
-    let titleRow = document.createElement('tr')
-    let bottomScroller = document.createElement('td')
-    bottomScroller.textContent = '⭳'
-    bottomScroller.addEventListener('click', scrollToBottom)
+  let topScroller = document.createElement('th')
+  topScroller.textContent = '⭱'
+  topScroller.addEventListener('click', scrollToTop)
 
-    queries = xmlDoc.querySelectorAll('query')
-    rowTemplate = document.createElement('tr')
-    let rowEditCell = document.createElement('td')
-    rowEditCell.textContent = '✐'
+  let titleRow = document.createElement('tr')
+  let bottomScroller = document.createElement('td')
+  bottomScroller.textContent = '⭳'
+  bottomScroller.addEventListener('click', scrollToBottom)
 
-    if (queries.length > 1) { // gap analysis
+  rowTemplate = document.createElement('tr')
+  let rowEditCell = document.createElement('td')
+  rowEditCell.textContent = '✐'
 
-      table.style.width = '1044px'
-      cols = 4
-      colgroup.innerHTML = `${'<col style="width:200px"/>'.repeat(2)}
-                            ${'<col style="width:300px"/>'.repeat(2)}`
+  if (queries.length > 1) { // gap analysis
 
-      for (let col = 0; col < cols; col++)
-        filterRow.appendChild(filterCell.cloneNode(true))
+    table.style.width = '1044px'
+    cols = 4
+    colgroup.innerHTML = `${'<col style="width:200px"/>'.repeat(2)}
+                          ${'<col style="width:300px"/>'.repeat(2)}`
 
-      titleRow.innerHTML = `
-          <td>${columns[0].attributes['title'].value}</td>
-          <td data-title="Data">Data</td>
-          <td>${queries[0].attributes['title'].value}</td>
-          <td>${queries[1].attributes['title'].value}</td>`
+    for (let col = 0; col < cols; col++)
+      filterRow.appendChild(filterCell.cloneNode(true))
 
-      rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
-                               <td style="font-style:italic"></td>
-                               <td></td><td></td>`
+    titleRow.innerHTML = `
+        <td>${columns[0].attributes['title'].value}</td>
+        <td data-title="Data">Data</td>
+        <td>${queries[0].attributes['title'].value}</td>
+        <td>${queries[1].attributes['title'].value}</td>`
 
-    } else { // simple or compound view
+    rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
+                             <td style="font-style:italic"></td>
+                             <td></td><td></td>`
 
-      let tableWidth = rightColumnWidth
-      cols = columns.length
-      for (let column of columns) {
-        const get = attribute => // read attribute
-          column.attributes[attribute] ?
-          column.attributes[attribute].value : null
+  } else { // simple or compound view
 
-        filterRow.appendChild(filterCell.cloneNode(true))
+    let tableWidth = rightColumnWidth
+    cols = columns.length
+    for (let column of columns) {
+      const get = attribute => // read attribute
+        column.attributes[attribute] ?
+        column.attributes[attribute].value : null
 
-        let title = document.createElement('td')
-        title.textContent = get('title')
-        titleRow.appendChild(title)
+      filterRow.appendChild(filterCell.cloneNode(true))
 
-        let datacell = document.createElement('td')
-        let align = get('type') === 'number' ? 'right' : ''
-        let font = ''
-        let width = '200'
-        switch (get('type')) {
-          case 'date':
-          case 'time':
-          case 'datetime':
-            align = 'center'
-          case 'number':
-            font = 'mono'
-            width = '128'
-        }
-        datacell.style.textAlign = get('align') || align
-        datacell.className = font || get('font')
-        rowTemplate.appendChild(datacell)
+      let title = document.createElement('td')
+      title.textContent = get('title')
+      titleRow.appendChild(title)
 
-        let col = document.createElement('col')
-        tableWidth += parseInt(col.style.width = (get('width') * 1.175 || width) + 'px')
-        colgroup.appendChild(col)
+      let datacell = document.createElement('td')
+      let align = get('type') === 'number' ? 'right' : ''
+      let font = ''
+      let width = '200'
+      switch (get('type')) {
+        case 'date':
+        case 'time':
+        case 'datetime':
+          align = 'center'
+        case 'number':
+          font = 'mono'
+          width = '128'
       }
-      table.style.width = tableWidth + 'px'
+      datacell.style.textAlign = get('align') || align
+      datacell.className = font || get('font')
+      rowTemplate.appendChild(datacell)
+
+      let col = document.createElement('col')
+      tableWidth += parseInt(col.style.width = (get('width') * 1.175 || width) + 'px')
+      colgroup.appendChild(col)
     }
-    colgroup.appendChild(rightColumn)
-    filterRow.appendChild(topScroller)
-    thead.appendChild(filterRow)
-    titleRow.appendChild(bottomScroller)
-    thead.appendChild(titleRow)
-    rowTemplate.appendChild(rowEditCell)
-    reloadData()
+    table.style.width = tableWidth + 'px'
   }
+  colgroup.appendChild(rightColumn)
+  filterRow.appendChild(topScroller)
+  thead.appendChild(filterRow)
+  titleRow.appendChild(bottomScroller)
+  thead.appendChild(titleRow)
+  rowTemplate.appendChild(rowEditCell)
+  reloadData()
 }
 
 // refresh dataArray in memory
 function reloadData() {
-  runSQLQueries(queries[0].textContent, loadDataArray)
+  runSQLQueries(queries[0], loadDataArray)
 }
 
 function loadDataArray(result) {
-  let pad = number => number <= 9 ? '0' + number : number
-  let normalize = date => date.getFullYear() + '-' +
-    pad(date.getMonth() + 1) + '-' + pad(date.getDate())
-  dataArray = []
-  for (let row of result) {
-    let dataRow = []
-    for (let data in row) {
-      if (row[data]) {
-        if (row[data] instanceof Date)
-          dataRow.push(normalize(row[data]))
-        else
-          dataRow.push(row[data].toString())
-      } else { // null or emtpy string
-        dataRow.push('')
-      }
-    }
-    dataRow.push(true) // display
-    dataArray.push(dataRow)
-  }
+  for (let row of result)
+    row.push(true) // display
+  dataArray = result
   filterData()
 }
 

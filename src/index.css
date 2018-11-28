@@ -30,7 +30,7 @@ main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 50%;
+  min-width: 25%;
 }
 
 main>article {
@@ -48,6 +48,7 @@ main>section {
 
 aside {
   width: var(--aside-width);
+  min-width: var(--aside-width);
   max-width: 50%;
   z-index: 8;
 }
