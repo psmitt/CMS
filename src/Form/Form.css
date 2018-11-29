@@ -9,3 +9,30 @@ aside>header>h1 {
 aside>footer {
   position: relative;
 }
+
+aside form {
+  width: calc(100% - var(--scrollbar-width));
+  margin: var(--title-padding);
+}
+
+aside table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+aside table th {
+  text-align: left;
+  color: DarkSlateGray;
+}
+
+aside table td {
+  padding-bottom: 10px;
+  padding-right: 10px;
+}
+
+aside form input,
+aside form select,
+aside form textarea {
+  font-size: large;
+  padding: 5px;
+}

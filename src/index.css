@@ -3,7 +3,6 @@
   --header-height: 48px;
   --title-padding: 8px;
   --scrollbar-width: 20px;
-  --font-size: x-large;
 }
 
 /* SCREEN LAYOUT */
@@ -19,6 +18,7 @@ html, body {
 body {
   display: flex;
   z-index: 0;
+  font-size: x-large;
 }
 
 nav {
@@ -55,9 +55,8 @@ aside {
 
 /* SCREEN STYLE */
 
-body, input {
+body, input, select, textarea {
   font-family: 'Barlow Semi Condensed', sans-serif;
-  font-size: var(--font-size);
   font-smoothing: antialiased;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -87,7 +86,7 @@ footer { /* scrollbox */
   position: absolute;
   bottom: 0;
   height: calc(100% - var(--header-height));
-  width: 100%;
+  width: calc(100% + var(--scrollbar-width));
   overflow-x: hidden;
   overflow-y: scroll;
 }
@@ -98,19 +97,25 @@ table {
   table-layout: fixed;
 }
 
-input {
+input, textarea, select {
   height: 100%;
   width: 100%;
   border: solid thin lightgray;
+  font-size: large;
 }
 
-input:hover {
+input:hover, textarea:hover, select:hover {
   border-color: skyblue;
 }
 
-input:focus {
+input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: deepskyblue;
+}
+
+textarea {
+  height: 5em;
+  resize: vertical;
 }
 
 button {

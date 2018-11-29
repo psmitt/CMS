@@ -16,7 +16,6 @@ article {
   white-space: normal;
   padding-left: var(--title-padding);
   padding-right: var(--title-padding);
-  width: calc(100% + var(--scrollbar-width));
 }
 
 #procedure div {

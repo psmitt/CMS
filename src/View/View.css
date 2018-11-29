@@ -52,7 +52,6 @@ section {
 #data {
   overflow-x: auto;
   overflow-y: scroll;
-  width: calc(100% + var(--scrollbar-width));
   font-size: smaller;
 }
 
@@ -103,8 +102,7 @@ section {
 }
 
 #data input {
-  font-size: smaller;
-  padding-left: 0.5em;
+  padding-left: calc(var(--title-padding) - 2px);
 }
 
 #data tbody td {
