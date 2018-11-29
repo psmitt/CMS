@@ -97,6 +97,7 @@ function createWindow(folder, file) {
   window.loadFile('src/index.html')
   window.webContents.on('did-finish-load', function () {
     window.maximize();
+    window.toggleDevTools()
   });
 
   window.on('closed', _ => windows.splice(windows.indexOf(window), 1))

@@ -19,6 +19,14 @@ foreach($_POST as $post_key => $post_value) {
         case 'runSQLQueries':
             $parameters = json_decode($post_value);
             $result = SQL($parameters->queries, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);
+            // Stringify all values
+            $rows = count($result_list);
+            if ($rows) {
+              $cols = count($result_list[0]);
+              for ($row = 0; $row < $rows; $row++)
+                for ($col = 0; $col < $cols; $col++)
+                  $result_list[$row][$col] = (string) $result_list[$row][$col];
+            }
             echo json_encode($result_list);
             break;
     }

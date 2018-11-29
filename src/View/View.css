@@ -119,3 +119,16 @@ section {
   font-family: "Nova Mono", monospace;
   padding-top: 4px;
 }
+
+#data .sortedUp,
+#data .sortedDown {
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+
+#data .sortedUp {
+  background-image: url('sortedUp.svg');
+}
+#data .sortedDown {
+  background-image: url('sortedDown.svg');
+}

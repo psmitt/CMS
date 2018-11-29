@@ -89,7 +89,7 @@ function loadView(xmlDoc) {
     for (let column of columns) {
       const get = attribute => // read attribute
         column.attributes[attribute] ?
-        column.attributes[attribute].value : null
+        column.attributes[attribute].value : ''
 
       filterRow.appendChild(filterCell.cloneNode(true))
 
@@ -97,6 +97,7 @@ function loadView(xmlDoc) {
       title.textContent = get('title')
       titleRow.appendChild(title)
 
+      let col = document.createElement('col')
       let datacell = document.createElement('td')
       let align = get('type') === 'number' ? 'right' : ''
       let font = ''
@@ -109,14 +110,13 @@ function loadView(xmlDoc) {
         case 'number':
           font = 'mono'
           width = '128'
+          col.className = get('type')
       }
+      tableWidth += parseInt(col.style.width = (get('width') * 1.175 || width) + 'px')
+      colgroup.appendChild(col)
       datacell.style.textAlign = get('align') || align
       datacell.className = font || get('font')
       rowTemplate.appendChild(datacell)
-
-      let col = document.createElement('col')
-      tableWidth += parseInt(col.style.width = (get('width') * 1.175 || width) + 'px')
-      colgroup.appendChild(col)
     }
     table.style.width = tableWidth + 'px'
   }
@@ -129,7 +129,6 @@ function loadView(xmlDoc) {
   reloadData()
 }
 
-// refresh dataArray in memory
 function reloadData() {
   runSQLQueries(queries[0], loadDataArray)
 }
@@ -140,6 +139,8 @@ function loadDataArray(result) {
   dataArray = result
   filterData()
 }
+
+/* FILTERING, SORTING */
 
 function filterData() {
   Message.textContent = '...'
@@ -154,21 +155,47 @@ function filterData() {
   let counter = 0
   for (let row of dataArray)
     row[cols] = true;
-  for (let f = 1; f < filters.length - 1; f++) {
-    i = filters[f].column
+  for (let f = 0; f < filters.length - 1; f++) {
+    let c = filters[f].column
     for (let row of dataArray)
-      row[cols] = row[cols] && filters[f].filter.test(row[i].replace(/\n/g, ' '))
+      row[cols] = row[cols] && filters[f].filter.test(row[c].replace(/\n/g, ' '))
   }
   if (filters.length) {
-    i = filters[filters.length - 1].column
+    let f = filters.length - 1
+    let c = filters[f].column
     for (let row of dataArray)
-      counter += row[cols] = row[cols] && filters[f].filter.test(row[i].replace(/\n/g, ' '))
+      counter += row[cols] = row[cols] && filters[f].filter.test(row[c].replace(/\n/g, ' '))
   } else {
     counter = dataArray.length
   }
   Message.textContent = counter
   scrollToTop()
 }
+
+DataPanel.addEventListener('input', filterData)
+
+DataPanel.addEventListener('click', event => {
+  if (event.target.matches('thead td') && !getSelection().toString()) {
+    let i = event.target.cellIndex
+    if (i < dataArray[0].length - 1) {
+      if (event.target.classList.length) {
+        dataArray.reverse()
+        event.target.classList.toggle('sortedUp')
+        event.target.classList.toggle('sortedDown')
+      } else {
+        thead.querySelectorAll('td').forEach(td => td.className = '')
+        let cols = document.getElementsByTagName('col')
+        if (cols[i].className === 'number') {
+          dataArray.sort((a, b) => a[i] - b[i])
+        } else {
+          dataArray.sort((a, b) => a[i].localeCompare(b[i]))
+        }
+        event.target.classList.toggle('sortedUp')
+      }
+    }
+    scrollToTop()
+  }
+})
 
 /* VIRTUAL SCROLLING */
 
