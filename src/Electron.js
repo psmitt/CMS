@@ -155,6 +155,7 @@ function runSQLQueries(query, callback) { // query is XML object
         if (error) throw error
         queryResultToArray(result.recordset)
         callback(result.recordset)
+        mssql.close()
       })
     })
   }

@@ -199,16 +199,26 @@ DataPanel.addEventListener('click', event => {
 
 /* VIRTUAL SCROLLING */
 
-let prevScrollTop, firstRowIndex, lastRowIndex;
+const screenSize = Math.max(window.screen.availWidth, window.screen.availHeight)
+let firstRowIndex, lastRowIndex;
 
 function scrollToTop() {
   while (tbody.firstChild)
     tbody.removeChild(tbody.firstChild)
-  DataPanel.scrollTop = prevScrollTop = 0
   lastRowIndex = -1
   appendRow()
   firstRowIndex = lastRowIndex
-  while (DataPanel.offsetHeight > table.offsetHeight && appendRow());
+  while (screenSize > table.offsetHeight - DataPanel.scrollTop && appendRow());
+}
+
+function scrollToBottom() {
+  while (tbody.firstChild)
+    tbody.removeChild(tbody.firstChild)
+  firstRowIndex = dataArray.length
+  prependRow()
+  lastRowIndex = firstRowIndex
+  while (table.offsetHeight < screenSize && prependRow());
+  DataPanel.scrollTop = table.offsetHeight
 }
 
 function appendRow() {
@@ -226,15 +236,6 @@ function appendRow() {
   }
   return false
 }
-
-DataPanel.addEventListener('scroll', _ => {
-  if (prevScrollTop < DataPanel.scrollTop)
-    appendRow()
-  else
-    prependRow()
-  prevScrollTop = DataPanel.scrollTop
-  console.log(prevScrollTop, DataPanel.scrollTop)
-})
 
 function prependRow() { // return success
   let firstIndex = firstRowIndex
@@ -255,18 +256,10 @@ function prependRow() { // return success
   return false;
 }
 
-function scrollToBottom() {
-  while (tbody.firstChild)
-    tbody.removeChild(tbody.firstChild)
-  DataPanel.scrollTop = prevScrollTop = 0
-  firstRowIndex = dataArray.length
-  prependRow()
-  lastRowIndex = firstRowIndex
-  while (DataPanel.offsetHeight > table.offsetHeight && prependRow());
-  DataPanel.scrollTop = prevScrollTop =
-    table.offsetHeight - DataPanel.offsetHeight + 20
-  console.log(table.offsetHeight, DataPanel.offsetHeight, prevScrollTop);
-}
+DataPanel.addEventListener('scroll', _ => {
+  while ((screenSize > DataPanel.scrollTop && prependRow()) ||
+    (table.offsetHeight - DataPanel.scrollTop < screenSize && appendRow()));
+})
 
 /* HEADER TOOLS */
 
