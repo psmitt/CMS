@@ -24,10 +24,9 @@ function loadView(xmlDoc) {
   ViewTitle.innerHTML = get('title')
   queries = []
   if (isTable)
-    queries.push(tableQuery(xmlDoc))
+    queries = tableQuery(xmlDoc) // ["<query><![CDATA[ ... ]]></query>"]
   else
-    xmlDoc.querySelectorAll('query').forEach(query =>
-      queries.push(query.textContent))
+    queries = xmlDoc.querySelectorAll('query')
 
   DataPanel.innerHTML = `<table>
                           <colgroup></colgroup>
@@ -178,7 +177,7 @@ DataPanel.addEventListener('input', filterData)
 DataPanel.addEventListener('click', event => {
   if (event.target.matches('thead td') && !getSelection().toString()) {
     let i = event.target.cellIndex
-    if (i < dataArray[0].length - 1) {
+    if (i < dataArray[0].length - 2) {
       if (event.target.classList.length) {
         dataArray.reverse()
         event.target.classList.toggle('sortedUp')
@@ -193,8 +192,8 @@ DataPanel.addEventListener('click', event => {
         }
         event.target.classList.toggle('sortedUp')
       }
+      scrollToTop()
     }
-    scrollToTop()
   }
 })
 
@@ -209,8 +208,7 @@ function scrollToTop() {
   lastRowIndex = -1
   appendRow()
   firstRowIndex = lastRowIndex
-  for (let row = 1; row < 20; row++)
-    appendRow()
+  while (DataPanel.offsetHeight > table.offsetHeight && appendRow());
 }
 
 function appendRow() {
@@ -224,7 +222,9 @@ function appendRow() {
     for (let cell = 0; cell < cols; cell++)
       newRow.children[cell].innerHTML = dataArray[lastIndex][cell]
     tbody.appendChild(newRow)
+    return true
   }
+  return false
 }
 
 DataPanel.addEventListener('scroll', _ => {
@@ -233,6 +233,7 @@ DataPanel.addEventListener('scroll', _ => {
   else
     prependRow()
   prevScrollTop = DataPanel.scrollTop
+  console.log(prevScrollTop, DataPanel.scrollTop)
 })
 
 function prependRow() { // return success
@@ -249,7 +250,9 @@ function prependRow() { // return success
       tbody.insertBefore(newRow, tbody.firstChild)
     else
       tbody.appendChild(newRow)
+    return true;
   }
+  return false;
 }
 
 function scrollToBottom() {
@@ -259,10 +262,10 @@ function scrollToBottom() {
   firstRowIndex = dataArray.length
   prependRow()
   lastRowIndex = firstRowIndex
-  for (let row = 1; row < 20; row++)
-    prependRow()
+  while (DataPanel.offsetHeight > table.offsetHeight && prependRow());
   DataPanel.scrollTop = prevScrollTop =
-    table.offsetHeight - DataPanel.offsetHeight + 20 // horizontal scrollbar
+    table.offsetHeight - DataPanel.offsetHeight + 20
+  console.log(table.offsetHeight, DataPanel.offsetHeight, prevScrollTop);
 }
 
 /* HEADER TOOLS */

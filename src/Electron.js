@@ -122,39 +122,63 @@ function readXMLFile(folder, filename, callback) {
   })
 }
 
-function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
-  if (!dsn || !user || !pass) { // MySQL queries
+function runSQLQueries(query, callback) { // query is XML object
+  let get = attribute => query.attributes[attribute].value
+  let connectionObject = {}
+  if (query.attributes['dsn']) {
+    let dsn = get('dsn').match(/Server=(\w+);Database=(\w+)/)
+    connectionObject = {
+      user: get('username'),
+      password: get('password'),
+      server: dsn[1],
+      database: dsn[2]
+    }
+  }
+  if (Object.keys(connectionObject).length === 0) { // MySQL queries
     MySQL_Pool.getConnection((error, cmdb) => {
       if (error) throw error
       cmdb.query({
-        sql: queries,
+        sql: query.textContent,
         nestTables: '.'
       }, (error, result, fields) => {
         if (error) throw error
-
-        let pad = number => number <= 9 ? '0' + number : number
-        let normalize = date => date.getFullYear() + '-' +
-          pad(date.getMonth() + 1) + '-' + pad(date.getDate())
-
-        for (row = 0; row < result.length; row++) {
-          let packet = result[row]
-          let dataRow = []
-          for (let data in packet) {
-            if (packet[data]) {
-              if (packet[data] instanceof Date)
-                dataRow.push(normalize(packet[data]))
-              else
-                dataRow.push(packet[data].toString())
-            } else { // null or emtpy string
-              dataRow.push('')
-            }
-          }
-          result[row] = dataRow
-        }
+        queryResultToArray(result)
         callback(result)
         cmdb.release()
       })
     })
+  } else { // MS-SQL queries
+    let mssql = require('mssql')
+    mssql.connect(connectionObject, error => {
+      if (error) throw error
+      new mssql.Request().query(query.textContent, (error, result) => {
+        if (error) throw error
+        queryResultToArray(result.recordset)
+        callback(result.recordset)
+      })
+    })
+  }
+}
+
+function queryResultToArray(result) {
+  let pad = number => number <= 9 ? '0' + number : number
+  let normalize = date => date.getFullYear() + '-' +
+    pad(date.getMonth() + 1) + '-' + pad(date.getDate())
+
+  for (row = 0; row < result.length; row++) {
+    let packet = result[row]
+    let dataRow = []
+    for (let data in packet) {
+      if (packet[data]) {
+        if (packet[data] instanceof Date)
+          dataRow.push(normalize(packet[data]))
+        else
+          dataRow.push(packet[data].toString())
+      } else { // null or emtpy string
+        dataRow.push('')
+      }
+    }
+    result[row] = dataRow
   }
 }
 

@@ -16,6 +16,7 @@ document.querySelector('article .close').addEventListener('click', _ => {
 })
 
 document.getElementById('CloseView').addEventListener('click', _ => {
+  Tools.style.display = 'none'
   Section.display = 'none'
   if (Article.display === 'block')
     Article.height = '100%'
