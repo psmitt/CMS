@@ -1,0 +1,56 @@
+:root {
+  --aside-width: 360px; /* responsive */
+}
+
+html, body, nav, main, aside, article, section {
+ position: relative;
+ height: 100%; /* overridden for wide screen layout */
+ width: 100%;  /* overridden for wide screen layout */
+ margin: 0;
+ padding: 0;
+ overflow: hidden;
+}
+
+nav            { z-index: 1; }
+nav>header     { z-index: 2; }
+article        { z-index: 3; }
+article>header { z-index: 4; }
+section        { z-index: 5; }
+section>header { z-index: 6; }
+aside          { z-index: 7; }
+aside>header   { z-index: 8; }
+
+/* WIDE SCREEN LAYOUT */
+
+body {
+  display: flex;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+aside {
+  width: var(--aside-width);
+  min-width: var(--aside-width);
+}
+
+/* MOBILE LAYOUT */
+
+@media only screen and (max-width : 720px) {
+  html, body, nav, main, aside, article, section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+/* STARTUP SCREEN */
+
+article, section, aside {
+  display: none;
+}

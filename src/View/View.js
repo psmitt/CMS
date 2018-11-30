@@ -4,7 +4,7 @@ const Tool = document.getElementById('tool')
 const Tools = document.getElementById('tools')
 const DataPanel = document.getElementById('data')
 
-/* TABULAR REPORT */
+/* LOAD TABULAR REPORT DATA */
 
 var table, colgroup, thead, tbody, cols, queries, dataArray, rowTemplate;
 const rightColumnWidth = 47
@@ -14,6 +14,7 @@ function load_view(viewname) {
   while (DataPanel.firstChild)
     DataPanel.removeChild(DataPanel.firstChild)
   readXMLFile('View', viewname + '.xml', loadView)
+  showFrame(Section)
 }
 
 function loadView(xmlDoc) {
@@ -140,7 +141,7 @@ function loadDataArray(result) {
   filterData()
 }
 
-/* FILTERING, SORTING */
+/* FILTER AND SORT TABLE */
 
 function filterData() {
   Message.textContent = '...'
@@ -264,8 +265,13 @@ function scrollToBottom() {
     table.offsetHeight - DataPanel.offsetHeight + 20 // horizontal scrollbar
 }
 
-function increaseView() {
-  closeForm()
-  minimizeNavigationBar()
-  decreaseTask()
-}
+/* HEADER TOOLS */
+
+ViewTitle.addEventListener('click', event => {
+  if (!event.target.matches('a') && !getSelection().toString() && innerWidth > 720)
+    growFrame(Section)
+})
+
+Tool.addEventListener('click', _ =>
+  Tools.style.display = Tools.style.display !== 'block' ? 'block' : 'none'
+)

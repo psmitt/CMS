@@ -6,6 +6,10 @@ section {
   background-color: WhiteSmoke;
 }
 
+section>header {
+  z-index: 7;
+}
+
 #view {
   width: calc(100% - 4em); /* give space to message and tools */
 }
@@ -39,14 +43,15 @@ section {
 
 #tools span {
   display: block;
-  font-weight: normal;
+  font-size: smaller;
+  font-weight: bold;
   padding: 3px;
   border-radius: 5px;
   cursor: pointer;
 }
 
 #tools span:hover {
-  background-color: wheat;
+  background-color: tan;
 }
 
 #data {

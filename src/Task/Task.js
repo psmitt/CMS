@@ -6,6 +6,7 @@ function load_task(taskname) { // taskname is filename without file extension
   while (Procedure.firstChild)
     Procedure.removeChild(Procedure.firstChild)
   readXMLFile('Task', taskname + '.xml', loadTask)
+  showFrame(Article)
 
   function loadTask(xmlDoc) {
     TaskTitle.textContent = xmlDoc.querySelector('task').attributes['title'].value
@@ -62,25 +63,7 @@ function appendStep(step, parent) {
 
 /* RESIZE FRAMES */
 
-const TaskPane = article.style
-
-article.querySelector('header>span').addEventListener('click', event => {
-  TaskPane.display = 'none'
+TaskTitle.addEventListener('click', event => {
+  if (!event.target.matches('a') && !getSelection().toString() && innerWidth > 720)
+    growFrame(Article)
 })
-
-function increaseTask() {
-  closeForm()
-  minimizeNavigationBar()
-  TaskPane.display = 'block'
-  if (TaskPane.height === 'var(--header-height)')
-    TaskPane.height = '50%'
-  else
-    TaskPane.height = 'calc(100% - var(--header-height))'
-}
-
-function decreaseTask() {
-  if (TaskPane.height === 'calc(100% - var(--header-height))')
-    TaskPane.height = '50%'
-  else
-    TaskPane.height = 'var(--header-height)'
-}

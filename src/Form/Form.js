@@ -1,18 +1,11 @@
 const aside = document.querySelector('aside')
 const FormTable = aside.querySelector('footer>form>table')
 
-aside.querySelector('header>span').addEventListener('click', event => {
-  closeForm()
-})
-
-function closeForm() {
-  aside.style.display = 'none'
-}
-
 function load_form(formname) {
   while (FormTable.firstChild)
     FormTable.removeChild(FormTable.firstChild)
   readXMLFile('Form', formname + '.xml', loadForm)
+  Aside.display = 'block'
 }
 
 let fields; // input field name -> [value -> text]

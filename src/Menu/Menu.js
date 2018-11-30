@@ -28,7 +28,6 @@ function loadMenuFiles(folder) {
       appendSubMenu(subMenu, Menu)
     loadNext()
   }
-  maximizeNavigationBar();
 }
 
 function appendSubMenu(subMenu, parentMenu) {
@@ -171,7 +170,9 @@ Search.addEventListener('blur', _ => {
 // Restore hits on focus
 Search.addEventListener('focus', _ => {
   lastClickedMenuItem.classList.remove('clicked')
-  maximizeNavigationBar()
+  restoreNavigationFrame(
+    Article.display === 'block' || Section.display === 'block' ?
+    'var(--aside-width)' : '100%')
   if (Search.value.trim()) {
     Search.selectionStart = Search.selectionEnd = Search.value.length
     Search.dispatchEvent(new Event('input'))
@@ -187,22 +188,12 @@ $(document).on('keypress', event => {
 
 /* NAV SIZING */
 
-const nav = document.body.firstElementChild.style
-
-function minimizeNavigationBar() {
-  Search.style.cursor = 'pointer'
-  Search.style.color = 'rgba(0,0,0,0)'
-  Search.placeholder = ''
-  Search.style.paddingLeft = '0'
-  nav.width = nav.minWidth = '2em'
-  Search.type = 'text'
-}
-
-function maximizeNavigationBar() {
+function restoreNavigationFrame(width) {
+  Nav.width = width
   Search.type = 'search'
-  nav.width = nav.minWidth = nav.maxWidth = 'var(--aside-width)'
-  Search.style.paddingLeft = '1.75em'
   Search.placeholder = 'Search'
-  Search.style.color = ''
+  Search.style.paddingLeft = '1.75em'
   Search.style.cursor = ''
+  Search.style.color = '' // show last search
+  Menu.style.display = 'block' // show menu
 }
