@@ -41,12 +41,17 @@ function readXMLFile(folder, filename, callback) {
   httpRequest.send(`readXMLFile=${folder}/${filename}`)
 }
 
-function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
-  let parameters = {
-    queries: queries,
-    dsn: dsn,
-    user: user,
-    pass: pass
+function runSQLQuery(query, callback, dsn = '', user = '', pass = '') {
+  let get = attribute => query.attributes[attribute].value
+  let connectionObject = {}
+  if (query.attributes['dsn']) {
+    let dsn = get('dsn').match(/Server=(\w+);Database=(\w+)/)
+    connectionObject = {
+      user: get('username'),
+      password: get('password'),
+      server: dsn[1],
+      database: dsn[2]
+    }
   }
   let httpRequest = new XMLHttpRequest()
   httpRequest.onreadystatechange = function () {
@@ -60,7 +65,7 @@ function runSQLQueries(queries, callback, dsn = '', user = '', pass = '') {
   }
   httpRequest.open('POST', '/CMS5/src/IIS.php')
   httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-  httpRequest.send(`runSQLQueries=${encodeURIComponent(JSON.stringify(parameters))}`)
+  httpRequest.send(`runSQLQueries=${encodeURIComponent(JSON.stringify(connectionObject))}`)
 }
 
 function load_link(URL) {

@@ -122,7 +122,7 @@ function readXMLFile(folder, filename, callback) {
   })
 }
 
-function runSQLQueries(query, callback) { // query is XML object
+async function runSQLQuery(query, callback) { // query is XML object
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {}
   if (query.attributes['dsn']) {
@@ -134,31 +134,33 @@ function runSQLQueries(query, callback) { // query is XML object
       database: dsn[2]
     }
   }
-  if (Object.keys(connectionObject).length === 0) { // MySQL queries
-    MySQL_Pool.getConnection((error, cmdb) => {
-      if (error) throw error
-      cmdb.query({
-        sql: query.textContent,
-        nestTables: '.'
-      }, (error, result, fields) => {
+  return new Promise((resolve, reject) => {
+    if (Object.keys(connectionObject).length === 0) { // MySQL queries
+      MySQL_Pool.getConnection((error, cmdb) => {
         if (error) throw error
-        queryResultToArray(result)
-        callback(result)
-        cmdb.release()
+        cmdb.query({
+          sql: query.textContent,
+          nestTables: '.'
+        }, (error, result, fields) => {
+          if (error) throw error
+          queryResultToArray(result)
+          callback(result)
+          resolve(cmdb.release())
+        })
       })
-    })
-  } else { // MS-SQL queries
-    let mssql = require('mssql')
-    mssql.connect(connectionObject, error => {
-      if (error) throw error
-      new mssql.Request().query(query.textContent, (error, result) => {
+    } else { // MS-SQL queries
+      let mssql = require('mssql')
+      mssql.connect(connectionObject, error => {
         if (error) throw error
-        queryResultToArray(result.recordset)
-        callback(result.recordset)
-        mssql.close()
+        new mssql.Request().query(query.textContent, (error, result) => {
+          if (error) throw error
+          queryResultToArray(result.recordset)
+          callback(result.recordset)
+          resolve(mssql.close())
+        })
       })
-    })
-  }
+    }
+  })
 }
 
 function queryResultToArray(result) {

@@ -6,7 +6,8 @@ const DataPanel = document.getElementById('data')
 
 /* LOAD TABULAR REPORT DATA */
 
-var table, colgroup, thead, tbody, cols, queries, dataArray, rowTemplate;
+var columnTitles, queries, dataArray, rowTemplate;
+var table, colgroup, thead, tbody, cols;
 const rightColumnWidth = 47
 
 function load_view(viewname) {
@@ -22,11 +23,6 @@ function loadView(xmlDoc) {
   let get = attribute =>
     xmlDoc.querySelector(isTable ? 'table' : 'view').attributes[attribute].value
   ViewTitle.innerHTML = get('title')
-  queries = []
-  if (isTable)
-    queries = tableQuery(xmlDoc) // ["<query><![CDATA[ ... ]]></query>"]
-  else
-    queries = xmlDoc.querySelectorAll('query')
 
   DataPanel.innerHTML = `<table>
                           <colgroup></colgroup>
@@ -61,6 +57,16 @@ function loadView(xmlDoc) {
   rowTemplate = document.createElement('tr')
   let rowEditCell = document.createElement('td')
   rowEditCell.textContent = '✐'
+
+  columnTitles = []
+  queries = []
+  if (isTable)
+    queries = tableQuery(xmlDoc) // ["<query><![CDATA[ ... ]]></query>"]
+  else {
+    for (let column of columns)
+      columnTitles.push(column.attributes['title'].value)
+    queries = xmlDoc.querySelectorAll('query')
+  }
 
   if (queries.length > 1) { // gap analysis
 
@@ -130,14 +136,64 @@ function loadView(xmlDoc) {
 }
 
 function reloadData() {
-  runSQLQueries(queries[0], loadDataArray)
+  let result0, result1;
+  const getResult0 = result => result0 = result
+  const getResult1 = result => result1 = result
+  const displayData = result => {
+    dataArray = result
+    for (let row of dataArray)
+      row.push(true)
+    filterData()
+  }
+  let promise0 = queries[0].querySelector('query') ?
+    compoundQuery(queries[0]) : runSQLQuery(queries[0], getResult0)
+  if (queries.length > 1) {
+    let promise1 = queries[1].querySelector('query') ?
+      compoundQuery(queries[1]) : runSQLQuery(queries[1], getResult1)
+    Promise.all([promise1, promise1])
+      .then(_ => displayData(gapAnalysis(result0, result1)))
+  } else {
+    promise0.then(_ => displayData(result0))
+  }
 }
 
-function loadDataArray(result) {
-  for (let row of result)
-    row.push(true) // display
-  dataArray = result
-  filterData()
+function compoundQuery(query) {
+  let baseResult;
+  const addResult = result => {}
+}
+
+function gapAnalysis(result1, result2) {
+  result1.sort((a, b) => a[0].localeCompare(b[0]))
+  result2.sort((a, b) => a[0].localeCompare(b[0]))
+  console.log(result1);
+  console.log(result2);
+  let result = []
+  let i = 0
+  let j = 0
+  const push1 = index =>
+    result.push([result1[index][0], '*',
+      `<span title="${result1[index].join('\n')}">*</span>`, ''])
+  const push2 = index =>
+    result.push([result2[index][0], '*', '',
+      `<span title="${result2[index].join('\n')}">*</span>`])
+  while (i < result1.length && j < result2.length) {
+    let comparison = result1[i][0].localeCompare(result2[j][0])
+    if (comparison < 0) push1(i++)
+    if (comparison > 0) push2(j++)
+    if (comparison == 0) { // first_key == second_key
+      for (let k = 1; k < result1[i].length; k++) {
+        let firstData = result1[i][k].toString()
+        let secondData = result2[j][k].toString()
+        if (firstData.localeCompare(secondData))
+          result.push([result1[i][0], columnTitles[k], firstData, secondData])
+      }
+      i++
+      j++
+    }
+  }
+  while (i < result1.length) push1(i++)
+  while (j < result2.length) push2(j++)
+  return result
 }
 
 /* FILTER AND SORT TABLE */
