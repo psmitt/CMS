@@ -125,46 +125,89 @@ function readXMLFile(folder, filename, callback) {
 async function runSQLQuery(query, callback) { // query is XML object
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {}
+  let dbType = query.attributes['dsn'] ?
+    get('dsn').substr(0, get('dsn').indexOf(':')) : 'MySQL'
+  switch (dbType) {
+    case 'pgsql':
+      let pgDSN = get('dsn').match(/host=(\w+);port=(\w+);dbname=(\w+)/)
+      connectionObject = {
+        user: get('username'),
+        password: get('password'),
+        host: pgDSN[1],
+        port: pgDSN[2],
+        database: pgDSN[3]
+      }
+      break;
+    case 'sqlsrv':
+      let dsn = get('dsn').match(/Server=(\w+);Database=(\w+)/)
+      connectionObject = {
+        user: get('username'),
+        password: get('password'),
+        server: dsn[1],
+        database: dsn[2]
+      }
+      break;
+    default: // MySQL
+      break;
+  }
   if (query.attributes['dsn']) {
-    let dsn = get('dsn').match(/Server=(\w+);Database=(\w+)/)
-    connectionObject = {
-      user: get('username'),
-      password: get('password'),
-      server: dsn[1],
-      database: dsn[2]
-    }
+    let dsn = get('dsn')
+    switch (dsn.substr(0, dsn.indexOf(':'))) {}
   }
   return new Promise((resolve, reject) => {
-    if (Object.keys(connectionObject).length === 0) { // MySQL queries
-      MySQL_Pool.getConnection((error, cmdb) => {
-        if (error) {
-          reject(cmdb.release())
-          throw error
-        }
-        cmdb.query({
-          sql: query.textContent,
-          nestTables: '.'
-        }, (error, result, fields) => {
-          if (error) throw error
-          queryResultToArray(result)
-          callback(result)
-          resolve(cmdb.release())
+    switch (dbType) {
+      case 'pgsql':
+        const Client = require('pg').Client
+        let client = new Client(connectionObject)
+        client.connect()
+        client.query(query.textContent, (error, result) => {
+          if (error) {
+            reject(client.end())
+            throw error
+          }
+          queryResultToArray(result.rows)
+          callback(result.rows)
+          resolve(client.end())
         })
-      })
-    } else { // MS-SQL queries
-      let mssql = require('mssql')
-      mssql.connect(connectionObject, error => {
-        if (error) {
-          reject(mssql.close())
-          throw error
-        }
-        new mssql.Request().query(query.textContent, (error, result) => {
-          if (error) throw error
-          queryResultToArray(result.recordset)
-          callback(result.recordset)
-          resolve(mssql.close())
+        break;
+      case 'sqlsrv':
+        let mssql = require('mssql')
+        mssql.connect(connectionObject, error => {
+          if (error) {
+            reject(mssql.close())
+            throw error
+          }
+          new mssql.Request().query(query.textContent, (error, result) => {
+            if (error) {
+              reject(mssql.close())
+              throw error
+            }
+            queryResultToArray(result.recordset)
+            callback(result.recordset)
+            resolve(mssql.close())
+          })
         })
-      })
+        break;
+      default: // MySQL
+        MySQL_Pool.getConnection((error, cmdb) => {
+          if (error) {
+            reject(cmdb.release())
+            throw error
+          }
+          cmdb.query({
+            sql: query.textContent,
+            nestTables: '.'
+          }, (error, result, fields) => {
+            if (error) {
+              reject(cmdb.release())
+              throw error
+            }
+            queryResultToArray(result)
+            callback(result)
+            resolve(cmdb.release())
+          })
+        })
+        break;
     }
   })
 }

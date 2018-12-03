@@ -70,7 +70,7 @@ function setBranchIcons(root) {
 
 var lastClickedMenuItem = document.body // just to have an initial node value
 
-// Maximize NAV on click
+// select menu item or expand|collapse menu branch
 Menu.addEventListener('click', event => {
   let node = event.target
   if (node.matches('span')) {
@@ -92,6 +92,12 @@ Menu.addEventListener('click', event => {
       }
       setBranchIcons(event.target.parentNode) // node has changed!
     }
+  }
+})
+
+Menu.addEventListener('mousedown', event => {
+  if (event.target.matches('mark')) {
+    event.path[1].click()
   }
 })
 
