@@ -41,31 +41,31 @@ function readXMLFile(folder, filename, callback) {
   httpRequest.send(`readXMLFile=${folder}/${filename}`)
 }
 
-function runSQLQuery(query, callback, dsn = '', user = '', pass = '') {
+async function runSQLQuery(query, callback, dsn = '', user = '', pass = '') {
   let get = attribute => query.attributes[attribute].value
-  let connectionObject = {}
+  let connectionObject = {
+    query: query.textContent
+  }
   if (query.attributes['dsn']) {
-    let dsn = get('dsn').match(/Server=(\w+);Database=(\w+)/)
-    connectionObject = {
-      user: get('username'),
-      password: get('password'),
-      server: dsn[1],
-      database: dsn[2]
-    }
+    connectionObject.dsn = get('dsn')
+    connectionObject.user = get('username')
+    connectionObject.pass = get('password')
   }
-  let httpRequest = new XMLHttpRequest()
-  httpRequest.onreadystatechange = function () {
-    if (httpRequest.readyState == 4) {
-      if (httpRequest.status == 200) {
-        callback(JSON.parse(httpRequest.responseText))
-      } else
-        console.log('HTTP status: ', httpRequest.status,
-          '\nResponse: ', httpRequest.responseText)
+  return new Promise((resolve, reject) => {
+    let httpRequest = new XMLHttpRequest()
+    httpRequest.onreadystatechange = function () {
+      if (httpRequest.readyState == 4) {
+        if (httpRequest.status == 200) {
+          resolve(callback(JSON.parse(httpRequest.responseText)))
+        } else
+          reject(console.log('HTTP status: ', httpRequest.status,
+            '\nResponse: ', httpRequest.responseText))
+      }
     }
-  }
-  httpRequest.open('POST', '/CMS5/src/IIS.php')
-  httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-  httpRequest.send(`runSQLQueries=${encodeURIComponent(JSON.stringify(connectionObject))}`)
+    httpRequest.open('POST', '/CMS5/src/IIS.php')
+    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    httpRequest.send(`runSQLQueries=${encodeURIComponent(JSON.stringify(connectionObject))}`)
+  })
 }
 
 function load_link(URL) {

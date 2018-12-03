@@ -137,7 +137,10 @@ async function runSQLQuery(query, callback) { // query is XML object
   return new Promise((resolve, reject) => {
     if (Object.keys(connectionObject).length === 0) { // MySQL queries
       MySQL_Pool.getConnection((error, cmdb) => {
-        if (error) throw error
+        if (error) {
+          reject(cmdb.release())
+          throw error
+        }
         cmdb.query({
           sql: query.textContent,
           nestTables: '.'
@@ -151,7 +154,10 @@ async function runSQLQuery(query, callback) { // query is XML object
     } else { // MS-SQL queries
       let mssql = require('mssql')
       mssql.connect(connectionObject, error => {
-        if (error) throw error
+        if (error) {
+          reject(mssql.close())
+          throw error
+        }
         new mssql.Request().query(query.textContent, (error, result) => {
           if (error) throw error
           queryResultToArray(result.recordset)

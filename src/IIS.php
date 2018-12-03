@@ -18,7 +18,10 @@ foreach($_POST as $post_key => $post_value) {
 
         case 'runSQLQueries':
             $parameters = json_decode($post_value);
-            $result = SQL($parameters->queries, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);
+            if (property_exists($parameters, 'dsn'))
+              $result = SQL($parameters->query, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);
+            else
+              $result = SQL($parameters->query, $result_list);
             // Stringify all values
             $rows = count($result_list);
             if ($rows) {

@@ -118,7 +118,7 @@ function loadView(xmlDoc) {
           width = '128'
           col.className = get('type')
       }
-      tableWidth += parseInt(col.style.width = (get('width') * 1.175 || width) + 'px')
+      tableWidth += parseInt(col.style.width = (get('width') * 1.3 || width) + 'px')
       colgroup.appendChild(col)
       datacell.style.textAlign = get('align') || align
       datacell.className = font || get('font')
@@ -150,7 +150,7 @@ function reloadData() {
   if (queries.length > 1) {
     let promise1 = queries[1].querySelector('query') ?
       compoundQuery(queries[1]) : runSQLQuery(queries[1], getResult1)
-    Promise.all([promise1, promise1])
+    Promise.all([promise0, promise1])
       .then(_ => displayData(gapAnalysis(result0, result1)))
   } else {
     promise0.then(_ => displayData(result0))
@@ -162,37 +162,35 @@ function compoundQuery(query) {
   const addResult = result => {}
 }
 
-function gapAnalysis(result1, result2) {
+function gapAnalysis(result0, result1) {
+  result0.sort((a, b) => a[0].localeCompare(b[0]))
   result1.sort((a, b) => a[0].localeCompare(b[0]))
-  result2.sort((a, b) => a[0].localeCompare(b[0]))
-  console.log(result1);
-  console.log(result2);
   let result = []
   let i = 0
   let j = 0
+  const push0 = index =>
+    result.push([result0[index][0], '*',
+      `<span title="${result0[index].join('\n')}">*</span>`, ''])
   const push1 = index =>
-    result.push([result1[index][0], '*',
-      `<span title="${result1[index].join('\n')}">*</span>`, ''])
-  const push2 = index =>
-    result.push([result2[index][0], '*', '',
-      `<span title="${result2[index].join('\n')}">*</span>`])
-  while (i < result1.length && j < result2.length) {
-    let comparison = result1[i][0].localeCompare(result2[j][0])
-    if (comparison < 0) push1(i++)
-    if (comparison > 0) push2(j++)
+    result.push([result1[index][0], '*', '',
+      `<span title="${result1[index].join('\n')}">*</span>`])
+  while (i < result0.length && j < result1.length) {
+    let comparison = result0[i][0].localeCompare(result1[j][0])
+    if (comparison < 0) push0(i++)
+    if (comparison > 0) push1(j++)
     if (comparison == 0) { // first_key == second_key
-      for (let k = 1; k < result1[i].length; k++) {
-        let firstData = result1[i][k].toString()
-        let secondData = result2[j][k].toString()
+      for (let k = 1; k < result0[i].length; k++) {
+        let firstData = result0[i][k] ? result0[i][k].toString() : ''
+        let secondData = result1[j][k] ? result1[j][k].toString() : ''
         if (firstData.localeCompare(secondData))
-          result.push([result1[i][0], columnTitles[k], firstData, secondData])
+          result.push([result0[i][0], columnTitles[k], firstData, secondData])
       }
       i++
       j++
     }
   }
-  while (i < result1.length) push1(i++)
-  while (j < result2.length) push2(j++)
+  while (i < result0.length) push0(i++)
+  while (j < result1.length) push1(j++)
   return result
 }
 
