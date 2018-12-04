@@ -64,7 +64,7 @@ async function runSQLQuery(query, callback, dsn = '', user = '', pass = '') {
     }
     httpRequest.open('POST', '/CMS5/src/IIS.php')
     httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    httpRequest.send(`runSQLQueries=${encodeURIComponent(JSON.stringify(connectionObject))}`)
+    httpRequest.send(`runSQLQuery=${encodeURIComponent(JSON.stringify(connectionObject))}`)
   })
 }
 

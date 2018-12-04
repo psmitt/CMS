@@ -16,7 +16,7 @@ foreach($_POST as $post_key => $post_value) {
             echo preg_replace("/^$bom/", '', file_get_contents("$xmlroot/$_SESSION[country]/$post_value"));
             break;
 
-        case 'runSQLQueries':
+        case 'runSQLQuery':
             $parameters = json_decode($post_value);
             if (property_exists($parameters, 'dsn'))
               $result = SQL($parameters->query, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);

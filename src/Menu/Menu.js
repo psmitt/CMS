@@ -3,7 +3,7 @@ const Search = document.getElementById('search')
 
 /* MENU DISPLAY */
 
-function loadMenuFiles(folder) {
+function loadMenuFiles() {
   while (Menu.firstChild)
     Menu.removeChild(Menu.firstChild)
 

@@ -65,7 +65,7 @@ function loadView(xmlDoc) {
   else {
     for (let column of columns)
       columnTitles.push(column.attributes['title'].value)
-    queries = xmlDoc.querySelectorAll('query')
+    queries = xmlDoc.querySelectorAll('view>query')
   }
 
   if (queries.length > 1) { // gap analysis
@@ -146,10 +146,10 @@ function reloadData() {
     filterData()
   }
   let promise0 = queries[0].querySelector('query') ?
-    compoundQuery(queries[0]) : runSQLQuery(queries[0], getResult0)
+    compoundQuery(queries[0], getResult0) : runSQLQuery(queries[0], getResult0)
   if (queries.length > 1) {
     let promise1 = queries[1].querySelector('query') ?
-      compoundQuery(queries[1]) : runSQLQuery(queries[1], getResult1)
+      compoundQuery(queries[1], getResult1) : runSQLQuery(queries[1], getResult1)
     Promise.all([promise0, promise1])
       .then(_ => displayData(gapAnalysis(result0, result1)))
   } else {
@@ -157,9 +157,47 @@ function reloadData() {
   }
 }
 
-function compoundQuery(query) {
-  let baseResult;
-  const addResult = result => {}
+async function compoundQuery(query, callback) {
+  let result = []
+  return new Promise((resolve, reject) => {
+    let promises = []
+    query.querySelectorAll('query').forEach(q =>
+      promises.push(runSQLQuery(q, addResult))
+    )
+    Promise.all(promises).then(_ => resolve(callback(result)))
+  })
+
+  function addResult(nextResult) {
+    if (nextResult.length) {
+      nextResult.sort((a, b) => a[0].localeCompare(b[0]))
+      if (result.length) {
+        let result0 = result
+        let result1 = nextResult
+        result = []
+        let pad0 = Array(result0[0].length - 1).fill('')
+        let pad1 = Array(result1[0].length - 1).fill('')
+        let i = 0
+        let j = 0
+        while (i < result0.length && j < result1.length) {
+          let comparison = result0[i][0].localeCompare(result1[j][0])
+          if (comparison < 0)
+            result.push(result0[i++].concat(pad1))
+          if (comparison > 0)
+            result.push(result1[j++].splice(1, 0, ...pad0))
+          if (comparison == 0) { // first_key == second_key
+            result1[j].shift()
+            result.push(result0[i++].concat(result1[j++]))
+          }
+        }
+        while (i < result0.length)
+          result.push(result0[i++].concat(pad1))
+        while (j < result1.length)
+          result.push(result1[j++].splice(1, 0, ...pad0))
+      } else {
+        result = nextResult
+      }
+    }
+  }
 }
 
 function gapAnalysis(result0, result1) {

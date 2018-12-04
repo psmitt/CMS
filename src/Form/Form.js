@@ -48,13 +48,14 @@ async function getField(column) {
     let options = column.querySelector('options')
     if (options) {
       let get = selector => options.querySelector(selector).textContent
-      let query = `SELECT ${get('value')}, ${get('text')}
+      let query = document.createElement('query')
+      query.textContent = `SELECT ${get('value')}, ${get('text')}
                    FROM ${get('from')}
                    ${options.querySelector('filter') ?
                   'WHERE ' + get('filter') : ''}
                    ORDER BY ${get('text')}`
       return new Promise((resolve, reject) => {
-        runSQLQueries(query, result => {
+        runSQLQuery(query, result => {
           result.forEach(option => fields[name].editor +=
             `<option data-value="${option[0]}" value="${option[1]}"/>`
           )
