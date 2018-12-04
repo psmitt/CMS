@@ -234,6 +234,25 @@ function queryResultToArray(result) {
   }
 }
 
+function executeStatements(statements, callback) {
+  MySQL_Pool.getConnection((error, cmdb) => {
+    if (error) {
+      cmdb.release()
+      throw error
+    }
+    cmdb.query({
+      sql: statements
+    }, (error, result, fields) => {
+      if (error) {
+        cmdb.release()
+        throw error
+      }
+      callback(result)
+      cmdb.release()
+    })
+  })
+}
+
 function load_link(URL) {
   if (URL.indexOf('HUN/') >= 0)
     shell.openItem(URL.replace('HUN', path.join(XMLRootDirectory, 'File')))

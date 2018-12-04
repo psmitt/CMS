@@ -1,4 +1,5 @@
 const aside = document.querySelector('aside')
+const FormTitle = document.getElementById('form')
 const FormTable = aside.querySelector('footer>form>table')
 
 function load_form(formname) {
@@ -11,6 +12,7 @@ function load_form(formname) {
 let fields; // input field name -> [value -> text]
 
 async function loadForm(xmlDoc) {
+  FormTitle.innerHTML = xmlDoc.querySelector('form').attributes['title'].value
   fields = []
   promises = []
   xmlDoc.querySelectorAll('column').forEach(column =>
@@ -28,6 +30,36 @@ async function loadForm(xmlDoc) {
     row.appendChild(editor)
     FormTable.appendChild(row)
   })
+  let submit = xmlDoc.querySelector('submit')
+  row = document.createElement('tr')
+  let cell = document.createElement('td')
+  let button = document.createElement('input')
+  button.type = 'submit'
+  button.value = submit.attributes['title'] ?
+    submit.attributes['title'].value : 'Submit'
+  button.addEventListener('click', event => {
+    event.preventDefault()
+    let statements = submit.textContent
+    for (field of aside.querySelector('footer>form').elements) {
+      if (field.name) {
+        let value = `'${field.value}'`
+        if (field.list)
+          value = document.getElementById(field.list.id)
+          .querySelector(`option[value="${field.value}"]`).dataset.value
+        statements = statements.replace(
+          new RegExp(`\\$${field.name}\\$`, 'g'), value)
+      }
+    }
+
+    executeStatements(statements, nocsak)
+
+    function nocsak(result) {
+      console.log(result);
+    }
+  })
+  cell.appendChild(button)
+  row.appendChild(cell)
+  FormTable.appendChild(row)
 }
 
 async function getField(column) {

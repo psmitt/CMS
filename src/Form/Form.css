@@ -3,7 +3,7 @@ aside {
 }
 
 aside>header>h1 {
-  width: calc(100% - 1em);
+  width: calc(100% - 2em);
 }
 
 aside>footer {
@@ -35,4 +35,8 @@ aside form select,
 aside form textarea {
   font-size: large;
   padding: 5px;
+}
+
+aside input[type="submit"] {
+  width: calc(100% + 12px)
 }
