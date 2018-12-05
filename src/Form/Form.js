@@ -90,20 +90,20 @@ async function getField(column, fields) {
                   'WHERE ' + get('filter') : ''}
                    ORDER BY ${get('text')}`
       fields[name].option = []
-      return Promise.all([
-        runSQLQuery(query, result => {
-          result.forEach(option => {
-            fields[name].option[option[0]] = option[1]
-          })
-        }),
-        runSQLQuery(filteredQuery, result => {
-          result.forEach(option => {
-            fields[name].editor +=
-              `<option data-value="${option[0]}" value="${option[1]}"/>`
-          })
-          fields[name].editor += '</datalist>'
+      await runSQLQuery(filteredQuery, result => {
+        result.forEach(option => {
+          fields[name].option[option[0]] = option[1]
+          fields[name].editor +=
+            `<option data-value="${option[0]}" value="${option[1]}"/>`
         })
-      ])
+        fields[name].editor += '</datalist>'
+      })
+      return runSQLQuery(query, result => {
+        result.forEach(option => {
+          if (!fields[name].option[option[0]])
+            fields[name].option[option[0]] = `<mark>${option[1]}</mark>`
+        })
+      })
     } else {
       fields[name].editor = `<select ${inputName}/>`
       column.querySelectorAll('option').forEach(option => {

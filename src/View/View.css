@@ -138,3 +138,8 @@ section>header {
 #data .sortedDown {
   background-image: url('sortedDown.svg');
 }
+
+#data mark {
+  background-color: white;
+  color: red;
+}
