@@ -61,7 +61,7 @@ async function loadForm(xmlDoc) {
   FormTable.appendChild(row)
 }
 
-async function getField(column, fields) {
+async function getField(column) {
   let get = attribute => column.attributes[attribute] ?
     column.attributes[attribute].value : null
   let name = get('field')
@@ -78,31 +78,18 @@ async function getField(column, fields) {
                            <datalist id="${name}-options">`
     let options = column.querySelector('options')
     if (options) {
-      let get = selector => options.querySelector(selector).textContent
+      let get = element => options.querySelector(element).textContent
       let query = document.createElement('query')
       query.textContent = `SELECT ${get('value')}, ${get('text')}
-                   FROM ${get('from')}
-                   ORDER BY ${get('text')}`
-      let filteredQuery = document.createElement('query')
-      filteredQuery.textContent = `SELECT ${get('value')}, ${get('text')}
-                   FROM ${get('from')}
-                   ${options.querySelector('filter') ?
-                  'WHERE ' + get('filter') : ''}
-                   ORDER BY ${get('text')}`
-      fields[name].option = []
-      await runSQLQuery(filteredQuery, result => {
-        result.forEach(option => {
-          fields[name].option[option[0]] = option[1]
-          fields[name].editor +=
-            `<option data-value="${option[0]}" value="${option[1]}"/>`
-        })
-        fields[name].editor += '</datalist>'
-      })
+                           FROM ${get('from')}
+                           ${options.querySelector('filter') ?
+                          'WHERE ' + get('filter') : ''}
+                           ORDER BY ${get('text')}`
       return runSQLQuery(query, result => {
-        result.forEach(option => {
-          if (!fields[name].option[option[0]])
-            fields[name].option[option[0]] = `<mark>${option[1]}</mark>`
-        })
+        result.forEach(option => fields[name].editor +=
+          `<option data-value="${option[0]}" value="${option[1]}"/>`
+        )
+        fields[name].editor += '</datalist>'
       })
     } else {
       fields[name].editor = `<select ${inputName}/>`

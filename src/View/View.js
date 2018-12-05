@@ -144,7 +144,11 @@ async function loadView(xmlDoc) {
   titleRow.appendChild(bottomScroller)
   thead.appendChild(titleRow)
   rowTemplate.appendChild(rowEditCell)
-  reloadData()
+
+  if (isTable)
+    loadOptions(xmlDoc).then(reloadData)
+  else
+    reloadData()
 }
 
 function reloadData() {
