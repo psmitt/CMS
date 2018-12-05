@@ -4,22 +4,26 @@ const Tool = document.getElementById('tool')
 const Tools = document.getElementById('tools')
 const DataPanel = document.getElementById('data')
 
+let progressGif = document.createElement('img')
+progressGif.src = 'View/progress.gif'
+
 /* LOAD TABULAR REPORT DATA */
 
-var columnTitles, queries, dataArray, rowTemplate;
+var isTable, columnTitles, queries, dataArray, rowTemplate;
 var table, colgroup, thead, tbody, cols;
 const rightColumnWidth = 47
 
 function load_view(viewname) {
-  Message.textContent = '...'
+  Message.textContent = ''
+  Message.appendChild(progressGif)
   while (DataPanel.firstChild)
     DataPanel.removeChild(DataPanel.firstChild)
   readXMLFile('View', viewname + '.xml', loadView)
   showFrame(Section)
 }
 
-function loadView(xmlDoc) {
-  let isTable = Boolean(xmlDoc.querySelector('table'))
+async function loadView(xmlDoc) {
+  isTable = Boolean(xmlDoc.querySelector('table'))
   let get = attribute =>
     xmlDoc.querySelector(isTable ? 'table' : 'view').attributes[attribute].value
   ViewTitle.innerHTML = get('title')
@@ -57,18 +61,24 @@ function loadView(xmlDoc) {
   rowTemplate = document.createElement('tr')
   let rowEditCell = document.createElement('td')
   rowEditCell.textContent = '✐'
+  if (!isTable && xmlDoc.querySelector('view').attributes['automation'])
+    rowEditCell.title = get('automation')
 
-  columnTitles = []
   queries = []
   if (isTable)
-    queries = tableQuery(xmlDoc) // ["<query><![CDATA[ ... ]]></query>"]
-  else {
-    for (let column of columns)
-      columnTitles.push(column.attributes['title'].value)
+    queries = await tableQuery(xmlDoc) // [<query><![CDATA[ ... ]]></query>]
+  else
     queries = xmlDoc.querySelectorAll('view>query')
-  }
 
   if (queries.length > 1) { // gap analysis
+
+    columnTitles = []
+    for (let column of columns) {
+      if (column.attributes['title'])
+        columnTitles.push(column.attributes['title'].value)
+      else // Table
+        columnTitles.push(column.attributes['field'].value)
+    }
 
     table.style.width = '1044px'
     cols = 4
@@ -88,7 +98,7 @@ function loadView(xmlDoc) {
                              <td style="font-style:italic"></td>
                              <td></td><td></td>`
 
-  } else { // simple or compound view
+  } else { // simple or compound view, or table
 
     let tableWidth = rightColumnWidth
     cols = columns.length
@@ -100,7 +110,9 @@ function loadView(xmlDoc) {
       filterRow.appendChild(filterCell.cloneNode(true))
 
       let title = document.createElement('td')
-      title.textContent = get('title')
+      title.textContent = get('title') || get('field')
+      if (isTable)
+        title.dataset.field = get('field')
       titleRow.appendChild(title)
 
       let col = document.createElement('col')
@@ -141,6 +153,8 @@ function reloadData() {
   const getResult1 = result => result1 = result
   const displayData = result => {
     dataArray = result
+    if (isTable)
+      resolveForeignKeys()
     for (let row of dataArray)
       row.push(true)
     filterData()
@@ -153,7 +167,9 @@ function reloadData() {
     Promise.all([promise0, promise1])
       .then(_ => displayData(gapAnalysis(result0, result1)))
   } else {
-    promise0.then(_ => displayData(result0))
+    promise0.then(_ => {
+      displayData(result0)
+    })
   }
 }
 
@@ -235,7 +251,8 @@ function gapAnalysis(result0, result1) {
 /* FILTER AND SORT TABLE */
 
 function filterData() {
-  Message.textContent = '...'
+  Message.textContent = ''
+  Message.appendChild(progressGif)
   let filters = []
   thead.querySelectorAll('input').forEach((input, index) => {
     if (input.value)

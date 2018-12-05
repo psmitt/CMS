@@ -42,6 +42,7 @@ function readXMLFile(folder, filename, callback) {
 }
 
 async function runSQLQuery(query, callback, dsn = '', user = '', pass = '') {
+  console.log(query);
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {
     query: query.textContent

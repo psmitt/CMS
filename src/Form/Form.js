@@ -16,7 +16,7 @@ async function loadForm(xmlDoc) {
   fields = []
   promises = []
   xmlDoc.querySelectorAll('column').forEach(column =>
-    promises.push(getField(column)))
+    promises.push(getField(column, fields)))
   await Promise.all(promises)
   xmlDoc.querySelectorAll('column').forEach(column => {
     let row = document.createElement('tr')
@@ -39,19 +39,18 @@ async function loadForm(xmlDoc) {
     submit.attributes['title'].value : 'Submit'
   button.addEventListener('click', event => {
     event.preventDefault()
-    let statements = submit.textContent
     for (field of aside.querySelector('footer>form').elements) {
       if (field.name) {
         let value = `'${field.value}'`
         if (field.list)
           value = document.getElementById(field.list.id)
           .querySelector(`option[value="${field.value}"]`).dataset.value
-        statements = statements.replace(
+        submit.textContent = submit.textContent.replace(
           new RegExp(`\\$${field.name}\\$`, 'g'), value)
       }
     }
 
-    executeStatements(statements, nocsak)
+    runSQLQuery(submit, nocsak)
 
     function nocsak(result) {
       console.log(result);
@@ -62,7 +61,7 @@ async function loadForm(xmlDoc) {
   FormTable.appendChild(row)
 }
 
-async function getField(column) {
+async function getField(column, fields) {
   let get = attribute => column.attributes[attribute] ?
     column.attributes[attribute].value : null
   let name = get('field')
@@ -83,17 +82,28 @@ async function getField(column) {
       let query = document.createElement('query')
       query.textContent = `SELECT ${get('value')}, ${get('text')}
                    FROM ${get('from')}
+                   ORDER BY ${get('text')}`
+      let filteredQuery = document.createElement('query')
+      filteredQuery.textContent = `SELECT ${get('value')}, ${get('text')}
+                   FROM ${get('from')}
                    ${options.querySelector('filter') ?
                   'WHERE ' + get('filter') : ''}
                    ORDER BY ${get('text')}`
-      return new Promise((resolve, reject) => {
+      fields[name].option = []
+      return Promise.all([
         runSQLQuery(query, result => {
-          result.forEach(option => fields[name].editor +=
-            `<option data-value="${option[0]}" value="${option[1]}"/>`
-          )
-          resolve(fields[name].editor += '</datalist>')
+          result.forEach(option => {
+            fields[name].option[option[0]] = option[1]
+          })
+        }),
+        runSQLQuery(filteredQuery, result => {
+          result.forEach(option => {
+            fields[name].editor +=
+              `<option data-value="${option[0]}" value="${option[1]}"/>`
+          })
+          fields[name].editor += '</datalist>'
         })
-      })
+      ])
     } else {
       fields[name].editor = `<select ${inputName}/>`
       column.querySelectorAll('option').forEach(option => {

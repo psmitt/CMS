@@ -202,7 +202,8 @@ async function runSQLQuery(query, callback) { // query is XML object
               reject(cmdb.release())
               throw error
             }
-            queryResultToArray(result)
+            if (result.constructor.name !== 'OkPacket')
+              queryResultToArray(result)
             callback(result)
             resolve(cmdb.release())
           })
@@ -232,25 +233,6 @@ function queryResultToArray(result) {
     }
     result[row] = dataRow
   }
-}
-
-function executeStatements(statements, callback) {
-  MySQL_Pool.getConnection((error, cmdb) => {
-    if (error) {
-      cmdb.release()
-      throw error
-    }
-    cmdb.query({
-      sql: statements
-    }, (error, result, fields) => {
-      if (error) {
-        cmdb.release()
-        throw error
-      }
-      callback(result)
-      cmdb.release()
-    })
-  })
 }
 
 function load_link(URL) {
