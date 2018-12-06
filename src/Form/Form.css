@@ -2,7 +2,7 @@ aside {
   background-color: #eeeeee;
 }
 
-aside>header>h1 {
+#FormTitle {
   width: calc(100% - 2em);
 }
 
@@ -32,11 +32,12 @@ aside table td {
 
 aside form input,
 aside form select,
-aside form textarea {
+aside form textarea,
+aside form button {
   font-size: large;
   padding: 5px;
 }
 
-aside input[type="submit"] {
+aside button {
   width: calc(100% + 12px)
 }

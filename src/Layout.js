@@ -1,8 +1,3 @@
-const Nav = document.querySelector('nav').style
-const Article = document.querySelector('article').style
-const Section = document.querySelector('section').style
-const Aside = document.querySelector('aside').style
-
 document.querySelector('aside .close').addEventListener('click', _ => {
   Aside.display = 'none'
 })

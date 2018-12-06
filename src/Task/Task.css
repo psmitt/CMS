@@ -8,33 +8,33 @@ article {
   white-space: nowrap;
 }
 
-#task { /* title */
+#TaskTitle {
   width: calc(100% - 1em);
 }
 
-#procedure {
+#Procedure {
   white-space: normal;
   padding-left: var(--title-padding);
   padding-right: var(--title-padding);
 }
 
-#procedure div {
+#Procedure div {
   position: relative;
   white-space: nowrap;
 }
 
-#procedure div div {
+#Procedure div div {
   margin-left: var(--div-margin);
 }
 
-#procedure input {
+#Procedure input {
   height: 1em;
   width: 1em;
   margin: var(--input-margin);
   vertical-align: top;
 }
 
-#procedure span {
+#Procedure span {
   display: inline-block;
   position: relative;
   width: calc(100% - var(--div-margin) - var(--input-margin));
@@ -43,7 +43,7 @@ article {
   white-space: normal;
 }
 
-#procedure button {
+#Procedure button {
   font-family: inherit;
   font-size: large;
   font-weight: bold;
@@ -53,7 +53,7 @@ article {
   border-radius: 5px;
 }
 
-#procedure h2 {
+#Procedure h2 {
   font-size: larger;
   font-style: italic;
 }

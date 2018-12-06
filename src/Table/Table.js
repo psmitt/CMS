@@ -66,5 +66,5 @@ async function loadOptions(xmlDoc) {
 
 async function resolveForeignKeys() {
   for (let index in ColumnOptions)
-    dataArray.forEach(row => row[index] = ColumnOptions[index][row[index]] || '')
+    View.data.forEach(row => row[index] = ColumnOptions[index][row[index]] || '')
 }

@@ -59,11 +59,11 @@ input, textarea, select {
   font-size: large;
 }
 
-input:hover, textarea:hover, select:hover {
+input:hover, textarea:hover, select:hover, button:hover {
   border-color: skyblue;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus, textarea:focus, select:focus, button:focus {
   outline: none;
   border-color: deepskyblue;
 }

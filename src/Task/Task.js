@@ -1,10 +1,5 @@
-const article = document.querySelector('article')
-const TaskTitle = document.getElementById('task')
-const Procedure = article.querySelector('footer')
-
 function load_task(taskname) { // taskname is filename without file extension
-  while (Procedure.firstChild)
-    Procedure.removeChild(Procedure.firstChild)
+  empty(Procedure)
   readXMLFile('Task', taskname + '.xml', loadTask)
   showFrame(Article)
 

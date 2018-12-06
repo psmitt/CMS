@@ -1,14 +1,8 @@
-const Menu = document.getElementById('menu')
-const Search = document.getElementById('search')
-
-/* MENU DISPLAY */
+/* DISPLAY MENU */
 
 function loadMenuFiles() {
-  while (Menu.firstChild)
-    Menu.removeChild(Menu.firstChild)
-
+  empty(Menu)
   var menu; // generator
-
   listDirectory('Menu', loadFiles) // initialize the menu generator
 
   function loadFiles(filenames) {
@@ -35,9 +29,8 @@ function appendSubMenu(subMenu, parentMenu) {
   let node = document.createElement('div')
   if (subMenu.children.length) {
     node.innerHTML = `<span class="branch expanded">${menu('title')}</span>`
-    for (let item of subMenu.children) {
+    for (let item of subMenu.children)
       appendSubMenu(item, node)
-    }
   } else {
     node.innerHTML = `<span class="item${subMenu.attributes.class ?
       ' ' + menu('class') +

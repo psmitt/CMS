@@ -1,119 +1,96 @@
-const ViewTitle = document.getElementById('view')
-const Message = document.getElementById('message')
-const Tool = document.getElementById('tool')
-const Tools = document.getElementById('tools')
-const DataPanel = document.getElementById('data')
-
-let progressGif = document.createElement('img')
-progressGif.src = 'View/progress.gif'
-
-/* LOAD TABULAR REPORT DATA */
-
-var isTable, columnTitles, queries, dataArray, rowTemplate;
-var table, colgroup, thead, tbody, cols;
-const rightColumnWidth = 47
-
 function load_view(viewname) {
-  Message.textContent = ''
+  empty(DataPanel)
+  empty(Message)
   Message.appendChild(progressGif)
-  while (DataPanel.firstChild)
-    DataPanel.removeChild(DataPanel.firstChild)
   readXMLFile('View', viewname + '.xml', loadView)
   showFrame(Section)
 }
 
 async function loadView(xmlDoc) {
-  isTable = Boolean(xmlDoc.querySelector('table'))
-  let get = attribute =>
-    xmlDoc.querySelector(isTable ? 'table' : 'view').attributes[attribute].value
-  ViewTitle.innerHTML = get('title')
 
-  DataPanel.innerHTML = `<table>
-                          <colgroup></colgroup>
-                          <thead></thead>
-                          <tbody></tbody>
-                         </table>`
+  View.isTable = Boolean(xmlDoc.querySelector('table'))
 
-  table = DataPanel.querySelector('table')
-  colgroup = table.querySelector('colgroup')
-  thead = table.querySelector('thead')
-  tbody = table.querySelector('tbody')
+  View.titles = []
+  xmlDoc.querySelectorAll('column').forEach(column =>
+    View.titles.push(get(column, 'title') || get(column, 'field'))
+  )
 
-  let columns = xmlDoc.querySelectorAll('column')
-  let rightColumn = document.createElement('col')
-  rightColumn.style.width = rightColumnWidth + 'px'
+  View.queries = View.isTable ?
+    await tableQuery(xmlDoc) : xmlDoc.querySelectorAll('view > query')
 
-  let filterRow = document.createElement('tr')
-  let filterCell = document.createElement('th')
-  let filter = document.createElement('input')
-  filter.type = 'search'
-  filterCell.appendChild(filter)
+  View.data = [] // --> reloadData
 
-  let topScroller = document.createElement('th')
-  topScroller.textContent = '⭱'
-  topScroller.addEventListener('click', scrollToTop)
+  View.row = document.createElement('tr')
 
-  let titleRow = document.createElement('tr')
-  let bottomScroller = document.createElement('td')
-  bottomScroller.textContent = '⭳'
-  bottomScroller.addEventListener('click', scrollToBottom)
+  ViewTitle.innerHTML =
+    get(xmlDoc.querySelector(View.isTable ? 'table' : 'view'), 'title')
 
-  rowTemplate = document.createElement('tr')
-  let rowEditCell = document.createElement('td')
-  rowEditCell.textContent = '✐'
-  if (!isTable && xmlDoc.querySelector('view').attributes['automation'])
-    rowEditCell.title = get('automation')
+  let editorCell = View.isTable ? '<td>✐</td>' :
+    `<td title="${get(xmlDoc.querySelector('view'), 'automation') || ''}">⚙</td>`
 
-  queries = []
-  if (isTable)
-    queries = await tableQuery(xmlDoc) // [<query><![CDATA[ ... ]]></query>]
-  else
-    queries = xmlDoc.querySelectorAll('view>query')
+  if (View.queries.length > 1) { // gap analysis
 
-  if (queries.length > 1) { // gap analysis
+    DataPanel.innerHTML = `<table style="width:${1000 + rigthColumnWidth}px">
+                            <colgroup>
+                              <col style="width:200px"/>
+                              <col style="width:200px"/>
+                              <col style="width:300px"/>
+                              <col style="width:300px"/>
+                              <col style="width:${rigthColumnWidth}px"/>
+                            </colgroup>
+                            <thead>
+                              <tr>
+                                <th><input type="search"/></th>
+                                <th><input type="search"/></th>
+                                <th><input type="search"/></th>
+                                <th><input type="search"/></th>
+                                <th onclick="scrollToTop()">⭱</th>
+                              </tr>
+                              <tr>
+                                <td>${View.titles[0]}</td>
+                                <td data-title="Data">Data</td>
+                                <td>${View.queries[0].attributes['title'].value}</td>
+                                <td>${View.queries[1].attributes['title'].value}</td>
+                                <td onclick="scrollToBottom()">⭳</td>
+                              </tr>
+                            </thead>
+                            <tbody></tbody>
+                           </table>`
 
-    columnTitles = []
-    for (let column of columns) {
-      if (column.attributes['title'])
-        columnTitles.push(column.attributes['title'].value)
-      else // Table
-        columnTitles.push(column.attributes['field'].value)
-    }
-
-    table.style.width = '1044px'
-    cols = 4
-    colgroup.innerHTML = `${'<col style="width:200px"/>'.repeat(2)}
-                          ${'<col style="width:300px"/>'.repeat(2)}`
-
-    for (let col = 0; col < cols; col++)
-      filterRow.appendChild(filterCell.cloneNode(true))
-
-    titleRow.innerHTML = `
-        <td>${columns[0].attributes['title'].value}</td>
-        <td data-title="Data">Data</td>
-        <td>${queries[0].attributes['title'].value}</td>
-        <td>${queries[1].attributes['title'].value}</td>`
-
-    rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
-                             <td style="font-style:italic"></td>
-                             <td></td><td></td>`
+    View.row.innerHTML = `<td style="font-weight:bold"></td>
+                          <td style="font-style:italic"></td>
+                          <td></td><td></td>${editorCell}`
 
   } else { // simple or compound view, or table
 
-    let tableWidth = rightColumnWidth
-    cols = columns.length
-    for (let column of columns) {
-      const get = attribute => // read attribute
+    DataPanel.innerHTML = `<table>
+                            <colgroup>
+                              <col style="width:${rigthColumnWidth}px">
+                            </colgroup>
+                            <thead>
+                              <tr><th onclick="scrollToTop()">⭱</th></tr>
+                              <tr><td onclick="scrollToBottom()">⭳</td></tr>
+                            </thead>
+                            <tbody></tbody>
+                           </table>`
+
+    let tableWidth = rigthColumnWidth
+    let colgroup = DataPanel.querySelector('colgroup')
+    let filterRow = DataPanel.querySelectorAll('tr')[0]
+    let titleRow = DataPanel.querySelectorAll('tr')[1]
+    View.row.innerHTML = editorCell
+    xmlDoc.querySelectorAll('column').forEach(column => {
+      const get = attribute =>
         column.attributes[attribute] ?
         column.attributes[attribute].value : ''
 
-      filterRow.appendChild(filterCell.cloneNode(true))
-
+      let filter = document.createElement('th')
+      filter.innerHTML = '<input type="search"/>'
+      filterRow.insertBefore(filter, filterRow.lastElementChild)
       let title = document.createElement('td')
       title.textContent = get('title') || get('field')
-      if (isTable)
-        title.dataset.field = get('field')
-      titleRow.appendChild(title)
+      title.dataset.field = get('field')
+      titleRow.insertBefore(title, titleRow.lastElementChild)
 
       let col = document.createElement('col')
       let datacell = document.createElement('td')
@@ -131,50 +108,36 @@ async function loadView(xmlDoc) {
           col.className = get('type')
       }
       tableWidth += parseInt(col.style.width = (get('width') * 1.3 || width) + 'px')
-      colgroup.appendChild(col)
+      colgroup.insertBefore(col, colgroup.lastElementChild)
       datacell.style.textAlign = get('align') || align
       datacell.className = font || get('font')
-      rowTemplate.appendChild(datacell)
-    }
-    table.style.width = tableWidth + 'px'
+      View.row.insertBefore(datacell, View.row.lastElementChild)
+    })
+    DataPanel.firstElementChild.style.width = tableWidth + 'px'
   }
-  colgroup.appendChild(rightColumn)
-  filterRow.appendChild(topScroller)
-  thead.appendChild(filterRow)
-  titleRow.appendChild(bottomScroller)
-  thead.appendChild(titleRow)
-  rowTemplate.appendChild(rowEditCell)
+  View.table = DataPanel.querySelector('table')
+  View.tbody = DataPanel.querySelector('tbody')
 
-  if (isTable)
+  if (View.isTable)
     loadOptions(xmlDoc).then(reloadData)
   else
     reloadData()
 }
 
 function reloadData() {
-  let result0, result1;
-  const getResult0 = result => result0 = result
-  const getResult1 = result => result1 = result
-  const displayData = result => {
-    dataArray = result
-    if (isTable)
-      resolveForeignKeys()
-    for (let row of dataArray)
-      row.push(true)
+  let promises = []
+  let results = []
+  View.queries.forEach(query => {
+    promises.push(query.querySelector('query') ?
+      compoundQuery(query, result => results.push(result)) :
+      runSQLQuery(query, result => results.push(result)))
+  })
+  Promise.all(promises).then(_ => {
+    View.data = results.length > 1 ? gapAnalysis(results) : results[0]
+    if (View.isTable) resolveForeignKeys()
+    for (rows of View.data) rows.push(true)
     filterData()
-  }
-  let promise0 = queries[0].querySelector('query') ?
-    compoundQuery(queries[0], getResult0) : runSQLQuery(queries[0], getResult0)
-  if (queries.length > 1) {
-    let promise1 = queries[1].querySelector('query') ?
-      compoundQuery(queries[1], getResult1) : runSQLQuery(queries[1], getResult1)
-    Promise.all([promise0, promise1])
-      .then(_ => displayData(gapAnalysis(result0, result1)))
-  } else {
-    promise0.then(_ => {
-      displayData(result0)
-    })
-  }
+  })
 }
 
 async function compoundQuery(query, callback) {
@@ -220,45 +183,44 @@ async function compoundQuery(query, callback) {
   }
 }
 
-function gapAnalysis(result0, result1) {
-  result0.sort((a, b) => a[0].localeCompare(b[0]))
-  result1.sort((a, b) => a[0].localeCompare(b[0]))
+function gapAnalysis(results) {
+  results[0].sort((a, b) => a[0].localeCompare(b[0]))
+  results[1].sort((a, b) => a[0].localeCompare(b[0]))
   let result = []
-  let i = 0
-  let j = 0
-  const push0 = index =>
-    result.push([result0[index][0], '*',
-      `<span title="${result0[index].join('\n')}">*</span>`, ''])
-  const push1 = index =>
-    result.push([result1[index][0], '*', '',
-      `<span title="${result1[index].join('\n')}">*</span>`])
-  while (i < result0.length && j < result1.length) {
-    let comparison = result0[i][0].localeCompare(result1[j][0])
-    if (comparison < 0) push0(i++)
-    if (comparison > 0) push1(j++)
+  let push = [
+    index => result.push([results[0][index][0], '*',
+      `<span title="${results[0][index].join('\n')}">*</span>`, '']),
+    index => result.push([results[1][index][0], '*', '',
+      `<span title="${results[1][index].join('\n')}">*</span>`])
+  ]
+  let i = j = 0
+  while (i < results[0].length && j < results[1].length) {
+    let comparison = results[0][i][0].localeCompare(results[1][j][0])
+    if (comparison < 0) push[0](i++)
+    if (comparison > 0) push[1](j++)
     if (comparison == 0) { // first_key == second_key
-      for (let k = 1; k < result0[i].length; k++) {
-        let firstData = result0[i][k] ? result0[i][k].toString() : ''
-        let secondData = result1[j][k] ? result1[j][k].toString() : ''
+      for (let k = 1; k < results[0][i].length; k++) {
+        let firstData = results[0][i][k] ? results[0][i][k].toString() : ''
+        let secondData = results[1][j][k] ? results[1][j][k].toString() : ''
         if (firstData.localeCompare(secondData))
-          result.push([result0[i][0], columnTitles[k], firstData, secondData])
+          result.push([results[0][i][0], View.titles[k], firstData, secondData])
       }
       i++
       j++
     }
   }
-  while (i < result0.length) push0(i++)
-  while (j < result1.length) push1(j++)
+  while (i < results[0].length) push[0](i++)
+  while (j < results[1].length) push[1](j++)
   return result
 }
 
 /* FILTER AND SORT TABLE */
 
 function filterData() {
-  Message.textContent = ''
+  empty(Message)
   Message.appendChild(progressGif)
   let filters = []
-  thead.querySelectorAll('input').forEach((input, index) => {
+  DataPanel.querySelectorAll('thead input').forEach((input, index) => {
     if (input.value)
       filters.push({
         column: index,
@@ -266,20 +228,23 @@ function filterData() {
       })
   })
   let counter = 0
-  for (let row of dataArray)
-    row[cols] = true;
+  let display = View.titles.length
+  for (let row of View.data)
+    row[display] = true
   for (let f = 0; f < filters.length - 1; f++) {
     let c = filters[f].column
-    for (let row of dataArray)
-      row[cols] = row[cols] && filters[f].filter.test(row[c].replace(/\n/g, ' '))
+    for (let row of View.data)
+      row[display] = row[display] &&
+      filters[f].filter.test(row[c].replace(/\n/g, ' '))
   }
   if (filters.length) {
     let f = filters.length - 1
     let c = filters[f].column
-    for (let row of dataArray)
-      counter += row[cols] = row[cols] && filters[f].filter.test(row[c].replace(/\n/g, ' '))
+    for (let row of View.data)
+      counter += row[display] = row[display] &&
+      filters[f].filter.test(row[c].replace(/\n/g, ' '))
   } else {
-    counter = dataArray.length
+    counter = View.data.length
   }
   Message.textContent = counter
   scrollToTop()
@@ -287,22 +252,20 @@ function filterData() {
 
 DataPanel.addEventListener('input', filterData)
 
-DataPanel.addEventListener('click', event => {
+DataPanel.addEventListener('click', event => { // SORT DATA
   if (event.target.matches('thead td') && !getSelection().toString()) {
     let i = event.target.cellIndex
-    if (i < dataArray[0].length - 2) {
+    if (i < View.data[0].length - 2) {
       if (event.target.classList.length) {
-        dataArray.reverse()
+        View.data.reverse()
         event.target.classList.toggle('sortedUp')
         event.target.classList.toggle('sortedDown')
       } else {
         thead.querySelectorAll('td').forEach(td => td.className = '')
-        let cols = document.getElementsByTagName('col')
-        if (cols[i].className === 'number') {
-          dataArray.sort((a, b) => a[i] - b[i])
-        } else {
-          dataArray.sort((a, b) => a[i].localeCompare(b[i]))
-        }
+        if (document.getElementsByTagName('col')[i].className === 'number')
+          View.data.sort((a, b) => a[i] - b[i])
+        else
+          View.data.sort((a, b) => a[i].localeCompare(b[i]))
         event.target.classList.toggle('sortedUp')
       }
       scrollToTop()
@@ -312,66 +275,63 @@ DataPanel.addEventListener('click', event => {
 
 /* VIRTUAL SCROLLING */
 
-const screenSize = Math.max(window.screen.availWidth, window.screen.availHeight)
-let firstRowIndex, lastRowIndex;
-
 function scrollToTop() {
-  while (tbody.firstChild)
-    tbody.removeChild(tbody.firstChild)
-  lastRowIndex = -1
+  empty(View.tbody)
+  View.last = -1
   appendRow()
-  firstRowIndex = lastRowIndex
-  while (screenSize > table.offsetHeight - DataPanel.scrollTop && appendRow());
+  View.first = View.last
+  while (screenSize > View.table.offsetHeight - DataPanel.scrollTop && appendRow());
 }
 
 function scrollToBottom() {
-  while (tbody.firstChild)
-    tbody.removeChild(tbody.firstChild)
-  firstRowIndex = dataArray.length
+  empty(View.tbody)
+  View.first = View.data.length
   prependRow()
-  lastRowIndex = firstRowIndex
-  while (table.offsetHeight < screenSize && prependRow());
-  DataPanel.scrollTop = table.offsetHeight
+  View.last = View.first
+  while (View.table.offsetHeight < screenSize && prependRow());
+  DataPanel.scrollTop = View.table.offsetHeight
 }
 
-function appendRow() {
-  let lastIndex = lastRowIndex
-  while (++lastIndex < dataArray.length)
-    if (dataArray[lastIndex][cols])
+function appendRow() { // return success
+  let last = View.last
+  let display = View.titles.length
+  while (++last < View.data.length)
+    if (View.data[last][display])
       break
-  if (lastIndex < dataArray.length && dataArray[lastIndex][cols]) {
-    let newRow = rowTemplate.cloneNode(true)
-    newRow.dataset.index = lastRowIndex = lastIndex
-    for (let cell = 0; cell < cols; cell++)
-      newRow.children[cell].innerHTML = dataArray[lastIndex][cell]
-    tbody.appendChild(newRow)
+  if (last < View.data.length && View.data[last][display]) {
+    let newRow = View.row.cloneNode(true)
+    newRow.dataset.index = View.last = last
+    for (let cell = 0; cell < display; cell++)
+      newRow.children[cell].innerHTML = View.data[last][cell]
+    View.tbody.appendChild(newRow)
     return true
   }
   return false
 }
 
 function prependRow() { // return success
-  let firstIndex = firstRowIndex
-  while (--firstIndex >= 0)
-    if (dataArray[firstIndex][cols])
+  let first = View.first
+  let display = View.titles.length
+  while (--first >= 0)
+    if (View.data[first][display])
       break
-  if (firstIndex >= 0 && dataArray[firstIndex][cols]) {
-    let newRow = rowTemplate.cloneNode(true)
-    newRow.dataset.index = firstRowIndex = firstIndex
-    for (let cell = 0; cell < cols; cell++)
-      newRow.children[cell].innerHTML = dataArray[firstIndex][cell]
-    if (tbody.firstChild)
-      tbody.insertBefore(newRow, tbody.firstChild)
+  if (first >= 0 && View.data[first][display]) {
+    let newRow = View.row.cloneNode(true)
+    newRow.dataset.index = View.first = first
+    for (let cell = 0; cell < display; cell++)
+      newRow.children[cell].innerHTML = View.data[first][cell]
+    if (View.tbody.firstChild)
+      View.tbody.insertBefore(newRow, View.tbody.firstChild)
     else
-      tbody.appendChild(newRow)
-    return true;
+      View.tbody.appendChild(newRow)
+    return true
   }
-  return false;
+  return false
 }
 
 DataPanel.addEventListener('scroll', _ => {
   while ((screenSize > DataPanel.scrollTop && prependRow()) ||
-    (table.offsetHeight - DataPanel.scrollTop < screenSize && appendRow()));
+    (View.table.offsetHeight - DataPanel.scrollTop < screenSize && appendRow()));
 })
 
 /* HEADER TOOLS */

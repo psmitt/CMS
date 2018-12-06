@@ -10,11 +10,11 @@ section>header {
   z-index: 7;
 }
 
-#view {
+#ViewTitle {
   width: calc(100% - 4em); /* give space to message and tools */
 }
 
-#message {
+#Message {
   position: absolute;
   right: 2em;
   width: 3em;
@@ -22,7 +22,7 @@ section>header {
   vertical-align: top;
 }
 
-#tool {
+#Tool {
   position: absolute;
   top: 10px;
   right: 8px;
@@ -30,7 +30,7 @@ section>header {
   user-select: none;
 }
 
-#tools {
+#Tools {
   display: none;
   position: absolute;
   top: var(--header-height);
@@ -41,7 +41,7 @@ section>header {
   border-radius: 5px;
 }
 
-#tools span {
+#Tools span {
   display: block;
   font-size: smaller;
   font-weight: bold;
@@ -50,18 +50,18 @@ section>header {
   cursor: pointer;
 }
 
-#tools span:hover {
+#Tools span:hover {
   background-color: tan;
 }
 
-#data {
+#Data {
   overflow-x: auto;
   overflow-y: scroll;
   font-size: smaller;
 }
 
-#data th:last-child,
-#data td:last-child {
+#Data th:last-child,
+#Data td:last-child {
   z-index: 6;
   transform: translate3d(0,0,0);
   position: sticky;
@@ -76,16 +76,16 @@ section>header {
   border:none;
 }
 
-#data th:last-child:hover,
-#data td:last-child:hover,
-#data th:last-child:active,
-#data td:last-child:active {
+#Data th:last-child:hover,
+#Data td:last-child:hover,
+#Data th:last-child:active,
+#Data td:last-child:active {
   background-color: gray;
   color: white;
 }
 
-#data thead th, /* filter row */
-#data thead td {/* title row */
+#Data thead th, /* filter row */
+#Data thead td {/* title row */
   background-color: var(--grid-color);
   z-index: 7;
   transform: translate3d(0,0,0);
@@ -94,23 +94,23 @@ section>header {
   top: 0;
 }
 
-#data thead th:last-child,
-#data thead td:last-child {
+#Data thead th:last-child,
+#Data thead td:last-child {
   z-index: 7;
 }
 
-#data thead td {/* title row */
+#Data thead td {/* title row */
   top: 32px;
   font-weight: bold;
   padding-left: var(--title-padding);
   white-space: nowrap;
 }
 
-#data input {
+#Data input {
   padding-left: calc(var(--title-padding) - 2px);
 }
 
-#data tbody td {
+#Data tbody td {
   border: solid thin var(--grid-color);
   vertical-align: top;
   padding-left: calc(var(--title-padding) - 2px);
@@ -121,25 +121,25 @@ section>header {
   word-wrap: break-word;
 }
 
-#data .mono {
+#Data .mono {
   font-family: "Nova Mono", monospace;
   padding-top: 4px;
 }
 
-#data .sortedUp,
-#data .sortedDown {
+#Data .sortedUp,
+#Data .sortedDown {
   background-position: right center;
   background-repeat: no-repeat;
 }
 
-#data .sortedUp {
+#Data .sortedUp {
   background-image: url('sortedUp.svg');
 }
-#data .sortedDown {
+#Data .sortedDown {
   background-image: url('sortedDown.svg');
 }
 
-#data mark {
+#Data mark {
   background-color: white;
   color: red;
 }

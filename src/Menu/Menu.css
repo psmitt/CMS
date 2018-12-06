@@ -6,7 +6,7 @@ nav>header {
   text-align: center;
 }
 
-#search {
+#Search {
   height: calc(100% - 2 * var(--menu-padding));
   width: calc(100% - 2 * var(--menu-padding));
   border-radius: var(--menu-padding);
@@ -18,18 +18,18 @@ nav>header {
   padding-left: 1.75em;
 }
 
-#menu {
+#Menu {
   padding-left: var(--menu-padding);
   padding-right: var(--menu-padding);
   width: calc(100% + var(--scrollbar-width) - var(--menu-padding) + 1px);
 }
 
-#menu div {
+#Menu div {
   line-height: 0;
   margin-left: calc(2 * var(--menu-padding));
 }
 
-#menu span {
+#Menu span {
   box-sizing: border-box;
   display: inline-block;
   line-height: 1.75em;
@@ -43,7 +43,7 @@ nav>header {
   user-select: none; /* prevent text selection on double click */
 }
 
-#menu .branch {
+#Menu .branch {
   margin-left: calc(-2 * var(--menu-padding));
   width: calc(100% + 2 * var(--menu-padding));
   background-size: auto 1em;
@@ -52,77 +52,77 @@ nav>header {
   padding-left: 1.8em;
 }
 
-#menu .collapsed {
+#Menu .collapsed {
   background-image: url('triangle_right.svg');
 }
-#menu .expanded {
+#Menu .expanded {
   background-image: url('triangle_down.svg');
 }
-#menu .filtered {
+#Menu .filtered {
   background-image: url('triangle_down_right.svg');
 }
 
-#menu .item:hover,
-#menu .item.hit,
-#menu .item.clicked {
+#Menu .item:hover,
+#Menu .item.hit,
+#Menu .item.clicked {
   white-space: normal;
 }
 
 /* DEFAULT COLOR THEME: gray */
 
-#menu .item {
+#Menu .item {
   color: #111111;
 }
 
-#menu mark,
-#menu .item:hover,
-#menu .item.hit {
+#Menu mark,
+#Menu .item:hover,
+#Menu .item.hit {
   background-color: #dddddd;
   color: black;
 }
 
-#menu .item.clicked {
+#Menu .item.clicked {
   background-color: #cccccc;
 }
 
 /* BRANCH COLOR THEME: tan */
 
-#menu .branch:hover,
-#menu .branch.clicked {
+#Menu .branch:hover,
+#Menu .branch.clicked {
   font-weight: bold;
 }
 
 /* TASK COLOR THEME: lightsteelblue */
 
-#menu .task {
+#Menu .task {
   color: #1d3549; /* 20% */
 }
 
-#menu .task mark,
-#menu .task:hover,
-#menu .task.hit {
+#Menu .task mark,
+#Menu .task:hover,
+#Menu .task.hit {
   background-color: #dbe4f0;  /* 90% */
   color: black;
 }
 
-#menu .task.clicked {
+#Menu .task.clicked {
   background-color: #c9d7e8;  /* 85% */
 }
 
 /* LINK COLOR THEME: seagreen */
 
-#menu .link {
+#Menu .link {
   color: #267347; /* 30% */
 }
 
-#menu .link mark,
-#menu .link:hover,
-#menu .link.hit {
+#Menu .link mark,
+#Menu .link:hover,
+#Menu .link.hit {
   background-color: #d9f2e4;  /* 90% */
   color: #20603b; /* 25% */
 }
 
-#menu .link.clicked {
+#Menu .link.clicked {
   background-color:  #c6ecd6;  /* 85% */
   color: #194d30; /* 20% */
 }

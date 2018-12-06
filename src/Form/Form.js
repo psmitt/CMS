@@ -1,64 +1,33 @@
-const aside = document.querySelector('aside')
-const FormTitle = document.getElementById('form')
-const FormTable = aside.querySelector('footer>form>table')
-
 function load_form(formname) {
-  while (FormTable.firstChild)
-    FormTable.removeChild(FormTable.firstChild)
+  empty(FormTable)
   readXMLFile('Form', formname + '.xml', loadForm)
   Aside.display = 'block'
 }
 
-let fields; // input field name -> [value -> text]
-
 async function loadForm(xmlDoc) {
   FormTitle.innerHTML = xmlDoc.querySelector('form').attributes['title'].value
-  fields = []
-  promises = []
-  xmlDoc.querySelectorAll('column').forEach(column =>
-    promises.push(getField(column, fields)))
-  await Promise.all(promises)
-  xmlDoc.querySelectorAll('column').forEach(column => {
-    let row = document.createElement('tr')
-    let label = document.createElement('th')
-    label.textContent = fields[column.attributes['field'].value].label
-    row.appendChild(label)
-    FormTable.appendChild(row)
-    row = document.createElement('tr')
-    let editor = document.createElement('td')
-    editor.innerHTML = fields[column.attributes['field'].value].editor
-    row.appendChild(editor)
-    FormTable.appendChild(row)
-  })
-  let submit = xmlDoc.querySelector('submit')
-  row = document.createElement('tr')
-  let cell = document.createElement('td')
-  let button = document.createElement('input')
-  button.type = 'submit'
-  button.value = submit.attributes['title'] ?
-    submit.attributes['title'].value : 'Submit'
-  button.addEventListener('click', event => {
-    event.preventDefault()
-    for (field of aside.querySelector('footer>form').elements) {
-      if (field.name) {
-        let value = `'${field.value}'`
-        if (field.list)
-          value = document.getElementById(field.list.id)
-          .querySelector(`option[value="${field.value}"]`).dataset.value
-        submit.textContent = submit.textContent.replace(
-          new RegExp(`\\$${field.name}\\$`, 'g'), value)
-      }
+  Options = []
+  for (element of xmlDoc.querySelectorAll('column, button, submit')) {
+    const get = attribute => element.attributes[attribute] ?
+      element.attributes[attribute].value : ''
+    if (element.matches('column')) {
+      await getField(element)
+      let label = document.createElement('tr')
+      label.innerHTML = `<th>${Options[get('field')].label}</th>`
+      FormTable.appendChild(label)
+      let editor = document.createElement('tr')
+      editor.innerHTML = `<td>${Options[get('field')].editor}</td>`
+      FormTable.appendChild(editor)
+    } else {
+      let button = document.createElement('tr')
+      button.innerHTML =
+        `<td><button onclick="event.preventDefault();${
+          get('language') === 'JS' ? element.textContent :
+          'executeSQL(\\\\"' + element.textContent +'\\\\", ' + (get('callback') || null) + ')'
+        }">${get('title') || 'Submit'}</button></td>`
+      FormTable.appendChild(button)
     }
-
-    runSQLQuery(submit, nocsak)
-
-    function nocsak(result) {
-      console.log(result);
-    }
-  })
-  cell.appendChild(button)
-  row.appendChild(cell)
-  FormTable.appendChild(row)
+  }
 }
 
 async function getField(column) {
@@ -67,14 +36,14 @@ async function getField(column) {
   let name = get('field')
   let inputName = `name="${name}"` +
     (get('required') === 'yes' ? ' required' : '')
-  fields[name] = {
+  Options[name] = {
     label: get('title')
   }
   if (get('multiline') === 'yes')
-    return fields[name].editor = `<textarea ${inputName}></textarea>`
+    return Options[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
-    fields[name].editor = `<input list="${name}-options" ${inputName}/>
+    Options[name].editor = `<input list="${name}-options" ${inputName}/>
                            <datalist id="${name}-options">`
     let options = column.querySelector('options')
     if (options) {
@@ -86,20 +55,20 @@ async function getField(column) {
                           'WHERE ' + get('filter') : ''}
                            ORDER BY ${get('text')}`
       return runSQLQuery(query, result => {
-        result.forEach(option => fields[name].editor +=
+        result.forEach(option => Options[name].editor +=
           `<option data-value="${option[0]}" value="${option[1]}"/>`
         )
-        fields[name].editor += '</datalist>'
+        Options[name].editor += '</datalist>'
       })
     } else {
-      fields[name].editor = `<select ${inputName}/>`
+      Options[name].editor = `<select ${inputName}/>`
       column.querySelectorAll('option').forEach(option => {
         let value = option.attributes['value'] ?
           option.attributes['value'].value : option.textContent
-        fields[name].editor +=
+        Options[name].editor +=
           `<option value="${value}">${option.textContent}</option>`
       })
-      return fields[name].editor += '</select>'
+      return Options[name].editor += '</select>'
     }
   }
 
@@ -108,23 +77,36 @@ async function getField(column) {
     type = 'date'
   switch (type) {
     case null:
-      fields[name].editor = `<input ${inputName}/>`
+      Options[name].editor = `<input ${inputName}/>`
       break;
     case 'email':
     case 'url':
     case 'number':
     case 'date':
-      fields[name].editor = `<input type="${type}" ${inputName}/>`
+      Options[name].editor = `<input type="${type}" ${inputName}/>`
       break;
     case 'datum':
-      fields[name].editor = `<input type="date" ${inputName}/>`
+      Options[name].editor = `<input type="date" ${inputName}/>`
       break;
     case 'datetime':
     case 'time':
-      fields[name].editor = `<input type="datetime-local" ${inputName}/>`
+      Options[name].editor = `<input type="datetime-local" ${inputName}/>`
       break;
     default:
-      fields[name].editor = `<input pattern="${type}" ${inputName}/>`
+      Options[name].editor = `<input pattern="${type}" ${inputName}/>`
       break;
   }
+}
+
+async function executeSQL(command, callback) {
+  for (field of document.querySelector('aside > form').elements) {
+    if (field.name) {
+      let value = `'${field.value}'`
+      if (field.list)
+        value = document.getElementById(field.list.id)
+        .querySelector(`option[value="${field.value}"]`).dataset.value
+      command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'), value)
+    }
+  }
+  runSQLQuery(command, callback)
 }
