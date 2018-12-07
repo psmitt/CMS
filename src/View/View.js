@@ -142,40 +142,38 @@ function reloadData() {
 
 async function compoundQuery(query, callback) {
   let result = []
-  return new Promise((resolve, reject) => {
-    let promises = []
-    query.querySelectorAll('query').forEach(q =>
-      promises.push(runSQLQuery(q, addResult))
-    )
-    Promise.all(promises).then(_ => resolve(callback(result)))
+  return new Promise(async function (resolve, reject) {
+    for (let each of query.querySelectorAll('query')) {
+      await runSQLQuery(each, addResult)
+    }
+    resolve(callback(result))
   })
 
   function addResult(nextResult) {
     if (nextResult.length) {
       nextResult.sort((a, b) => a[0].localeCompare(b[0]))
       if (result.length) {
-        let result0 = result
-        let result1 = nextResult
+        let prevResult = result
         result = []
-        let pad0 = Array(result0[0].length - 1).fill('')
-        let pad1 = Array(result1[0].length - 1).fill('')
+        let padPrev = Array(prevResult[0].length - 1).fill('')
+        let padNext = Array(nextResult[0].length - 1).fill('')
         let i = 0
         let j = 0
-        while (i < result0.length && j < result1.length) {
-          let comparison = result0[i][0].localeCompare(result1[j][0])
+        while (i < prevResult.length && j < nextResult.length) {
+          let comparison = prevResult[i][0].localeCompare(nextResult[j][0])
           if (comparison < 0)
-            result.push(result0[i++].concat(pad1))
+            result.push(prevResult[i++].concat(padNext))
           if (comparison > 0)
-            result.push(result1[j++].splice(1, 0, ...pad0))
+            result.push(nextResult[j++].splice(1, 0, ...padPrev))
           if (comparison == 0) { // first_key == second_key
-            result1[j].shift()
-            result.push(result0[i++].concat(result1[j++]))
+            nextResult[j].shift()
+            result.push(prevResult[i++].concat(nextResult[j++]))
           }
         }
-        while (i < result0.length)
-          result.push(result0[i++].concat(pad1))
-        while (j < result1.length)
-          result.push(result1[j++].splice(1, 0, ...pad0))
+        while (i < prevResult.length)
+          result.push(prevResult[i++].concat(padNext))
+        while (j < nextResult.length)
+          result.push(nextResult[j++].splice(1, 0, ...padPrev))
       } else {
         result = nextResult
       }

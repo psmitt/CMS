@@ -21,10 +21,26 @@ async function loadForm(xmlDoc) {
     } else {
       let button = document.createElement('tr')
       button.innerHTML =
-        `<td><button onclick="event.preventDefault();${
-          get('language') === 'JS' ? element.textContent :
-          'executeSQL(\\\\"' + element.textContent +'\\\\", ' + (get('callback') || null) + ')'
-        }">${get('title') || 'Submit'}</button></td>`
+        `<td><button type="button">${get('title') || 'Submit'}</button></td>`
+      if (get('language') === 'JS')
+        button.onclick = element.textContent
+      else
+        button.addEventListener('click', event => {
+          let callback = get('callback') || (result => console.log(result))
+          let command = element.textContent
+          for (field of document.querySelector('aside form').elements) {
+            if (field.name) {
+              let value = `'${field.value}'`
+              if (field.list)
+                value = document.getElementById(field.list.id)
+                .querySelector(`option[value="${field.value}"]`).dataset.value
+              command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'), value)
+            }
+          }
+          let query = document.createElement('query')
+          query.textContent = command
+          runSQLQuery(query, callback)
+        })
       FormTable.appendChild(button)
     }
   }
@@ -96,17 +112,4 @@ async function getField(column) {
       Options[name].editor = `<input pattern="${type}" ${inputName}/>`
       break;
   }
-}
-
-async function executeSQL(command, callback) {
-  for (field of document.querySelector('aside > form').elements) {
-    if (field.name) {
-      let value = `'${field.value}'`
-      if (field.list)
-        value = document.getElementById(field.list.id)
-        .querySelector(`option[value="${field.value}"]`).dataset.value
-      command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'), value)
-    }
-  }
-  runSQLQuery(command, callback)
 }
