@@ -1,8 +1,8 @@
 function load_table(tablename) {
-  Message.textContent = ''
+  Table.name = tablename
+  empty(DataPanel)
+  empty(Message)
   Message.appendChild(progressGif)
-  while (DataPanel.firstChild)
-    DataPanel.removeChild(DataPanel.firstChild)
   readXMLFile('Table', tablename + '.xml', loadView)
   showFrame(Section)
 }
@@ -27,8 +27,6 @@ async function tableQuery(xmlDoc) { // return [<query>SQL</query>]
   query.textContent = SQL
   return [query]
 }
-
-let ColumnOptions; // index -> [ value -> text ]
 
 async function loadOptions(xmlDoc) {
   ColumnOptions = []
@@ -64,7 +62,81 @@ async function loadOptions(xmlDoc) {
   }
 }
 
-async function resolveForeignKeys() {
+function resolveForeignKeys(result) {
   for (let index in ColumnOptions)
-    View.data.forEach(row => row[index] = ColumnOptions[index][row[index]] || '')
+    result.forEach(row => row[index] = ColumnOptions[index][row[index]] || '')
+}
+
+async function editRecord(record) {
+  Table.record = record
+  Table.clause = []
+  empty(FormTable)
+  await readXMLFile('Table', Table.name + '.xml', loadForm)
+  let formElements = document.querySelector('aside form').elements
+  for (i = 0; i < formElements.length; i++) {
+    let value = formElements[i].value = record.data[i]
+    if (formElements[i].list && value)
+      value = document.getElementById(formElements[i].list.id)
+      .querySelector(`option[value="${value}"]`).dataset.value
+    Table.clause.push(formElements[i].name +
+      (value ? `='${value}'` : ' IS NULL'))
+  }
+  let buttons = document.createElement('tr')
+  buttons.innerHTML = `
+    <button type="button" onclick="deleteRecord(Table.record)"
+     style="width:40%">Delete</button>
+    <button type="button" onclick="saveRecord(Table.record)"
+     style="width:40%;float:right">Save</button>`
+  FormTable.appendChild(buttons)
+  Aside.display = 'block'
+}
+
+function deleteRecord(record) {
+  let query = document.createElement('query')
+  query.textContent = `DELETE FROM ${Table.name} WHERE ${Table.clause.join(' AND ')}`
+  runSQLQuery(query, result => {
+    if (result.affectedRows === 1) {
+      if (record.tr)
+        View.tbody.removeChild(record.tr)
+      View.rows.splice(View.rows.indexOf(record), 1)
+      closeForm()
+    } else {
+      console.log(result)
+      alert(result.message)
+    }
+  })
+}
+
+function saveRecord(record) {
+  let newValues = []
+  let newRow = View.rowTemplate.cloneNode(true)
+  let formElements = document.querySelector('aside form').elements
+  for (i = 0; i < formElements.length; i++) {
+    let field = formElements[i]
+    if (field.name) {
+      let value = `'${field.value}'`
+      if (field.list)
+        value = document.getElementById(field.list.id)
+        .querySelector(`option[value="${field.value}"]`).dataset.value
+      newValues.push(`${field.name}= ` + (field.value ? value : 'NULL'))
+      newRow.children[i].innerHTML = field.value
+    }
+  }
+  let query = document.createElement('query')
+  query.textContent = `UPDATE ${Table.name}
+                       SET ${newValues.join(',')}
+                       WHERE ${Table.clause.join(' AND ')}`
+  runSQLQuery(query, result => {
+    if (result.affectedRows === 1 && result.changedRows === 1) {
+      for (i = 0; i < View.titles.length; i++) {
+        record.data[i] = formElements[i].value
+        if (record.tr)
+          record.tr.children[i].innerHTML = formElements[i].value
+      }
+      closeForm()
+    } else {
+      console.log(result)
+      alert(result.message)
+    }
+  })
 }

@@ -5,7 +5,7 @@ function load_form(formname) {
 }
 
 async function loadForm(xmlDoc) {
-  FormTitle.innerHTML = xmlDoc.querySelector('form').attributes['title'].value
+  FormTitle.innerHTML = xmlDoc.firstElementChild.attributes['title'].value
   Options = []
   for (element of xmlDoc.querySelectorAll('column, button, submit')) {
     const get = attribute => element.attributes[attribute] ?
@@ -53,7 +53,7 @@ async function getField(column) {
   let inputName = `name="${name}"` +
     (get('required') === 'yes' ? ' required' : '')
   Options[name] = {
-    label: get('title')
+    label: get('title') || get('field')
   }
   if (get('multiline') === 'yes')
     return Options[name].editor = `<textarea ${inputName}></textarea>`

@@ -2,25 +2,14 @@
 
 function loadMenuFiles() {
   empty(Menu)
-  var menu; // generator
   listDirectory('Menu', loadFiles) // initialize the menu generator
 
-  function loadFiles(filenames) {
-    menu = (function* () {
-      yield* filenames
-    })()
-    loadNext()
-  }
-
-  function loadNext() {
-    if (next = menu.next().value)
-      readXMLFile('Menu', next, loadMenu)
-  }
-
-  function loadMenu(xmlDoc) {
-    for (let subMenu of xmlDoc.children)
-      appendSubMenu(subMenu, Menu)
-    loadNext()
+  async function loadFiles(files) {
+    for (file of files)
+      await readXMLFile('Menu', file, xmlDoc => {
+        for (let subMenu of xmlDoc.children)
+          appendSubMenu(subMenu, Menu)
+      })
   }
 }
 

@@ -1,6 +1,10 @@
-document.querySelector('aside .close').addEventListener('click', _ => {
+document.querySelector('aside .close').addEventListener('click', closeForm)
+
+function closeForm() {
   Aside.display = 'none'
-})
+  empty(FormTable)
+  View.record = null
+}
 
 document.querySelector('article .close').addEventListener('click', _ => {
   Article.display = 'none'

@@ -113,12 +113,14 @@ function listDirectory(folder, callback) {
   })
 }
 
-function readXMLFile(folder, filename, callback) {
-  fs.readFile(path.join(XMLRootDirectory, folder, filename), 'utf8', (error, xmlString) => {
-    if (error) throw error
-    callback(new DOMParser().parseFromString(
-      xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-      xmlString.substring(1) : xmlString, 'text/xml'))
+async function readXMLFile(folder, filename, callback) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path.join(XMLRootDirectory, folder, filename), 'utf8', (error, xmlString) => {
+      if (error) throw error
+      resolve(callback(new DOMParser().parseFromString(
+        xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+        xmlString.substring(1) : xmlString, 'text/xml')))
+    })
   })
 }
 

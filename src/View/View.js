@@ -18,15 +18,15 @@ async function loadView(xmlDoc) {
   View.queries = View.isTable ?
     await tableQuery(xmlDoc) : xmlDoc.querySelectorAll('view > query')
 
-  View.data = [] // --> reloadData
-
-  View.row = document.createElement('tr')
+  View.rowTemplate = document.createElement('tr')
 
   ViewTitle.innerHTML =
     get(xmlDoc.querySelector(View.isTable ? 'table' : 'view'), 'title')
 
-  let editorCell = View.isTable ? '<td>✐</td>' :
-    `<td title="${get(xmlDoc.querySelector('view'), 'automation') || ''}">⚙</td>`
+  let editorCell = View.isTable ? '<td class="editor">✐</td>' :
+    `<td class="editor" title="${
+      get(xmlDoc.querySelector('view'), 'automation') || ''
+    }">⚙</td>`
 
   if (View.queries.length > 1) { // gap analysis
 
@@ -57,7 +57,7 @@ async function loadView(xmlDoc) {
                             <tbody></tbody>
                            </table>`
 
-    View.row.innerHTML = `<td style="font-weight:bold"></td>
+    View.rowTemplate.innerHTML = `<td style="font-weight:bold"></td>
                           <td style="font-style:italic"></td>
                           <td></td><td></td>${editorCell}`
 
@@ -78,7 +78,7 @@ async function loadView(xmlDoc) {
     let colgroup = DataPanel.querySelector('colgroup')
     let filterRow = DataPanel.querySelectorAll('tr')[0]
     let titleRow = DataPanel.querySelectorAll('tr')[1]
-    View.row.innerHTML = editorCell
+    View.rowTemplate.innerHTML = editorCell
     xmlDoc.querySelectorAll('column').forEach(column => {
       const get = attribute =>
         column.attributes[attribute] ?
@@ -111,17 +111,25 @@ async function loadView(xmlDoc) {
       colgroup.insertBefore(col, colgroup.lastElementChild)
       datacell.style.textAlign = get('align') || align
       datacell.className = font || get('font')
-      View.row.insertBefore(datacell, View.row.lastElementChild)
+      View.rowTemplate.insertBefore(datacell, View.rowTemplate.lastElementChild)
     })
     DataPanel.firstElementChild.style.width = tableWidth + 'px'
   }
   View.table = DataPanel.querySelector('table')
   View.tbody = DataPanel.querySelector('tbody')
 
-  if (View.isTable)
+  if (View.isTable) {
+    /*
+      View.tbody.addEventListener('click', event => {
+        if (event.target.matches('.editor')) {
+          editRecord(View.rows[event.target.parentNode.dataset.index])
+        }
+      })
+    */
     loadOptions(xmlDoc).then(reloadData)
-  else
+  } else {
     reloadData()
+  }
 }
 
 function reloadData() {
@@ -133,9 +141,15 @@ function reloadData() {
       runSQLQuery(query, result => results.push(result)))
   })
   Promise.all(promises).then(_ => {
-    View.data = results.length > 1 ? gapAnalysis(results) : results[0]
-    if (View.isTable) resolveForeignKeys()
-    for (rows of View.data) rows.push(true)
+    let result = results.length > 1 ? gapAnalysis(results) : results[0]
+    if (View.isTable) resolveForeignKeys(result)
+    View.rows = []
+    for (row of result)
+      View.rows.push({
+        data: row,
+        display: true,
+        tr: null
+      })
     filterData()
   })
 }
@@ -143,9 +157,8 @@ function reloadData() {
 async function compoundQuery(query, callback) {
   let result = []
   return new Promise(async function (resolve, reject) {
-    for (let each of query.querySelectorAll('query')) {
+    for (each of query.querySelectorAll('query'))
       await runSQLQuery(each, addResult)
-    }
     resolve(callback(result))
   })
 
@@ -227,22 +240,22 @@ function filterData() {
   })
   let counter = 0
   let display = View.titles.length
-  for (let row of View.data)
-    row[display] = true
+  for (let row of View.rows)
+    row.display = true
   for (let f = 0; f < filters.length - 1; f++) {
     let c = filters[f].column
-    for (let row of View.data)
-      row[display] = row[display] &&
-      filters[f].filter.test(row[c].replace(/\n/g, ' '))
+    for (let row of View.rows)
+      row.display = row.display &&
+      filters[f].filter.test(row.data[c].replace(/\n/g, ' '))
   }
   if (filters.length) {
     let f = filters.length - 1
     let c = filters[f].column
-    for (let row of View.data)
-      counter += row[display] = row[display] &&
-      filters[f].filter.test(row[c].replace(/\n/g, ' '))
+    for (let row of View.rows)
+      counter += row.display = row.display &&
+      filters[f].filter.test(row.data[c].replace(/\n/g, ' '))
   } else {
-    counter = View.data.length
+    counter = View.rows.length
   }
   Message.textContent = counter
   scrollToTop()
@@ -253,17 +266,17 @@ DataPanel.addEventListener('input', filterData)
 DataPanel.addEventListener('click', event => { // SORT DATA
   if (event.target.matches('thead td') && !getSelection().toString()) {
     let i = event.target.cellIndex
-    if (i < View.data[0].length - 2) {
+    if (i < View.titles.length) {
       if (event.target.classList.length) {
-        View.data.reverse()
+        View.rows.reverse()
         event.target.classList.toggle('sortedUp')
         event.target.classList.toggle('sortedDown')
       } else {
-        thead.querySelectorAll('td').forEach(td => td.className = '')
+        document.querySelectorAll('thead td').forEach(td => td.className = '')
         if (document.getElementsByTagName('col')[i].className === 'number')
-          View.data.sort((a, b) => a[i] - b[i])
+          View.rows.sort((a, b) => a.data[i] - b.data[i])
         else
-          View.data.sort((a, b) => a[i].localeCompare(b[i]))
+          View.rows.sort((a, b) => a.data[i].localeCompare(b.data[i]))
         event.target.classList.toggle('sortedUp')
       }
       scrollToTop()
@@ -275,6 +288,8 @@ DataPanel.addEventListener('click', event => { // SORT DATA
 
 function scrollToTop() {
   empty(View.tbody)
+  for (row of View.rows)
+    row.tr = null
   View.last = -1
   appendRow()
   View.first = View.last
@@ -283,7 +298,9 @@ function scrollToTop() {
 
 function scrollToBottom() {
   empty(View.tbody)
-  View.first = View.data.length
+  for (row of View.rows)
+    row.tr = null
+  View.first = View.rows.length
   prependRow()
   View.last = View.first
   while (View.table.offsetHeight < screenSize && prependRow());
@@ -292,16 +309,18 @@ function scrollToBottom() {
 
 function appendRow() { // return success
   let last = View.last
-  let display = View.titles.length
-  while (++last < View.data.length)
-    if (View.data[last][display])
+  while (++last < View.rows.length)
+    if (View.rows[last].display)
       break
-  if (last < View.data.length && View.data[last][display]) {
-    let newRow = View.row.cloneNode(true)
-    newRow.dataset.index = View.last = last
-    for (let cell = 0; cell < display; cell++)
-      newRow.children[cell].innerHTML = View.data[last][cell]
+  if (last < View.rows.length && View.rows[last].display) {
+    let newRow = View.rowTemplate.cloneNode(true)
+    for (let cell = 0; cell < View.titles.length; cell++)
+      newRow.children[cell].innerHTML = View.rows[last].data[cell]
+    newRow.children[View.titles.length].addEventListener('click', _ =>
+      editRecord(View.rows[last]))
     View.tbody.appendChild(newRow)
+    View.rows[last].tr = newRow
+    View.last = last
     return true
   }
   return false
@@ -311,17 +330,20 @@ function prependRow() { // return success
   let first = View.first
   let display = View.titles.length
   while (--first >= 0)
-    if (View.data[first][display])
+    if (View.rows[first].display)
       break
-  if (first >= 0 && View.data[first][display]) {
-    let newRow = View.row.cloneNode(true)
-    newRow.dataset.index = View.first = first
-    for (let cell = 0; cell < display; cell++)
-      newRow.children[cell].innerHTML = View.data[first][cell]
+  if (first >= 0 && View.rows[first].display) {
+    let newRow = View.rowTemplate.cloneNode(true)
+    for (let cell = 0; cell < View.titles.length; cell++)
+      newRow.children[cell].innerHTML = View.rows[first].data[cell]
+    newRow.children[View.titles.length].addEventListener('click', _ =>
+      editRecord(View.rows[first]))
     if (View.tbody.firstChild)
       View.tbody.insertBefore(newRow, View.tbody.firstChild)
     else
       View.tbody.appendChild(newRow)
+    View.rows[first].tr = newRow
+    View.first = first
     return true
   }
   return false

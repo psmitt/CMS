@@ -28,8 +28,8 @@ const View = { /* global properties for tabular view */
   isTable: false,
   titles: [],
   queries: [],
-  data: [],
-  row: document.createElement('tr'),
+  rows: [], // { data: [], display: true, tr: null }
+  rowTemplate: document.createElement('tr'),
   first: 0, // index of first displayed data row when scrolling
   last: 0, // index of last data displayed row when scrolling
   table: null, // the data table
@@ -44,7 +44,14 @@ const FormTable = document.querySelector('form > table')
 var Options = {} // input field name -> [value -> text]
 
 // TABLE
+var Table = {
+  name: '', // XML file name
+  record: null, // the actual row to edit in View.rows
+  clause: [] // record identifier conditions for DELETE and UPDATE
+}
+var ColumnOptions = {} // index -> [ value -> text ]
 
+// UTILITIES
 
 function empty(node) {
   while (node.firstChild)
