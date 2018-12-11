@@ -14,16 +14,23 @@ function loadMenuFiles() {
 }
 
 function appendSubMenu(subMenu, parentMenu) {
-  const menu = attribute => subMenu.attributes[attribute].value // read attribute
+  const menu = attribute => subMenu.attributes[attribute] ?
+    subMenu.attributes[attribute].value : '' // read attribute
   let node = document.createElement('div')
   if (subMenu.children.length) {
     node.innerHTML = `<span class="branch expanded">${menu('title')}</span>`
     for (let item of subMenu.children)
       appendSubMenu(item, node)
   } else {
-    node.innerHTML = `<span class="item${subMenu.attributes.class ?
-      ' ' + menu('class') +
-      '" onclick="load_' + menu('class') + "('" + menu('order') + '\')"' : ''
+    let menu_class = menu('class')
+    let menu_order = menu('order')
+    if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {
+      menu_class = 'form'
+      menu_order = menu_order.charAt(13).toUpperCase() +
+        menu_order.substring(14, menu_order.lastIndexOf('.'))
+    }
+    node.innerHTML = `<span class="item${menu_class ? ' ' + menu_class +
+      '" onclick="load_' + menu_class + "('" + menu_order + '\')"' : ''
       }>${menu('title')}</span>`
   }
   parentMenu.appendChild(node)

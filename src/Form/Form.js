@@ -31,7 +31,7 @@ async function loadForm(xmlDoc) {
           for (field of document.querySelector('aside form').elements) {
             if (field.name) {
               let value = `'${field.value}'`
-              if (field.list)
+              if (field.value && field.list)
                 value = document.getElementById(field.list.id)
                 .querySelector(`option[value="${field.value}"]`).dataset.value
               command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'), value)
