@@ -25,24 +25,25 @@ function listDirectory(folder, callback) {
   httpRequest.send(`listDirectory=${folder}`)
 }
 
-function readXMLFile(folder, filename, callback) {
-  let httpRequest = new XMLHttpRequest()
-  httpRequest.onreadystatechange = function () {
-    if (httpRequest.readyState == 4) {
-      if (httpRequest.status == 200) {
-        callback(new DOMParser().parseFromString(httpRequest.responseText, 'text/xml'))
-      } else
-        console.log('HTTP status: ', httpRequest.status,
-          '\nResponse: ', httpRequest.responseText)
+async function readXMLFile(folder, filename, callback) {
+  return new Promise((resolve, reject) => {
+    let httpRequest = new XMLHttpRequest()
+    httpRequest.onreadystatechange = function () {
+      if (httpRequest.readyState == 4) {
+        if (httpRequest.status == 200) {
+          resolve(callback(new DOMParser().parseFromString(httpRequest.responseText, 'text/xml')))
+        } else
+          reject(console.log('HTTP status: ', httpRequest.status,
+            '\nResponse: ', httpRequest.responseText))
+      }
     }
-  }
-  httpRequest.open('POST', '/CMS5/src/IIS.php')
-  httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-  httpRequest.send(`readXMLFile=${folder}/${filename}`)
+    httpRequest.open('POST', '/CMS5/src/IIS.php')
+    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    httpRequest.send(`readXMLFile=${folder}/${filename}`)
+  })
 }
 
 async function runSQLQuery(query, callback, dsn = '', user = '', pass = '') {
-  console.log(query);
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {
     query: query.textContent

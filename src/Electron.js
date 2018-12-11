@@ -98,10 +98,6 @@ function changeMySQLDatabase(server) {
   }
 }
 
-function openNewWindow(folder, filename) {
-  ipc.send('New Window', folder, filename)
-}
-
 function listDirectory(folder, callback) {
   fs.readdir(path.join(XMLRootDirectory, folder), (error, entries) => {
     if (error) throw error

@@ -59,8 +59,12 @@ async function getField(column) {
     return Options[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
-    Options[name].editor = `<input list="${name}-options" ${inputName}/>
-                           <datalist id="${name}-options">`
+    Options[name].editor = `<input list="${name}-options" ${inputName}
+                             onfocus="focusDatalist(this)"
+                             onkeydown="switch(event.key){
+                               case'Escape':case'Enter':validateDatalist(this)}"
+                             onblur="validateDatalist(this)"/>
+                            <datalist id="${name}-options">`
     let options = column.querySelector('options')
     if (options) {
       let get = element => options.querySelector(element).textContent
@@ -112,4 +116,25 @@ async function getField(column) {
       Options[name].editor = `<input pattern="${type}" ${inputName}/>`
       break;
   }
+}
+
+function focusDatalist(input) {
+  input.placeholder = input.value
+  input.value = ''
+  let rect = input.getBoundingClientRect()
+  if (typeof ipc !== 'undefined') ipc.send('datalist focused', rect.left, rect.top)
+  input.addEventListener('input', _ => {
+    input.placeholder = ''
+  }, {
+    once: true
+  })
+}
+
+function validateDatalist(input) {
+  if (!input.value && input.placeholder)
+    input.value = input.placeholder
+  input.placeholder = ''
+  if (!document.getElementById(input.list.id)
+    .querySelector(`option[value="${input.value}"]`))
+    input.value = ''
 }
