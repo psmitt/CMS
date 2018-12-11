@@ -92,12 +92,15 @@ async function loadView(xmlDoc) {
       title.dataset.field = get('field')
       titleRow.insertBefore(title, titleRow.lastElementChild)
 
+      let type = get('type') || (View.isTable ?
+        (column.querySelector('options') ? '' : Table.fieldTypes[get('field')]) : '')
+
       let col = document.createElement('col')
       let datacell = document.createElement('td')
-      let align = get('type') === 'number' ? 'right' : ''
+      let align = type === 'number' ? 'right' : ''
       let font = ''
       let width = '200'
-      switch (get('type')) {
+      switch (type) {
         case 'date':
         case 'time':
         case 'datetime':
@@ -105,7 +108,7 @@ async function loadView(xmlDoc) {
         case 'number':
           font = 'mono'
           width = '128'
-          col.className = get('type')
+          col.className = type
       }
       tableWidth += parseInt(col.style.width = (get('width') * 1.3 || width) + 'px')
       colgroup.insertBefore(col, colgroup.lastElementChild)

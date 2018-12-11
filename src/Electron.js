@@ -120,7 +120,7 @@ async function readXMLFile(folder, filename, callback) {
   })
 }
 
-async function runSQLQuery(query, callback) { // query is XML object
+async function runSQLQuery(query, callback, loadFieldTypes = false) { // query is XML object
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {}
   let dbType = query.attributes['dsn'] ?
@@ -199,6 +199,35 @@ async function runSQLQuery(query, callback) { // query is XML object
             if (error) {
               reject(cmdb.release())
               throw error
+            }
+            if (loadFieldTypes) {
+              fields.forEach(field => {
+                if (field.type < 10)
+                  Table.fieldTypes[field.name] = 'number'
+                else switch (field.type) {
+                  case 16: // BIT
+                  case 17: // TIMESTAMP2
+                  case 246: // NEWDECIMAL
+                    Table.fieldTypes[field.name] = 'number'
+                    break;
+                  case 10: // DATE
+                  case 13: // YEAR
+                  case 14: // NEWDATE
+                    Table.fieldTypes[field.name] = 'date'
+                    break;
+                  case 11: // TIME
+                  case 19: // TIME2
+                    Table.fieldTypes[field.name] = 'time'
+                    break;
+                  case 12: // DATETIME
+                  case 18: // DATETIME2
+                    Table.fieldTypes[field.name] = 'datetime'
+                    break;
+                  default: // anything else --> text
+                    Table.fieldTypes[field.name] = ''
+                    break;
+                }
+              })
             }
             if (result.constructor.name !== 'OkPacket')
               queryResultToArray(result)

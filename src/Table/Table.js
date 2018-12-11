@@ -24,6 +24,9 @@ async function tableQuery(xmlDoc) { // return [<query>SQL</query>]
     SQL += ' ORDER BY ' + orders.join(',')
   }
   let query = document.createElement('query')
+  Table.fieldTypes = []
+  query.textContent = SQL + ' LIMIT 0'
+  await runSQLQuery(query, result => null, true) // load field types from MySQL
   query.textContent = SQL
   return [query]
 }
@@ -77,9 +80,9 @@ async function editRecord(record) {
     let value = formElements[i].value = record.data[i]
     if (formElements[i].list && value)
       value = document.getElementById(formElements[i].list.id)
-      .querySelector(`option[value="${value}"]`).dataset.value
+      .querySelector(`option[value="${value.replace(/"/g, '&quot;')}"]`).dataset.value
     Table.clause.push(formElements[i].name +
-      (value ? `='${value}'` : ' IS NULL'))
+      (value ? `='${value.replace(/'/g, "\\'")}'` : ' IS NULL'))
   }
   let buttons = document.createElement('tr')
   buttons.innerHTML = `
@@ -101,7 +104,6 @@ function deleteRecord(record) {
       View.rows.splice(View.rows.indexOf(record), 1)
       closeForm()
     } else {
-      console.log(result)
       alert(result.message)
     }
   })
@@ -114,10 +116,10 @@ function saveRecord(record) {
   for (i = 0; i < formElements.length; i++) {
     let field = formElements[i]
     if (field.name) {
-      let value = `'${field.value}'`
-      if (field.list)
+      let value = `'${field.value.replace(/'/g, "\\'")}'`
+      if (field.value && field.list)
         value = document.getElementById(field.list.id)
-        .querySelector(`option[value="${field.value}"]`).dataset.value
+        .querySelector(`option[value="${field.value.replace(/"/g, '&quot;')}"]`).dataset.value
       newValues.push(`${field.name}= ` + (field.value ? value : 'NULL'))
       newRow.children[i].innerHTML = field.value
     }
@@ -135,7 +137,6 @@ function saveRecord(record) {
       }
       closeForm()
     } else {
-      console.log(result)
       alert(result.message)
     }
   })

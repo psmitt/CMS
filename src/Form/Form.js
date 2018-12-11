@@ -48,7 +48,7 @@ async function loadForm(xmlDoc) {
 
 async function getField(column) {
   let get = attribute => column.attributes[attribute] ?
-    column.attributes[attribute].value : null
+    column.attributes[attribute].value : ''
   let name = get('field')
   let inputName = `name="${name}"` +
     (get('required') === 'yes' ? ' required' : '')
@@ -92,11 +92,13 @@ async function getField(column) {
     }
   }
 
-  let type = get('pattern')
+  let type = get('pattern') || get('type') || (View.isTable ?
+    (column.querySelector('options') ? '' : Table.fieldTypes[name]) : '')
+
   if (type === 'datum')
     type = 'date'
   switch (type) {
-    case null:
+    case '':
       Options[name].editor = `<input ${inputName}/>`
       break;
     case 'email':
@@ -121,8 +123,10 @@ async function getField(column) {
 function focusDatalist(input) {
   input.placeholder = input.value
   input.value = ''
-  let rect = input.getBoundingClientRect()
-  if (typeof ipc !== 'undefined') ipc.send('datalist focused', rect.left, rect.top)
+  if (typeof ipc !== 'undefined') {
+    let rect = input.getBoundingClientRect()
+    ipc.send('datalist focused', rect.left, rect.top)
+  }
   input.addEventListener('input', _ => {
     input.placeholder = ''
   }, {

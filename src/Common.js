@@ -47,7 +47,8 @@ var Options = {} // input field name -> [value -> text]
 var Table = {
   name: '', // XML file name
   record: null, // the actual row to edit in View.rows
-  clause: [] // record identifier conditions for DELETE and UPDATE
+  clause: [], // record identifier conditions for DELETE and UPDATE
+  fieldTypes: [] // field types
 }
 var ColumnOptions = {} // index -> [ value -> text ]
 
