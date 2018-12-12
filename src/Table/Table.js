@@ -86,11 +86,11 @@ async function editRecord(record) {
     }
   })
   let buttons = document.createElement('tr')
-  buttons.innerHTML = `
-    <button type="button" onclick="deleteRecord(Table.record)"
-     style="width:40%">Delete</button>
-    <button type="button" onclick="saveRecord(Table.record)"
-     style="width:40%;float:right">Save</button>`
+  buttons.innerHTML = `<td style="padding:0">
+    <input type="button" onclick="deleteRecord(Table.record)"
+     style="width:40%" value="Delete"/>
+    <input type="submit" onclick="saveRecord(Table.record)"
+     style="width:40%;float:right" value="Save"/></td>`
   FormTable.appendChild(buttons)
   Aside.display = 'block'
 }
@@ -116,6 +116,10 @@ function saveRecord(record) {
   let formElements = document.querySelector('aside form').elements
   for (i = 0; i < formElements.length; i++) {
     let field = formElements[i]
+    if (!field.checkValidity()) {
+      field.focus()
+      return
+    }
     if (field.name) {
       let value = `'${field.value.replace(/'/g, "\\'")}'`
       if (field.value && field.list)
@@ -131,11 +135,14 @@ function saveRecord(record) {
                        WHERE ${Table.clause.join(' AND ')}`
   runSQLQuery(query, result => {
     if (result.affectedRows === 1 && result.changedRows === 1) {
-      for (i = 0; i < View.titles.length; i++) {
-        record.data[i] = formElements[i].value
-        if (record.tr)
-          record.tr.children[i].innerHTML = formElements[i].value
-      }
+      Object.keys(Table.fields).forEach((name, index) => {
+        if (!Table.fields[name].disabled) {
+          let value = FormTable.querySelector(`[name="${name}"]`).value
+          record.data[index] = value
+          if (record.tr)
+            record.tr.children[index].innerHTML = value
+        }
+      })
       closeForm()
     } else {
       alert(result.message)

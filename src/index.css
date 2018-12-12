@@ -59,13 +59,22 @@ input, textarea, select {
   font-size: large;
 }
 
+input:invalid {
+  border-color: red;
+}
+
 input:hover, textarea:hover, select:hover, button:hover {
   border-color: skyblue;
 }
 
-input:focus, textarea:focus, select:focus, button:focus {
+input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: deepskyblue;
+}
+
+input[type="checkbox"]:focus, input[type="radio"]:focus, button:focus {
+  outline: none;
+  box-shadow: 0 0 5px 5px skyblue;
 }
 
 textarea {
