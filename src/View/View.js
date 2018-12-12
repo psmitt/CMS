@@ -93,7 +93,7 @@ async function loadView(xmlDoc) {
       titleRow.insertBefore(title, titleRow.lastElementChild)
 
       let type = get('type') || (View.isTable ?
-        (column.querySelector('options') ? '' : Table.fieldTypes[get('field')]) : '')
+        (column.querySelector('options') ? '' : Table.fields[get('field')].type) : '')
 
       let col = document.createElement('col')
       let datacell = document.createElement('td')

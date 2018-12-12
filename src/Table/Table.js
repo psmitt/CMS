@@ -24,9 +24,8 @@ async function tableQuery(xmlDoc) { // return [<query>SQL</query>]
     SQL += ' ORDER BY ' + orders.join(',')
   }
   let query = document.createElement('query')
-  Table.fieldTypes = []
   query.textContent = SQL + ' LIMIT 0'
-  await runSQLQuery(query, result => null, true) // load field types from MySQL
+  await runSQLQuery(query, result => Table.fields = result, Table.name)
   query.textContent = SQL
   return [query]
 }
@@ -75,15 +74,17 @@ async function editRecord(record) {
   Table.clause = []
   empty(FormTable)
   await readXMLFile('Table', Table.name + '.xml', loadForm)
-  let formElements = document.querySelector('aside form').elements
-  for (i = 0; i < formElements.length; i++) {
-    let value = formElements[i].value = record.data[i]
-    if (formElements[i].list && value)
-      value = document.getElementById(formElements[i].list.id)
-      .querySelector(`option[value="${value.replace(/"/g, '&quot;')}"]`).dataset.value
-    Table.clause.push(formElements[i].name +
-      (value ? `='${value.replace(/'/g, "\\'")}'` : ' IS NULL'))
-  }
+  Object.keys(Table.fields).forEach((name, index) => {
+    if (!Table.fields[name].disabled) {
+      let input = FormTable.querySelector(`[name="${name}"]`)
+      let value = input.value = record.data[index]
+      if (input.list && value)
+        value = document.getElementById(input.list.id)
+        .querySelector(`option[value="${value.replace(/"/g, '&quot;')}"]`).dataset.value
+      Table.clause.push(input.name +
+        (value ? `='${value.replace(/'/g, "\\'")}'` : ' IS NULL'))
+    }
+  })
   let buttons = document.createElement('tr')
   buttons.innerHTML = `
     <button type="button" onclick="deleteRecord(Table.record)"

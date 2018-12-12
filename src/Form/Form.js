@@ -11,6 +11,7 @@ async function loadForm(xmlDoc) {
     const get = attribute => element.attributes[attribute] ?
       element.attributes[attribute].value : ''
     if (element.matches('column')) {
+      if (View.isTable && Table.fields[get('field')].disabled) continue;
       await getField(element)
       let label = document.createElement('tr')
       label.innerHTML = `<th>${Options[get('field')].label}</th>`
@@ -51,11 +52,12 @@ async function getField(column) {
     column.attributes[attribute].value : ''
   let name = get('field')
   let inputName = `name="${name}"` +
-    (get('required') === 'yes' ? ' required' : '')
+    (get('required') === 'yes' || (View.isTable && Table.fields[name].required) ? ' required' : '')
+
   Options[name] = {
     label: get('title') || get('field')
   }
-  if (get('multiline') === 'yes')
+  if (get('multiline') === 'yes' || (View.isTable && Table.fields[name].type === 'multiline'))
     return Options[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
@@ -92,8 +94,20 @@ async function getField(column) {
     }
   }
 
-  let type = get('pattern') || get('type') || (View.isTable ?
-    (column.querySelector('options') ? '' : Table.fieldTypes[name]) : '')
+  if (View.isTable && Table.fields[name].type === 'enum') {
+    let query = document.createElement('query')
+    query.textContent = `SHOW COLUMNS FROM ${Table.name}
+                         WHERE FIELD = '${name}'`
+    return runSQLQuery(query, result => {
+      Options[name].editor = `<select ${inputName}/>`
+      result[0][1].match(/^enum\('(.*)'\)$/)[1].split("','").forEach(option =>
+        Options[name].editor += `<option>${option}</option>`
+      )
+      Options[name].editor += '</select>'
+    })
+  }
+
+  let type = get('pattern') || get('type') || (View.isTable ? Table.fields[name].type : '')
 
   if (type === 'datum')
     type = 'date'

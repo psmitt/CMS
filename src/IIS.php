@@ -18,17 +18,48 @@ foreach($_POST as $post_key => $post_value) {
 
         case 'runSQLQuery':
             $parameters = json_decode($post_value);
-            if (property_exists($parameters, 'dsn'))
-              $result = SQL($parameters->query, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);
-            else
-              $result = SQL($parameters->query, $result_list);
-            // Stringify all values
-            $rows = count($result_list);
-            if ($rows) {
-              $cols = count($result_list[0]);
-              for ($row = 0; $row < $rows; $row++)
-                for ($col = 0; $col < $cols; $col++)
-                  $result_list[$row][$col] = (string) $result_list[$row][$col];
+            if ($parameters->loadFields) {
+              SQL("SHOW COLUMNS FROM $parameters->loadFields", $rows);
+              foreach ($rows as $row) {
+                  list($sql_type) = explode('(', $row[1]);
+                  switch ($sql_type) {
+                      case 'enum':
+                      case 'date':
+                      case 'time':
+                      case 'datetime':
+                          $type = $sql_type;
+                          break;
+                      case 'char':
+                      case 'varchar':
+                      case 'tinytext':
+                          $type = '';
+                          break;
+                      case 'text':
+                      case 'mediumtext':
+                      case 'longtext':
+                          $type = 'multiline';
+                          break;
+                      default:
+                          $type = 'number';
+                          break;
+                  }
+                  $result_list[$row[0]] = array( type => $type,
+                                                 required => $row[2] == 'NO',
+                                                 disabled => $row[5] == 'auto_increment');
+              }
+            } else {
+              if (property_exists($parameters, 'dsn'))
+                $result = SQL($parameters->query, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);
+              else
+                $result = SQL($parameters->query, $result_list);
+              // Stringify all values
+              $rows = count($result_list);
+              if ($rows) {
+                $cols = count($result_list[0]);
+                for ($row = 0; $row < $rows; $row++)
+                  for ($col = 0; $col < $cols; $col++)
+                    $result_list[$row][$col] = (string) $result_list[$row][$col];
+              }
             }
             echo json_encode($result_list);
             break;

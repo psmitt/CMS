@@ -48,7 +48,7 @@ var Table = {
   name: '', // XML file name
   record: null, // the actual row to edit in View.rows
   clause: [], // record identifier conditions for DELETE and UPDATE
-  fieldTypes: [] // field types
+  fields: [] // field name -> { type, required, disabled }
 }
 var ColumnOptions = {} // index -> [ value -> text ]
 

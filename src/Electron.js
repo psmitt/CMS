@@ -201,36 +201,46 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
               throw error
             }
             if (loadFieldTypes) {
+              result = []
               fields.forEach(field => {
+                result[field.name] = {}
                 if (field.type < 10)
-                  Table.fieldTypes[field.name] = 'number'
+                  result[field.name].type = 'number'
                 else switch (field.type) {
                   case 16: // BIT
                   case 17: // TIMESTAMP2
                   case 246: // NEWDECIMAL
-                    Table.fieldTypes[field.name] = 'number'
+                    result[field.name].type = 'number'
                     break;
                   case 10: // DATE
                   case 13: // YEAR
                   case 14: // NEWDATE
-                    Table.fieldTypes[field.name] = 'date'
+                    result[field.name].type = 'date'
                     break;
                   case 11: // TIME
                   case 19: // TIME2
-                    Table.fieldTypes[field.name] = 'time'
+                    result[field.name].type = 'time'
                     break;
                   case 12: // DATETIME
                   case 18: // DATETIME2
-                    Table.fieldTypes[field.name] = 'datetime'
+                    result[field.name].type = 'datetime'
+                    break;
+                  case 250: // MEDIUMBLOB, MEDIUMTEXT
+                  case 251: // LONGBLOG, LONGTEXT
+                  case 252: // BLOB, TEXT
+                    result[field.name].type = 'multiline'
                     break;
                   default: // anything else --> text
-                    Table.fieldTypes[field.name] = ''
+                    result[field.name].type = ''
                     break;
                 }
+                if (field.flags & 256) result[field.name].type = 'enum'
+                result[field.name].required = Boolean(field.flags & 1) // NOT NULL
+                result[field.name].disabled = Boolean(field.flags & 512) // AUTO INCREMENT
               })
-            }
-            if (result.constructor.name !== 'OkPacket')
+            } else if (result.constructor.name !== 'OkPacket') {
               queryResultToArray(result)
+            }
             callback(result)
             resolve(cmdb.release())
           })
