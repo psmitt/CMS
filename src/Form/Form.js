@@ -22,7 +22,9 @@ async function loadForm(xmlDoc) {
     } else {
       let button = document.createElement('tr')
       button.innerHTML =
-        `<td><button type="button">${get('title') || 'Submit'}</button></td>`
+        `<td style="padding-right:0">
+          <input type="${element.tagName}" value="${get('title') || 'Submit'}"/>
+        </td>`
       if (get('language') === 'JS')
         button.onclick = element.textContent
       else
