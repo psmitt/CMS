@@ -10,7 +10,18 @@ const Menu = document.getElementById('Menu')
 
 // TASK
 const TaskTitle = document.getElementById('TaskTitle') // title
+const BackToMain = document.getElementById('BackToMain').style
+const CloseArticle = document.getElementById('CloseArticle').style
 const Procedure = document.getElementById('Procedure')
+const Task = {
+  id: 0,
+  fileName: '',
+  main: 0,
+  openTime: null,
+  checkString: '0',
+  displayString: '1',
+  scrollPosition: 0
+}
 
 // VIEW
 const ViewTitle = document.getElementById('ViewTitle')

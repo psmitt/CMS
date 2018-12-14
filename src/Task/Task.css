@@ -12,6 +12,13 @@ article {
   width: calc(100% - 1em);
 }
 
+#BackToMain {
+  position: absolute;
+  right: 0.25em;
+  cursor: pointer;
+  display: none;
+}
+
 #Procedure {
   white-space: normal;
   padding-left: var(--title-padding);

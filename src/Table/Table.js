@@ -1,5 +1,4 @@
 function load_table(tablename) {
-  Table.name = tablename
   empty(DataPanel)
   empty(Message)
   Message.appendChild(progressGif)
@@ -80,7 +79,7 @@ async function editRecord(record) {
       let value = input.value = record.data[index]
       if (input.list && value)
         value = document.getElementById(input.list.id)
-        .querySelector(`option[value="${value.replace(/"/g, '&quot;')}"]`).dataset.value
+        .querySelector(`option[value="${value.replace(/"/g, '\\"')}"]`).dataset.value
       Table.clause.push(input.name +
         (value ? `='${value.replace(/'/g, "\\'")}'` : ' IS NULL'))
     }
@@ -124,7 +123,7 @@ function saveRecord(record) {
       let value = `'${field.value.replace(/'/g, "\\'")}'`
       if (field.value && field.list)
         value = document.getElementById(field.list.id)
-        .querySelector(`option[value="${field.value.replace(/"/g, '&quot;')}"]`).dataset.value
+        .querySelector(`option[value="${field.value.replace(/"/g, '\\"')}"]`).dataset.value
       newValues.push(`${field.name}= ` + (field.value ? value : 'NULL'))
       newRow.children[i].innerHTML = field.value
     }

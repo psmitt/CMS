@@ -43,10 +43,14 @@ foreach($_POST as $post_key => $post_value) {
                           $type = 'number';
                           break;
                   }
-                  $result_list[$row[0]] = array( type => $type,
-                                                 required => $row[2] == 'NO',
-                                                 disabled => $row[5] == 'auto_increment');
+                  $field[$row[0]] = array( 'type' => $type,
+                                           'required' => $row[2] == 'NO',
+                                           'disabled' => $row[5] == 'auto_increment');
               }
+              preg_match("/^SELECT (.*) FROM $parameters->loadFields/", $parameters->query, $matches);
+              $names = explode(',', $matches[1]);
+              foreach ($names as $name)
+                $result_list[$name] = $field[$name];
             } else {
               if (property_exists($parameters, 'dsn'))
                 $result = SQL($parameters->query, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);

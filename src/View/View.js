@@ -9,6 +9,7 @@ function load_view(viewname) {
 async function loadView(xmlDoc) {
 
   View.isTable = Boolean(xmlDoc.querySelector('table'))
+  if (View.isTable) Table.name = xmlDoc.firstElementChild.attributes['name'].value
 
   View.titles = []
   xmlDoc.querySelectorAll('column').forEach(column =>
@@ -147,7 +148,7 @@ function reloadData() {
     let result = results.length > 1 ? gapAnalysis(results) : results[0]
     if (View.isTable) resolveForeignKeys(result)
     View.rows = []
-    for (row of result)
+    for (let row of result)
       View.rows.push({
         data: row,
         display: true,
@@ -160,7 +161,7 @@ function reloadData() {
 async function compoundQuery(query, callback) {
   let result = []
   return new Promise(async function (resolve, reject) {
-    for (each of query.querySelectorAll('query'))
+    for (let each of query.querySelectorAll('query'))
       await runSQLQuery(each, addResult)
     resolve(callback(result))
   })
@@ -276,7 +277,7 @@ DataPanel.addEventListener('click', event => { // SORT DATA
         event.target.classList.toggle('sortedDown')
       } else {
         document.querySelectorAll('thead td').forEach(td => td.className = '')
-        if (document.getElementsByTagName('col')[i].className === 'number')
+        if (document.getElementsByTagName('COL')[i].className === 'number')
           View.rows.sort((a, b) => a.data[i] - b.data[i])
         else
           View.rows.sort((a, b) => a.data[i].localeCompare(b.data[i]))
@@ -291,7 +292,7 @@ DataPanel.addEventListener('click', event => { // SORT DATA
 
 function scrollToTop() {
   empty(View.tbody)
-  for (row of View.rows)
+  for (let row of View.rows)
     row.tr = null
   View.last = -1
   appendRow()
@@ -301,7 +302,7 @@ function scrollToTop() {
 
 function scrollToBottom() {
   empty(View.tbody)
-  for (row of View.rows)
+  for (let row of View.rows)
     row.tr = null
   View.first = View.rows.length
   prependRow()

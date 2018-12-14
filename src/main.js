@@ -129,7 +129,6 @@ app.on('activate', () => {
 })
 
 ipcMain.on('datalist focused', (event, left, top) => {
-  console.log(left, top);
   event.sender.sendInputEvent({
     type: 'mouseDown',
     x: left + 1,

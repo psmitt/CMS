@@ -65,6 +65,10 @@ async function getField(column) {
   if (column.querySelector('selection')) {
     Options[name].editor = `<input list="${name}-options" ${inputName}
                              onfocus="focusDatalist(this)"
+                             ontouchstart="console.log(event)"
+                             ontouchend="console.log(event)"
+                             ontouchcancel="console.log(event)"
+                             ontouchmove="console.log(event)"
                              onkeydown="switch(event.key){
                                case'Escape':case'Enter':validateDatalist(this)}"
                              onblur="validateDatalist(this)"/>
@@ -80,7 +84,7 @@ async function getField(column) {
                            ORDER BY ${get('text')}`
       return runSQLQuery(query, result => {
         result.forEach(option => Options[name].editor +=
-          `<option data-value="${option[0]}" value="${option[1]}"/>`
+          `<option data-value="${option[0]}" value="${option[1].replace(/"/g, '&quot;')}"/>`
         )
         Options[name].editor += '</datalist>'
       })
@@ -155,6 +159,6 @@ function validateDatalist(input) {
     input.value = input.placeholder
   input.placeholder = ''
   if (!document.getElementById(input.list.id)
-    .querySelector(`option[value="${input.value}"]`))
+    .querySelector(`option[value="${input.value.replace(/"/g, '\\"')}"]`))
     input.value = ''
 }

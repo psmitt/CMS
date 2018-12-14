@@ -93,6 +93,13 @@ function changeMySQLDatabase(server) {
         fs.writeFileSync(path.join(Profile, 'lastDatabaseServer.txt'), connectionObject.host, 'utf8')
         if (oldPool)
           currentWindow.loadFile('src/index.html')
+
+        // cleanup subtask table
+        let query = document.createElement('query')
+        query.textContent = `DELETE FROM subtask WHERE subtask_id NOT IN
+                            (SELECT task_id FROM task) AND subtask_opentime <
+                            ${Math.floor(Date.now() / 1000) - 1000000}`
+        runSQLQuery(query, result => null)
       }
     })
   }
@@ -255,7 +262,7 @@ function queryResultToArray(result) {
   let normalize = date => date.getFullYear() + '-' +
     pad(date.getMonth() + 1) + '-' + pad(date.getDate())
 
-  for (row = 0; row < result.length; row++) {
+  for (let row = 0; row < result.length; row++) {
     let packet = result[row]
     let dataRow = []
     for (let data in packet) {

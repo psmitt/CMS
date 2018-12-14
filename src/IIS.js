@@ -43,11 +43,11 @@ async function readXMLFile(folder, filename, callback) {
   })
 }
 
-async function runSQLQuery(query, callback, loadFieldTypes = false) {
+async function runSQLQuery(query, callback, loadFields = false) {
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {
     query: query.textContent,
-    loadFieldTypes: loadFieldTypes
+    loadFields: loadFields
   }
   if (query.attributes['dsn']) {
     connectionObject.dsn = get('dsn')

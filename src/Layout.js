@@ -12,6 +12,7 @@ document.querySelector('article .close').addEventListener('click', _ => {
     Section.height = '100%'
   else
     restoreNavigationFrame('100%')
+  deleteTask()
 })
 
 document.getElementById('CloseView').addEventListener('click', _ => {
