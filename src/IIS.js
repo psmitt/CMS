@@ -1,37 +1,13 @@
 const Electron = false
 const IIS = true
 
-document.addEventListener('DOMContentLoaded', _ => {
-  loadMenuFiles()
-})
-
-function openNewWindow(folder, filename) {
-  open('/CMS5/src/index.php', '_blank')
-}
-
-function listDirectory(folder, callback) {
-  let httpRequest = new XMLHttpRequest()
-  httpRequest.onreadystatechange = function () {
-    if (httpRequest.readyState == 4) {
-      if (httpRequest.status == 200)
-        callback(JSON.parse(httpRequest.responseText))
-      else
-        console.log('\nHTTP status: ', httpRequest.status,
-          '\nResponse: ', httpRequest.responseText)
-    }
-  }
-  httpRequest.open('POST', '/CMS5/src/IIS.php')
-  httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-  httpRequest.send(`listDirectory=${folder}`)
-}
-
-async function readXMLFile(folder, filename, callback) {
+async function post(parameter, value, callback) {
   return new Promise((resolve, reject) => {
     let httpRequest = new XMLHttpRequest()
     httpRequest.onreadystatechange = function () {
       if (httpRequest.readyState == 4) {
         if (httpRequest.status == 200) {
-          resolve(callback(new DOMParser().parseFromString(httpRequest.responseText, 'text/xml')))
+          resolve(callback(httpRequest.responseText))
         } else
           reject(console.log('HTTP status: ', httpRequest.status,
             '\nResponse: ', httpRequest.responseText))
@@ -39,8 +15,34 @@ async function readXMLFile(folder, filename, callback) {
     }
     httpRequest.open('POST', '/CMS5/src/IIS.php')
     httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    httpRequest.send(`readXMLFile=${folder}/${filename}`)
+    httpRequest.send(parameter + '=' + encodeURIComponent(value))
   })
+}
+
+document.addEventListener('DOMContentLoaded', _ => {
+  loadMenuFiles()
+
+  // cleanup subtask table
+  let query = document.createElement('query')
+  query.textContent = `DELETE FROM subtask WHERE subtask_id NOT IN
+                      (SELECT task_id FROM task) AND subtask_opentime <
+                      ${Math.floor(Date.now() / 1000) - 1000000}`
+  runSQLQuery(query, result => null)
+
+  post('getTitle', '', response => document.title = response)
+})
+
+function openNewWindow(folder, filename) {
+  open('/CMS5/src/index.php', '_blank')
+}
+
+function listDirectory(folder, callback) {
+  post('listDirectory', folder, response => callback(JSON.parse(response)))
+}
+
+async function readXMLFile(folder, filename, callback) {
+  return post('readXMLFile', folder + '/' + filename, response =>
+    callback(new DOMParser().parseFromString(response, 'text/xml')))
 }
 
 async function runSQLQuery(query, callback, loadFields = false) {
@@ -54,21 +56,8 @@ async function runSQLQuery(query, callback, loadFields = false) {
     connectionObject.user = get('username')
     connectionObject.pass = get('password')
   }
-  return new Promise((resolve, reject) => {
-    let httpRequest = new XMLHttpRequest()
-    httpRequest.onreadystatechange = function () {
-      if (httpRequest.readyState == 4) {
-        if (httpRequest.status == 200) {
-          resolve(callback(JSON.parse(httpRequest.responseText)))
-        } else
-          reject(console.log('HTTP status: ', httpRequest.status,
-            '\nResponse: ', httpRequest.responseText))
-      }
-    }
-    httpRequest.open('POST', '/CMS5/src/IIS.php')
-    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    httpRequest.send(`runSQLQuery=${encodeURIComponent(JSON.stringify(connectionObject))}`)
-  })
+  return post('runSQLQuery', JSON.stringify(connectionObject),
+    response => callback(JSON.parse(response)))
 }
 
 function load_link(URL) {

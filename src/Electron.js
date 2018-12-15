@@ -82,6 +82,9 @@ function changeMySQLDatabase(server) {
       supportBigNumbers: true,
       multipleStatements: true
     }
+
+    document.title = `CMS ${path.basename(XMLRootDirectory)} ( ${server} )`
+
     mysql.createConnection(connectionObject).connect(error => {
       if (error) {
         alert(error)

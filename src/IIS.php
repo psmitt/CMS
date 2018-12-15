@@ -4,6 +4,10 @@ require_once 'Dispatcher.php';
 
 foreach($_POST as $post_key => $post_value) {
     switch ($post_key) {
+        case 'getTitle':
+            echo "CMS $_SESSION[country] ( $_SERVER[SERVER_NAME] )";
+            break;
+
         case 'listDirectory':
             $filenames = [];
             foreach (glob("$xmlroot/$_SESSION[country]/$post_value/*.xml") as $path)
