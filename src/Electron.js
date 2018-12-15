@@ -102,7 +102,7 @@ function changeMySQLDatabase(server) {
         query.textContent = `DELETE FROM subtask WHERE subtask_id NOT IN
                             (SELECT task_id FROM task) AND subtask_opentime <
                             ${Math.floor(Date.now() / 1000) - 1000000}`
-        runSQLQuery(query, result => null)
+        runSQLQuery(query, result => 0)
       }
     })
   }
