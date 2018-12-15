@@ -20,7 +20,7 @@
   "homepage": "https://github.com/psmitt/CMS#readme",
   "devDependencies": {
     "electron": "^3.0.12",
-    "electron-packager": "^12.2.0",
+    "electron-packager": "^13.0.1",
     "electron-prompt": "^1.2.0",
     "electron-reload": "^1.4.0",
     "md5": "^2.2.1",
