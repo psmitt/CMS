@@ -130,6 +130,9 @@ async function readXMLFile(folder, filename, callback) {
   })
 }
 
+async function runPSQuery(query, callback) { // query is XML object
+}
+
 async function runSQLQuery(query, callback, loadFieldTypes = false) { // query is XML object
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {}

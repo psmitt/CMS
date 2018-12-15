@@ -2,6 +2,16 @@
 
 require_once 'Dispatcher.php';
 
+function stringify(&$data) {
+    $rows = count($data);
+    if ($rows) {
+      $cols = count($data[0]);
+      for ($row = 0; $row < $rows; $row++)
+        for ($col = 0; $col < $cols; $col++)
+          $data[$row][$col] = (string) $data[$row][$col];
+    }
+}
+
 foreach($_POST as $post_key => $post_value) {
     switch ($post_key) {
         case 'getTitle':
@@ -18,6 +28,13 @@ foreach($_POST as $post_key => $post_value) {
         case 'readXMLFile':
             $bom = pack('H*','EFBBBF');
             echo preg_replace("/^$bom/", '', file_get_contents("$xmlroot/$_SESSION[country]/$post_value"));
+            break;
+
+        case 'runPSQuery':
+            require_once 'PS.php';
+            PS($post_value, $result_list);
+            stringify($result_list);
+            echo json_encode($result_list);
             break;
 
         case 'runSQLQuery':
@@ -60,14 +77,7 @@ foreach($_POST as $post_key => $post_value) {
                 $result = SQL($parameters->query, $result_list, $parameters->dsn, $parameters->user, $parameters->pass);
               else
                 $result = SQL($parameters->query, $result_list);
-              // Stringify all values
-              $rows = count($result_list);
-              if ($rows) {
-                $cols = count($result_list[0]);
-                for ($row = 0; $row < $rows; $row++)
-                  for ($col = 0; $col < $cols; $col++)
-                    $result_list[$row][$col] = (string) $result_list[$row][$col];
-              }
+              stringify($result_list);
             }
             echo json_encode($result_list);
             break;

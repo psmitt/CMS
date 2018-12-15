@@ -38,6 +38,7 @@ const screenSize = Math.max(window.screen.availWidth, window.screen.availHeight)
 const View = { /* global properties for tabular view */
   isTable: false,
   titles: [],
+  columns: 0, // number of columns, can be different of number of titles
   queries: [],
   rows: [], // { data: [], display: true, tr: null }
   rowTemplate: document.createElement('tr'),

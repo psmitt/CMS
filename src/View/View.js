@@ -31,6 +31,8 @@ async function loadView(xmlDoc) {
 
   if (View.queries.length > 1) { // gap analysis
 
+    View.columns = 4
+
     DataPanel.innerHTML = `<table style="width:${1000 + rigthColumnWidth}px">
                             <colgroup>
                               <col style="width:200px"/>
@@ -63,6 +65,8 @@ async function loadView(xmlDoc) {
                           <td></td><td></td>${editorCell}`
 
   } else { // simple or compound view, or table
+
+    View.columns = View.titles.length
 
     DataPanel.innerHTML = `<table>
                             <colgroup>
@@ -142,6 +146,8 @@ function reloadData() {
   View.queries.forEach(query => {
     promises.push(query.querySelector('query') ?
       compoundQuery(query, result => results.push(result)) :
+      (query.attributes['language'] && query.attributes['language'].value === 'PS') ?
+      runPSQuery(query, result => results.push(result)) :
       runSQLQuery(query, result => results.push(result)))
   })
   Promise.all(promises).then(_ => {
@@ -161,8 +167,12 @@ function reloadData() {
 async function compoundQuery(query, callback) {
   let result = []
   return new Promise(async function (resolve, reject) {
-    for (let each of query.querySelectorAll('query'))
-      await runSQLQuery(each, addResult)
+    for (let each of query.querySelectorAll('query')) {
+      each.attributes['language'] &&
+        each.attributes['language'].value === 'PS' ?
+        await runPSQuery(each, addResult) :
+        await runSQLQuery(each, addResult)
+    }
     resolve(callback(result))
   })
 
@@ -214,7 +224,7 @@ function gapAnalysis(results) {
     if (comparison < 0) push[0](i++)
     if (comparison > 0) push[1](j++)
     if (comparison == 0) { // first_key == second_key
-      for (let k = 1; k < results[0][i].length; k++) {
+      for (let k = 1; k < View.titles.length; k++) {
         let firstData = results[0][i][k] ? results[0][i][k].toString() : ''
         let secondData = results[1][j][k] ? results[1][j][k].toString() : ''
         if (firstData.localeCompare(secondData))
@@ -243,7 +253,6 @@ function filterData() {
       })
   })
   let counter = 0
-  let display = View.titles.length
   for (let row of View.rows)
     row.display = true
   for (let f = 0; f < filters.length - 1; f++) {
@@ -270,7 +279,7 @@ DataPanel.addEventListener('input', filterData)
 DataPanel.addEventListener('click', event => { // SORT DATA
   if (event.target.matches('thead td') && !getSelection().toString()) {
     let i = event.target.cellIndex
-    if (i < View.titles.length) {
+    if (i < View.columns) {
       if (event.target.classList.length) {
         View.rows.reverse()
         event.target.classList.toggle('sortedUp')
@@ -318,9 +327,9 @@ function appendRow() { // return success
       break
   if (last < View.rows.length && View.rows[last].display) {
     let newRow = View.rowTemplate.cloneNode(true)
-    for (let cell = 0; cell < View.titles.length; cell++)
+    for (let cell = 0; cell < View.columns; cell++)
       newRow.children[cell].innerHTML = View.rows[last].data[cell]
-    newRow.children[View.titles.length].addEventListener('click', _ =>
+    newRow.children[View.columns].addEventListener('click', _ =>
       editRecord(View.rows[last]))
     View.tbody.appendChild(newRow)
     View.rows[last].tr = newRow
@@ -332,15 +341,14 @@ function appendRow() { // return success
 
 function prependRow() { // return success
   let first = View.first
-  let display = View.titles.length
   while (--first >= 0)
     if (View.rows[first].display)
       break
   if (first >= 0 && View.rows[first].display) {
     let newRow = View.rowTemplate.cloneNode(true)
-    for (let cell = 0; cell < View.titles.length; cell++)
+    for (let cell = 0; cell < View.columns; cell++)
       newRow.children[cell].innerHTML = View.rows[first].data[cell]
-    newRow.children[View.titles.length].addEventListener('click', _ =>
+    newRow.children[View.columns].addEventListener('click', _ =>
       editRecord(View.rows[first]))
     if (View.tbody.firstChild)
       View.tbody.insertBefore(newRow, View.tbody.firstChild)

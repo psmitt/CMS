@@ -45,6 +45,11 @@ async function readXMLFile(folder, filename, callback) {
     callback(new DOMParser().parseFromString(response, 'text/xml')))
 }
 
+async function runPSQuery(query, callback) {
+  return post('runPSQuery', query.textContent,
+    response => callback(JSON.parse(response)))
+}
+
 async function runSQLQuery(query, callback, loadFields = false) {
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {
