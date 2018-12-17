@@ -216,7 +216,7 @@ function shrinkNavigationFrame() {
 function restoreNavigationFrame(width) {
   Nav.width = width
   Search.type = 'search'
-  Search.placeholder = 'Search'
+  Search.placeholder = 'Search...'
   Search.style.paddingLeft = '1.75em'
   Search.style.cursor = ''
   Search.style.color = '' // show last search

@@ -43,10 +43,10 @@ async function loadView(xmlDoc) {
                             </colgroup>
                             <thead>
                               <tr>
-                                <th><input type="search"/></th>
-                                <th><input type="search"/></th>
-                                <th><input type="search"/></th>
-                                <th><input type="search"/></th>
+                                <th><input type="search" placeholder="Filter..."/></th>
+                                <th><input type="search" placeholder="Filter..."/></th>
+                                <th><input type="search" placeholder="Filter..."/></th>
+                                <th><input type="search" placeholder="Filter..."/></th>
                                 <th onclick="scrollToTop()">⭱</th>
                               </tr>
                               <tr>
@@ -90,7 +90,7 @@ async function loadView(xmlDoc) {
         column.attributes[attribute].value : ''
 
       let filter = document.createElement('th')
-      filter.innerHTML = '<input type="search"/>'
+      filter.innerHTML = '<input type="search" placeholder="Filter..."/>'
       filterRow.insertBefore(filter, filterRow.lastElementChild)
       let title = document.createElement('td')
       title.textContent = get('title') || get('field')

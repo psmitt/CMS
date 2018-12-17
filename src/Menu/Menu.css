@@ -18,6 +18,10 @@ nav>header {
   padding-left: 1.75em;
 }
 
+#Search::placeholder {
+  color: lightgray;
+}
+
 #Menu {
   padding-left: var(--menu-padding);
   padding-right: var(--menu-padding);
