@@ -1,4 +1,4 @@
-function load_form(formname) {
+Load['form'] = formname => {
   empty(FormTable)
   readXMLFile('Form', formname + '.xml', loadForm)
   Aside.display = 'block'

@@ -1,4 +1,4 @@
-function load_table(tablename) {
+Load['table'] = tablename => {
   empty(DataPanel)
   empty(Message)
   Message.appendChild(progressGif)

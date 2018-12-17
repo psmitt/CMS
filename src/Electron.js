@@ -6,6 +6,7 @@ const fs = require('fs')
 const path = require('path')
 const shell = require("electron").shell
 const ipc = require('electron').ipcRenderer
+const powershell = require('node-powershell')
 
 var Profile // Local CMS profile folder
 var XMLRootDirectory // CMS country folder with XML subfolders
@@ -24,6 +25,8 @@ document.addEventListener('DOMContentLoaded', _ => {
   } else {
     changeXMLRootDirectory()
   }
+
+  ipc.on('New Window', (callback, argument) => console.log(callback, argument))
 });
 
 const remote = require('electron').remote
@@ -131,6 +134,37 @@ async function readXMLFile(folder, filename, callback) {
 }
 
 async function runPSQuery(query, callback) { // query is XML object
+  let psQuery = `Import-Module ActiveDirectory;
+           Import-Module Microsoft.PowerShell.Utility;
+           [Console]::OutputEncoding = [System.Text.Encoding]::UTF8;
+           ${query.textContent.replace(/;+$/, '')} | ConvertTo-HTML -Fragment
+          `.replace(/(?:\r\n|\r|\n)/g, ' ')
+  let ps = new powershell({
+    debugMsg: false,
+    executionPolicy: 'Bypass',
+    noProfile: true
+  })
+  ps.addCommand(psQuery)
+  return new Promise((resolve, reject) => {
+    ps.invoke()
+      .then(output => {
+        let xmlDoc = new DOMParser().parseFromString(output, 'text/xml')
+        let result = []
+        xmlDoc.querySelectorAll('tr').forEach(tr => {
+          let row = []
+          for (let cell of tr.children)
+            row.push(cell.textContent)
+          result.push(row)
+        })
+        result.shift()
+        callback(result)
+        resolve(ps.dispose())
+      })
+      .catch(error => {
+        console.error(error)
+        reject(ps.dispose())
+      })
+  })
 }
 
 async function runSQLQuery(query, callback, loadFieldTypes = false) { // query is XML object
@@ -285,7 +319,7 @@ function queryResultToArray(result) {
   }
 }
 
-function load_link(URL) {
+Load['link'] = URL => {
   if (URL.indexOf('HUN/') >= 0)
     shell.openItem(URL.replace('HUN', path.join(XMLRootDirectory, 'File')))
   else

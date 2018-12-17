@@ -16,7 +16,7 @@ const menu = Menu.buildFromTemplate([{
   submenu: [{
     label: 'New Window',
     accelerator: 'Ctrl+N',
-    click: createWindow
+    click: _ => createWindow(false)
   }, {
     label: 'Change Root',
     accelerator: 'Ctrl+O',
@@ -90,12 +90,14 @@ Menu.setApplicationMenu(menu)
 
 let windows = []
 
-function createWindow(folder, file) {
+function createWindow(openerScript) {
   let window = new BrowserWindow({
     show: false
   })
   window.loadFile('src/index.html')
   window.webContents.on('did-finish-load', function () {
+    if (openerScript)
+      window.webContents.executeJavaScript(openerScript)
     window.maximize();
   });
 
@@ -135,3 +137,5 @@ ipcMain.on('datalist focused', (event, left, top) => {
     y: top + 1
   })
 })
+
+ipcMain.on('New Window', (event, openerScript) => createWindow(openerScript))

@@ -36,13 +36,7 @@ function growFrame(frame) { // frame = Article or Section
   // Close Form Frame
   Aside.display = 'none'
   // Shrink Navigation Frame
-  Nav.width = '2em'
-  Search.type = 'text' // remove clear button from input field
-  Search.placeholder = ''
-  Search.style.paddingLeft = '0'
-  Search.style.cursor = 'pointer'
-  Search.style.color = 'rgba(0,0,0,0)' // hide last search
-  Menu.style.display = 'none' // hide menu
+  shrinkNavigationFrame()
   // Change height of main frames
   if (frame.height === 'var(--header-height)')
     frame.height = ''

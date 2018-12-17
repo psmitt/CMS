@@ -10,6 +10,7 @@ function loadMenuFiles() {
         for (let subMenu of xmlDoc.children)
           appendSubMenu(subMenu, Menu)
       })
+    Search.dispatchEvent(new Event('input'))
   }
 }
 
@@ -17,8 +18,12 @@ function appendSubMenu(subMenu, parentMenu) {
   const menu = attribute => subMenu.attributes[attribute] ?
     subMenu.attributes[attribute].value : '' // read attribute
   let node = document.createElement('div')
+  let title = document.createElement('span')
+  title.innerHTML = menu('title')
   if (subMenu.children.length) {
-    node.innerHTML = `<span class="branch expanded">${menu('title')}</span>`
+    title.classList.add('branch')
+    title.classList.add('expanded')
+    node.appendChild(title)
     for (let item of subMenu.children)
       appendSubMenu(item, node)
   } else {
@@ -29,9 +34,20 @@ function appendSubMenu(subMenu, parentMenu) {
       menu_order = menu_order.charAt(13).toUpperCase() +
         menu_order.substring(14, menu_order.lastIndexOf('.'))
     }
-    node.innerHTML = `<span class="item${menu_class ? ' ' + menu_class +
-      '" onclick="load_' + menu_class + "('" + menu_order + '\')"' : ''
-      }>${menu('title')}</span>`
+    title.classList.add('item')
+    if (menu_class && menu_order) {
+      title.classList.add(menu_class)
+      title.onclick = event => {
+        if (event.ctrlKey) {
+          ipc.send('New Window',
+            `Load['${menu_class}']('${menu_order}');
+             shrinkNavigationFrame()`)
+        } else {
+          Load[menu_class](menu_order)
+        }
+      }
+    }
+    node.appendChild(title)
   }
   parentMenu.appendChild(node)
 }
@@ -182,6 +198,16 @@ $(document).on('keypress', event => {
 */
 
 /* NAV SIZING */
+
+function shrinkNavigationFrame() {
+  Nav.width = '2em'
+  Search.type = 'text' // remove clear button from input field
+  Search.placeholder = ''
+  Search.style.paddingLeft = '0'
+  Search.style.cursor = 'pointer'
+  Search.style.color = 'rgba(0,0,0,0)' // hide last search
+  Menu.style.display = 'none' // hide menu
+}
 
 function restoreNavigationFrame(width) {
   Nav.width = width

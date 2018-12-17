@@ -13,7 +13,7 @@ function load_main(id) {
   })
 }
 
-function load_task(taskname, main = 0, id = 0) { // taskname is filename without file extension
+Load['task'] = (taskname, main = 0, id = 0) => { // taskname is filename without file extension
   Task.id = id
   Task.fileName = taskname
   if (Task.main = main) { // replace CLOSE icon with BACK icon

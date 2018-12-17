@@ -65,6 +65,6 @@ async function runSQLQuery(query, callback, loadFields = false) {
     response => callback(JSON.parse(response)))
 }
 
-function load_link(URL) {
+Load['link'] = URL => {
   open(URL, '_blank')
 }

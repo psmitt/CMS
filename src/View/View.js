@@ -1,4 +1,4 @@
-function load_view(viewname) {
+Load['view'] = viewname => {
   empty(DataPanel)
   empty(Message)
   Message.appendChild(progressGif)
@@ -214,9 +214,9 @@ function gapAnalysis(results) {
   let result = []
   let push = [
     index => result.push([results[0][index][0], '*',
-      `<span title="${results[0][index].join('\n')}">*</span>`, '']),
+      `<mark title="${results[0][index].join('\n')}">*</mark>`, '']),
     index => result.push([results[1][index][0], '*', '',
-      `<span title="${results[1][index].join('\n')}">*</span>`])
+      `<mark title="${results[1][index].join('\n')}">*</mark>`])
   ]
   let i = j = 0
   while (i < results[0].length && j < results[1].length) {

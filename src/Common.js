@@ -7,6 +7,7 @@ const Aside = document.querySelector('aside').style
 // MENU
 const Search = document.getElementById('Search')
 const Menu = document.getElementById('Menu')
+var Load = [] // loader functions
 
 // TASK
 const TaskTitle = document.getElementById('TaskTitle') // title
