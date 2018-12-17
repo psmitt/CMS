@@ -27,21 +27,25 @@ function appendSubMenu(subMenu, parentMenu) {
     for (let item of subMenu.children)
       appendSubMenu(item, node)
   } else {
+    title.classList.add('item')
     let menu_class = menu('class')
     let menu_order = menu('order')
-    if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {
-      menu_class = 'form'
-      menu_order = menu_order.charAt(13).toUpperCase() +
-        menu_order.substring(14, menu_order.lastIndexOf('.'))
-    }
-    title.classList.add('item')
     if (menu_class && menu_order) {
       title.classList.add(menu_class)
+      if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {
+        menu_class = 'form'
+        menu_order = menu_order.charAt(13).toUpperCase() +
+          menu_order.substring(14, menu_order.lastIndexOf('.'))
+      }
       title.onclick = event => {
         if (event.ctrlKey) {
-          ipc.send('New Window',
-            `Load['${menu_class}']('${menu_order}');
-             shrinkNavigationFrame()`)
+          if (Electron) {
+            ipc.send('New Window',
+              `Load['${menu_class}']('${menu_order}');
+               shrinkNavigationFrame();`)
+          } else { // IIS
+            Load['link'](`index.php?${menu_class}=${menu_order}`)
+          }
         } else {
           Load[menu_class](menu_order)
         }

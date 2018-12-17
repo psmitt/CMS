@@ -9,7 +9,7 @@ function load_main(id) {
     Task.checkString = result[0][4]
     Task.displayString = result[0][5]
     Task.scrollPosition = result[0][6]
-    load_task(Task.fileName, Task.main, Task.id)
+    Load['task'](Task.fileName, Task.main, Task.id)
   })
 }
 
@@ -80,16 +80,18 @@ function appendStep(step, parent) {
       if (Electron)
         text = text.replace('src="HUN/img/',
           'src="' + path.join(XMLRootDirectory, 'File', 'img', ' ').trimEnd())
+      span.innerHTML = text + '&ensp;'
       while ((child = child.nextElementSibling) && child.tagName === 'button') {
         const get = attribute => child.attributes[attribute].value
-        if (get('class') === 'task')
-          text += `&ensp;<button onclick="saveTask().then(id=>load_task(
-                  '${get('order')}',id))">${get('title')}</button>`
-        else
-          text += `&ensp;<button onclick="load_${get('class')}(
-                  '${get('order')}')">${get('title')}</button>`
+        let button = document.createElement('button')
+        let menu_class = get('class')
+        let menu_order = get('order')
+        button.textContent = get('title')
+        button.onclick = menu_class === 'task' ?
+          _ => saveTask().then(id => Load['task'](menu_order, id)) :
+          _ => Load[menu_class](menu_order)
+        span.insertAdjacentElement('beforeend', button)
       }
-      span.innerHTML = text
       node.appendChild(span)
       while (child) {
         appendStep(child, node)
