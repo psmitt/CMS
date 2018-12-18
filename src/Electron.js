@@ -122,6 +122,24 @@ function listDirectory(folder, callback) {
   })
 }
 
+let XLSX = require('xlsx')
+async function readXLSXFile(query, callback) {
+  let parameters = query.textContent.trim().split('\n')
+  // Create proper access path
+  let prefix = 'C:\\\\inetpub\\\\xmlroot\\\\' + path.basename(XMLRootDirectory)
+  let filePath = path.join(XMLRootDirectory,
+    parameters[0].trim().replace(new RegExp('^' + prefix), ''))
+  let columns = parameters[1] ? parameters[1].trim().split(',') : []
+  return new Promise((resolve, reject) => {
+    let xlsx = XLSX.readFile(filePath, {
+      type: 'array',
+      cellFormula: false,
+      cellHTML: false
+    })
+    resolve(callback(xlsxToArray(xlsx, columns)))
+  })
+}
+
 async function readXMLFile(folder, filename, callback) {
   return new Promise((resolve, reject) => {
     fs.readFile(path.join(XMLRootDirectory, folder, filename), 'utf8', (error, xmlString) => {

@@ -11,7 +11,7 @@ $test     = strtolower($_SERVER['HTTP_HOST']) == 'cms4test' ? ' TEST' : '';
 $index = str_replace(['href="Font/Font.css"',
                       '<script src="Electron.js"></script>'],
                      ['href="https://fonts.googleapis.com/css?family=Barlow+Semi+Condensed|Nova+Mono"',
-                      '<script src="IIS.js"></script>'],
+                      '<script src="xlsx.core.min.js"></script><script src="IIS.js"></script>'],
                      file_get_contents('index.html'));
 
 if (count($_GET)) foreach ($_GET as $menu_class => $menu_order)

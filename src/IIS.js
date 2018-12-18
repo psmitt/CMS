@@ -40,6 +40,33 @@ function listDirectory(folder, callback) {
   post('listDirectory', folder, response => callback(JSON.parse(response)))
 }
 
+async function readXLSXFile(query, callback) {
+  let parameters = query.textContent.trim().split('\n')
+  let path = parameters[0].trim()
+  let columns = parameters[1] ? parameters[1].trim().split(',') : []
+  return new Promise((resolve, reject) => {
+    let httpRequest = new XMLHttpRequest()
+    httpRequest.responseType = 'arraybuffer'
+    httpRequest.onreadystatechange = function () {
+      if (httpRequest.readyState == 4) {
+        if (httpRequest.status == 200) {
+          let xlsx = XLSX.read(new Uint8Array(httpRequest.response), {
+            type: 'array',
+            cellFormula: false,
+            cellHTML: false
+          })
+          resolve(callback(xlsxToArray(xlsx, columns)))
+        } else
+          reject(console.log('HTTP status: ', httpRequest.status,
+            '\nResponse: ', httpRequest.response))
+      }
+    }
+    httpRequest.open('POST', '/CMS5/src/IIS.php')
+    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    httpRequest.send('readXLSXFile=' + encodeURIComponent(path))
+  })
+}
+
 async function readXMLFile(folder, filename, callback) {
   return post('readXMLFile', folder + '/' + filename, response =>
     callback(new DOMParser().parseFromString(response, 'text/xml')))

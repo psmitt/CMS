@@ -144,6 +144,6 @@ section>header {
 }
 
 #Data mark {
-  background-color: white;
+  background-color: inherit;
   color: red;
 }

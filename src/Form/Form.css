@@ -38,6 +38,8 @@ aside form button {
   padding: 5px;
 }
 
-aside button {
-  width: calc(100% + 12px)
+aside [type="button"],
+aside [type="submit"] {
+  font-size: x-large;
+  font-weight: bold;
 }

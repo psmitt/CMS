@@ -25,6 +25,12 @@ foreach($_POST as $post_key => $post_value) {
             echo json_encode($filenames);
             break;
 
+        case 'readXLSXFile':
+            if (str_replace('\\', '/', substr($post_value, 0, strlen($xmlroot))) !== $xmlroot)
+              $post_value = "$xmlroot/$_SESSION[country]/".str_replace('\\', '/',$post_value);
+            echo file_get_contents($post_value);
+            break;
+
         case 'readXMLFile':
             $bom = pack('H*','EFBBBF');
             echo preg_replace("/^$bom/", '', file_get_contents("$xmlroot/$_SESSION[country]/$post_value"));

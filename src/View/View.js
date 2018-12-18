@@ -143,12 +143,28 @@ async function loadView(xmlDoc) {
 function reloadData() {
   let promises = []
   let results = []
+  const addResult = result => results.push(result)
   View.queries.forEach(query => {
-    promises.push(query.querySelector('query') ?
-      compoundQuery(query, result => results.push(result)) :
-      (query.attributes['language'] && query.attributes['language'].value === 'PS') ?
-      runPSQuery(query, result => results.push(result)) :
-      runSQLQuery(query, result => results.push(result)))
+    const get = attribute => query.attributes[attribute] ?
+      query.attributes[attribute].value : ''
+    if (query.querySelector('query')) {
+      promises.push(compoundQuery(query, addResult))
+    } else {
+      switch (get('language')) {
+        case 'PHP':
+          switch (get('callback')) {
+            case 'readExcel':
+            case 'readExcelColumns':
+              promises.push(readXLSXFile(query, addResult))
+          }
+          break
+        case 'PS':
+          promises.push(runPSQuery(query, addResult))
+          break
+        default: // nothing
+          promises.push(runSQLQuery(query, addResult))
+      }
+    }
   })
   Promise.all(promises).then(_ => {
     let result = results.length > 1 ? gapAnalysis(results) : results[0]
@@ -168,10 +184,19 @@ async function compoundQuery(query, callback) {
   let result = []
   return new Promise(async function (resolve, reject) {
     for (let each of query.querySelectorAll('query')) {
-      each.attributes['language'] &&
-        each.attributes['language'].value === 'PS' ?
-        await runPSQuery(each, addResult) :
+      if (each.attributes['language']) {
+        switch (each.attributes['language'].value) {
+          case 'PHP':
+            if (each.attributes['callback'].value === 'readExcel')
+              await readXLSXFile(each, addResult)
+            break
+          case 'PS':
+            await runPSQuery(each, addResult)
+            break
+        }
+      } else {
         await runSQLQuery(each, addResult)
+      }
     }
     resolve(callback(result))
   })
@@ -386,7 +411,10 @@ document.getElementById('ReloadData').addEventListener('click', _ => {
 })
 
 document.getElementById('ExportXLSX').addEventListener('click', _ => {
-  reloadData()
+  var wb = XLSX.utils.table_to_book(View.table, {
+    sheet: "Sheet JS"
+  })
+  return XLSX.writeFile(wb, 'Peti.xlsx')
 })
 
 document.getElementById('ClearFilters').addEventListener('click', _ => {

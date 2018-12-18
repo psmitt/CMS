@@ -75,3 +75,23 @@ function empty(node) {
 function get(node, attribute) {
   return node.attributes[attribute] ? node.attributes[attribute].value : null
 }
+
+function xlsxToArray(xlsx, columns) {
+  let cells = xlsx.Sheets[xlsx.SheetNames[0]]
+  let range = XLSX.utils.decode_range(cells['!ref'])
+  if (!columns.length)
+    columns = [...Array(range.e.c).keys()]
+  let result = []
+  for (var R = range.s.r + 1; R <= range.e.r; R++) {
+    let row = []
+    for (var C = range.s.c; C <= columns.length; C++) {
+      let cell = cells[XLSX.utils.encode_cell({
+        c: columns[C],
+        r: R
+      })]
+      row.push(cell ? cell.w.toString() ? cell.v.toString() : '' : '')
+    }
+    result.push(row)
+  }
+  return result
+}
