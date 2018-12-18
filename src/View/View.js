@@ -376,3 +376,20 @@ ViewTitle.addEventListener('click', event => {
 Tool.addEventListener('click', _ =>
   Tools.style.display = Tools.style.display !== 'block' ? 'block' : 'none'
 )
+
+Tools.addEventListener('click', _ =>
+  Tools.style.display = Tools.style.display !== 'block' ? 'block' : 'none'
+)
+
+document.getElementById('ReloadData').addEventListener('click', _ => {
+  reloadData()
+})
+
+document.getElementById('ExportXLSX').addEventListener('click', _ => {
+  reloadData()
+})
+
+document.getElementById('ClearFilters').addEventListener('click', _ => {
+  DataPanel.querySelectorAll('thead input').forEach(input => input.value = '')
+  filterData()
+})
