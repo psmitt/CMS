@@ -29,7 +29,7 @@ Load['task'] = (taskname, main = 0, id = 0) => { // taskname is filename without
 }
 
 function loadTask(xmlDoc) {
-  TaskTitle.textContent = xmlDoc.querySelector('task').attributes['title'].value
+  TaskTitle.textContent = get(xmlDoc.querySelector('task'), 'title')
   for (let step of xmlDoc.querySelector('task').children)
     appendStep(step, Procedure)
   if (Task.id) { // restoreTask
@@ -82,11 +82,10 @@ function appendStep(step, parent) {
           'src="' + path.join(XMLRootDirectory, 'File', 'img', ' ').trimEnd())
       span.innerHTML = text + '&ensp;'
       while ((child = child.nextElementSibling) && child.tagName === 'button') {
-        const get = attribute => child.attributes[attribute].value
         let button = document.createElement('button')
-        let menu_class = get('class')
-        let menu_order = get('order')
-        button.textContent = get('title')
+        let menu_class = get(child, 'class')
+        let menu_order = get(child, 'order')
+        button.textContent = get(child, 'title')
         button.onclick = menu_class === 'task' ?
           _ => saveTask().then(id => Load['task'](menu_order, id)) :
           _ => Load[menu_class](menu_order)

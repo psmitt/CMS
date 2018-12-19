@@ -1,5 +1,3 @@
-/* DISPLAY MENU */
-
 function loadMenuFiles() {
   empty(Menu)
   listDirectory('Menu', loadFiles) // initialize the menu generator
@@ -15,11 +13,9 @@ function loadMenuFiles() {
 }
 
 function appendSubMenu(subMenu, parentMenu) {
-  const menu = attribute => subMenu.attributes[attribute] ?
-    subMenu.attributes[attribute].value : '' // read attribute
   let node = document.createElement('div')
   let title = document.createElement('span')
-  title.innerHTML = menu('title')
+  title.innerHTML = get(subMenu, 'title')
   if (subMenu.children.length) {
     title.classList.add('branch')
     title.classList.add('expanded')
@@ -28,8 +24,8 @@ function appendSubMenu(subMenu, parentMenu) {
       appendSubMenu(item, node)
   } else {
     title.classList.add('item')
-    let menu_class = menu('class')
-    let menu_order = menu('order')
+    let menu_class = get(subMenu, 'class')
+    let menu_order = get(subMenu, 'order')
     if (menu_class && menu_order) {
       title.classList.add(menu_class)
       if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {

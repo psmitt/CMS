@@ -5,31 +5,30 @@ Load['form'] = formname => {
 }
 
 async function loadForm(xmlDoc) {
-  FormTitle.innerHTML = xmlDoc.firstElementChild.attributes['title'].value
+  FormTitle.innerHTML = get(xmlDoc.firstElementChild, 'title')
   Options = []
   for (element of xmlDoc.querySelectorAll('column, button, submit')) {
-    const get = attribute => element.attributes[attribute] ?
-      element.attributes[attribute].value : ''
     if (element.matches('column')) {
-      if (View.isTable && Table.fields[get('field')].disabled) continue;
+      let field = get(element, 'field')
+      if (View.isTable && Table.fields[field].disabled) continue;
       await getField(element)
       let label = document.createElement('tr')
-      label.innerHTML = `<th>${Options[get('field')].label}</th>`
+      label.innerHTML = `<th>${Options[field].label}</th>`
       FormTable.appendChild(label)
       let editor = document.createElement('tr')
-      editor.innerHTML = `<td>${Options[get('field')].editor}</td>`
+      editor.innerHTML = `<td>${Options[field].editor}</td>`
       FormTable.appendChild(editor)
     } else {
       let button = document.createElement('tr')
       button.innerHTML =
         `<td style="padding-right:0">
-          <input type="${element.tagName}" value="${get('title') || 'Submit'}"/>
+          <input type="${element.tagName}" value="${get(element, 'title') || 'Submit'}"/>
         </td>`
-      if (get('language') === 'JS')
+      if (get(element, 'language') === 'JS')
         button.onclick = element.textContent
       else
         button.addEventListener('click', event => {
-          let callback = get('callback') || (result => console.log(result))
+          let callback = get(element, 'callback') || (result => console.log(result))
           let command = element.textContent
           for (field of document.querySelector('aside form').elements) {
             if (field.name) {
@@ -50,8 +49,10 @@ async function loadForm(xmlDoc) {
 }
 
 async function getField(column) {
-  let get = attribute => column.attributes[attribute] ?
+  let get = attribute =>
+    column.attributes[attribute] ?
     column.attributes[attribute].value : ''
+
   let name = get('field')
   let inputName = `name="${name}"` +
     (get('required') === 'yes' || (View.isTable && Table.fields[name].required) ? ' required' : '')
@@ -84,18 +85,18 @@ async function getField(column) {
                            ORDER BY ${get('text')}`
       return runSQLQuery(query, result => {
         result.forEach(option => Options[name].editor +=
-          `<option data-value="${option[0]}" value="${option[1].replace(/"/g, '&quot;')}"/>`
+          `<option data-value="${option[0]}"
+            value="${option[1].replace(/"/g, '&quot;')}"/>`
         )
         Options[name].editor += '</datalist>'
       })
     } else {
       Options[name].editor = `<select ${inputName}/>`
-      column.querySelectorAll('option').forEach(option => {
-        let value = option.attributes['value'] ?
-          option.attributes['value'].value : option.textContent
-        Options[name].editor +=
-          `<option value="${value}">${option.textContent}</option>`
-      })
+      column.querySelectorAll('option').forEach(option =>
+        Options[name].editor += `<option
+          value="${get(option, 'value') || option.textContent}"
+          >${option.textContent}</option>`
+      )
       return Options[name].editor += '</select>'
     }
   }

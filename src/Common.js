@@ -73,7 +73,7 @@ function empty(node) {
 }
 
 function get(node, attribute) {
-  return node.attributes[attribute] ? node.attributes[attribute].value : null
+  return node.attributes[attribute] ? node.attributes[attribute].value : ''
 }
 
 function xlsxToArray(xlsx, columns) {

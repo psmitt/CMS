@@ -9,17 +9,16 @@ Load['table'] = tablename => {
 async function tableQuery(xmlDoc) { // return [<query>SQL</query>]
   let fields = []
   xmlDoc.querySelectorAll('column').forEach(column => {
-    fields.push(column.attributes['field'].value)
+    fields.push(get(column, 'field'))
   })
   let SQL = 'SELECT ' + fields.join(',') + ' FROM ' +
-    xmlDoc.querySelector('table').attributes['name'].value
+    get(xmlDoc.querySelector('table'), 'name')
   if (xmlDoc.querySelector('table>filter'))
     SQL += ' WHERE ' + xmlDoc.querySelector('table>filter').textContent
   if (xmlDoc.querySelector('table>order')) {
     let orders = []
     xmlDoc.querySelectorAll('table>order').forEach(order =>
-      orders.push(order.attributes['field'].value +
-        (order.attributes['way'] ? ' ' + order.attributes['way'] : '')))
+      orders.push(get(order, 'field') + ' ' + get(order, 'way')))
     SQL += ' ORDER BY ' + orders.join(',')
   }
   let query = document.createElement('query')

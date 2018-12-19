@@ -9,7 +9,7 @@ Load['view'] = viewname => {
 async function loadView(xmlDoc) {
 
   View.isTable = Boolean(xmlDoc.querySelector('table'))
-  if (View.isTable) Table.name = xmlDoc.firstElementChild.attributes['name'].value
+  if (View.isTable) Table.name = get(xmlDoc.firstElementChild, 'name')
 
   View.titles = []
   xmlDoc.querySelectorAll('column').forEach(column =>
@@ -52,8 +52,8 @@ async function loadView(xmlDoc) {
                               <tr>
                                 <td>${View.titles[0]}</td>
                                 <td data-title="Data">Data</td>
-                                <td>${View.queries[0].attributes['title'].value}</td>
-                                <td>${View.queries[1].attributes['title'].value}</td>
+                                <td>${get(View.queries[0], 'title')}</td>
+                                <td>${get(View.queries[1], 'title')}</td>
                                 <td onclick="scrollToBottom()">⭳</td>
                               </tr>
                             </thead>
@@ -145,14 +145,12 @@ function reloadData() {
   let results = []
   const addResult = result => results.push(result)
   View.queries.forEach(query => {
-    const get = attribute => query.attributes[attribute] ?
-      query.attributes[attribute].value : ''
     if (query.querySelector('query')) {
       promises.push(compoundQuery(query, addResult))
     } else {
-      switch (get('language')) {
+      switch (get(query, 'language')) {
         case 'PHP':
-          switch (get('callback')) {
+          switch (get(query, 'callback')) {
             case 'readExcel':
             case 'readExcelColumns':
               promises.push(readXLSXFile(query, addResult))
@@ -184,18 +182,19 @@ async function compoundQuery(query, callback) {
   let result = []
   return new Promise(async function (resolve, reject) {
     for (let each of query.querySelectorAll('query')) {
-      if (each.attributes['language']) {
-        switch (each.attributes['language'].value) {
-          case 'PHP':
-            if (each.attributes['callback'].value === 'readExcel')
+      switch (get(each, 'language')) {
+        case 'PHP':
+          switch (get(each, 'callback')) {
+            case 'readExcel':
+            case 'readExcelColumns':
               await readXLSXFile(each, addResult)
-            break
-          case 'PS':
-            await runPSQuery(each, addResult)
-            break
-        }
-      } else {
-        await runSQLQuery(each, addResult)
+          }
+          break
+        case 'PS':
+          await runPSQuery(each, addResult)
+          break
+        default: // SQL
+          await runSQLQuery(each, addResult)
       }
     }
     resolve(callback(result))
@@ -415,7 +414,8 @@ document.getElementById('ExportXLSX').addEventListener('click', _ => {
   DataPanel.querySelectorAll('thead td').forEach(td => aoa[0].push(td.textContent))
   aoa[0].pop() // remove scrollToBottom icon
   for (let row of View.rows)
-    aoa.push(row.data.map(value => value.replace(/<[^>]+>/g, '')))
+    if (row.display)
+      aoa.push(row.data.map(value => value.replace(/<[^>]+>/g, '')))
   let workbook = XLSX.utils.book_new()
   let worksheet = XLSX.utils.aoa_to_sheet(aoa)
   XLSX.utils.book_append_sheet(workbook, worksheet, ViewTitle.textContent.substring(0, 31))
