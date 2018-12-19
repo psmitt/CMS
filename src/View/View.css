@@ -34,24 +34,23 @@ section>header {
   display: none;
   position: absolute;
   top: var(--header-height);
-  right: 5px;
+  right: 0;
   line-height: 1;
   background-color: white;
-  border: solid thin tan;
+  border: ridge thick lightgray;
   border-radius: 5px;
 }
 
 #Tools span {
   display: block;
-  font-size: smaller;
   font-weight: bold;
-  padding: 3px;
-  border-radius: 5px;
+  padding: 5px;
   cursor: pointer;
 }
 
 #Tools span:hover {
   background-color: tan;
+  color: white;
 }
 
 #Data {
