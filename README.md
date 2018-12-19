@@ -1,5 +1,5 @@
 # CMS
-Configuration Management Client
+__Configuration Management Client__
 
 CMS Client is an integrated package of a responsive web application
 and a standalone Electron-based desktop application.
