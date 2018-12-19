@@ -1,7 +1,7 @@
 {
   "name": "cms",
   "productName": "CMS",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Client application for Configuration Management System",
   "main": "src/main.js",
   "scripts": {
