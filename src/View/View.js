@@ -411,10 +411,17 @@ document.getElementById('ReloadData').addEventListener('click', _ => {
 })
 
 document.getElementById('ExportXLSX').addEventListener('click', _ => {
-  var wb = XLSX.utils.table_to_book(View.table, {
-    sheet: "Sheet JS"
-  })
-  return XLSX.writeFile(wb, 'Peti.xlsx')
+  let aoa = [[]]
+  DataPanel.querySelectorAll('thead td').forEach(td => aoa[0].push(td.textContent))
+  aoa[0].pop() // remove scrollToBottom icon
+  for (let row of View.rows)
+    aoa.push(row.data.map(value => value.replace(/<[^>]+>/g, '')))
+  let workbook = XLSX.utils.book_new()
+  let worksheet = XLSX.utils.aoa_to_sheet(aoa)
+  XLSX.utils.book_append_sheet(workbook, worksheet, ViewTitle.textContent.substring(0, 31))
+  return XLSX.writeFile(workbook, IIS ? 'CMS_View.xlsx' : dialog.showSaveDialog(null, {
+    defaultPath: path.join(os.homedir(), 'CMS_View.xlsx')
+  }))
 })
 
 document.getElementById('ClearFilters').addEventListener('click', _ => {
