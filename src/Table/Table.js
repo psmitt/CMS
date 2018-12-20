@@ -1,5 +1,5 @@
 Load['table'] = tablename => {
-  empty(DataPanel)
+  empty(ViewPanel)
   empty(Message)
   Message.appendChild(progressGif)
   readXMLFile('Table', tablename + '.xml', loadView)
@@ -32,8 +32,19 @@ async function loadOptions(xmlDoc) {
   ColumnOptions = []
   let promises = []
   xmlDoc.querySelectorAll('column').forEach((column, index) => {
-    if (column.querySelector('options'))
-      promises.push(getOptions(column.querySelector('options'), index))
+    if (column.querySelector('selection')) {
+      if (column.querySelector('options')) {
+        promises.push(getOptions(column.querySelector('options'), index))
+      } else {
+        ColumnOptions[index] = []
+        if (!Table.fields[get(column, 'field')].required)
+          ColumnOptions[index][''] = ''
+        column.querySelectorAll('option').forEach(option =>
+          ColumnOptions[index][get(option, 'value') || option.textContent] =
+          option.textContent
+        )
+      }
+    }
   })
   return Promise.all(promises)
 

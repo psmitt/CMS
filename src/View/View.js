@@ -1,10 +1,4 @@
-Load['view'] = viewname => {
-  empty(DataPanel)
-  empty(Message)
-  Message.appendChild(progressGif)
-  readXMLFile('View', viewname + '.xml', loadView)
-  showFrame(Section)
-}
+Load['view'] = filename => loadReport('View', filename)
 
 async function loadView(xmlDoc) {
 
@@ -33,7 +27,7 @@ async function loadView(xmlDoc) {
 
     View.columns = 4
 
-    DataPanel.innerHTML = `<table style="width:${1000 + rigthColumnWidth}px">
+    ViewPanel.innerHTML = `<table style="width:${1000 + rigthColumnWidth}px">
                             <colgroup>
                               <col style="width:200px"/>
                               <col style="width:200px"/>
@@ -68,7 +62,7 @@ async function loadView(xmlDoc) {
 
     View.columns = View.titles.length
 
-    DataPanel.innerHTML = `<table>
+    ViewPanel.innerHTML = `<table>
                             <colgroup>
                               <col style="width:${rigthColumnWidth}px">
                             </colgroup>
@@ -80,9 +74,9 @@ async function loadView(xmlDoc) {
                            </table>`
 
     let tableWidth = rigthColumnWidth
-    let colgroup = DataPanel.querySelector('colgroup')
-    let filterRow = DataPanel.querySelectorAll('tr')[0]
-    let titleRow = DataPanel.querySelectorAll('tr')[1]
+    let colgroup = ViewPanel.querySelector('colgroup')
+    let filterRow = ViewPanel.querySelectorAll('tr')[0]
+    let titleRow = ViewPanel.querySelectorAll('tr')[1]
     View.rowTemplate.innerHTML = editorCell
     xmlDoc.querySelectorAll('column').forEach(column => {
       const get = attribute =>
@@ -118,13 +112,13 @@ async function loadView(xmlDoc) {
       tableWidth += parseInt(col.style.width = (get('width') * 1.3 || width) + 'px')
       colgroup.insertBefore(col, colgroup.lastElementChild)
       datacell.style.textAlign = get('align') || align
-      datacell.className = font || get('font')
+      datacell.className = get('font') || font
       View.rowTemplate.insertBefore(datacell, View.rowTemplate.lastElementChild)
     })
-    DataPanel.firstElementChild.style.width = tableWidth + 'px'
+    ViewPanel.firstElementChild.style.width = tableWidth + 'px'
   }
-  View.table = DataPanel.querySelector('table')
-  View.tbody = DataPanel.querySelector('tbody')
+  View.table = ViewPanel.querySelector('table')
+  View.tbody = ViewPanel.querySelector('tbody')
 
   if (View.isTable) {
     /*
@@ -269,7 +263,7 @@ function filterData() {
   empty(Message)
   Message.appendChild(progressGif)
   let filters = []
-  DataPanel.querySelectorAll('thead input').forEach((input, index) => {
+  ViewPanel.querySelectorAll('thead input').forEach((input, index) => {
     if (input.value)
       filters.push({
         column: index,
@@ -298,9 +292,9 @@ function filterData() {
   scrollToTop()
 }
 
-DataPanel.addEventListener('input', filterData)
+ViewPanel.addEventListener('input', filterData)
 
-DataPanel.addEventListener('click', event => { // SORT DATA
+ViewPanel.addEventListener('click', event => { // SORT DATA
   if (event.target.matches('thead td') && !getSelection().toString()) {
     let i = event.target.cellIndex
     if (i < View.columns) {
@@ -330,7 +324,7 @@ function scrollToTop() {
   View.last = -1
   appendRow()
   View.first = View.last
-  while (screenSize > View.table.offsetHeight - DataPanel.scrollTop && appendRow());
+  while (screenSize > View.table.offsetHeight - ViewPanel.scrollTop && appendRow());
 }
 
 function scrollToBottom() {
@@ -341,7 +335,7 @@ function scrollToBottom() {
   prependRow()
   View.last = View.first
   while (View.table.offsetHeight < screenSize && prependRow());
-  DataPanel.scrollTop = View.table.offsetHeight
+  ViewPanel.scrollTop = View.table.offsetHeight
 }
 
 function appendRow() { // return success
@@ -385,9 +379,9 @@ function prependRow() { // return success
   return false
 }
 
-DataPanel.addEventListener('scroll', _ => {
-  while ((screenSize > DataPanel.scrollTop && prependRow()) ||
-    (View.table.offsetHeight - DataPanel.scrollTop < screenSize && appendRow()));
+ViewPanel.addEventListener('scroll', _ => {
+  while ((screenSize > ViewPanel.scrollTop && prependRow()) ||
+    (View.table.offsetHeight - ViewPanel.scrollTop < screenSize && appendRow()));
 })
 
 /* HEADER TOOLS */
@@ -406,12 +400,15 @@ Tools.addEventListener('click', _ =>
 )
 
 document.getElementById('ReloadData').addEventListener('click', _ => {
-  reloadData()
+  if (TreePanel.style.display === 'block')
+    Load['tree'](Tree.filename)
+  if (ViewPanel.style.display === 'block')
+    reloadData()
 })
 
 document.getElementById('ExportXLSX').addEventListener('click', _ => {
   let aoa = [[]]
-  DataPanel.querySelectorAll('thead td').forEach(td => aoa[0].push(td.textContent))
+  ViewPanel.querySelectorAll('thead td').forEach(td => aoa[0].push(td.textContent))
   aoa[0].pop() // remove scrollToBottom icon
   for (let row of View.rows)
     if (row.display)
@@ -425,6 +422,12 @@ document.getElementById('ExportXLSX').addEventListener('click', _ => {
 })
 
 document.getElementById('ClearFilters').addEventListener('click', _ => {
-  DataPanel.querySelectorAll('thead input').forEach(input => input.value = '')
-  filterData()
+  if (TreePanel.style.display === 'block') {
+    TreeSearch.value = ''
+    TreeSearch.dispatchEvent(new Event('input'))
+  }
+  if (ViewPanel.style.display === 'block') {
+    ViewPanel.querySelectorAll('thead input').forEach(input => input.value = '')
+    filterData()
+  }
 })

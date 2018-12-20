@@ -24,12 +24,20 @@ const Task = {
   scrollPosition: 0
 }
 
+// TREE
+const TreePanel = document.getElementById('TreePanel')
+const TreeSearch = document.getElementById('TreeSearch')
+const Tree = {
+  filename: ''
+}
+
+
 // VIEW
 const ViewTitle = document.getElementById('ViewTitle')
 const Message = document.getElementById('Message')
 const Tool = document.getElementById('Tool')
 const Tools = document.getElementById('Tools')
-const DataPanel = document.getElementById('Data')
+const ViewPanel = document.getElementById('ViewPanel')
 
 const progressGif = document.createElement('img')
 progressGif.src = 'View/progress.gif'
@@ -94,4 +102,16 @@ function xlsxToArray(xlsx, columns) {
     result.push(row)
   }
   return result
+}
+
+function loadReport(type, filename) {
+  while (TreePanel.lastElementChild !== document.getElementById('TreeSearch'))
+    TreePanel.removeChild(TreePanel.lastElementChild)
+  empty(ViewPanel)
+  TreePanel.style.display = type === 'Tree' ? 'block' : 'none'
+  ViewPanel.style.display = type === 'View' ? 'block' : 'none'
+  empty(Message)
+  Message.appendChild(progressGif)
+  readXMLFile(type, filename + '.xml', type === 'Tree' ? loadTree : loadView)
+  showFrame(Section)
 }

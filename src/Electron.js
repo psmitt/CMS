@@ -142,12 +142,14 @@ async function readXLSXFile(query, callback) {
 
 async function readXMLFile(folder, filename, callback) {
   return new Promise((resolve, reject) => {
-    fs.readFile(path.join(XMLRootDirectory, folder, filename), 'utf8', (error, xmlString) => {
-      if (error) throw error
-      resolve(callback(new DOMParser().parseFromString(
-        xmlString.charCodeAt(0) === 0xFEFF ? // BOM
-        xmlString.substring(1) : xmlString, 'text/xml')))
-    })
+    let specific = path.join(XMLRootDirectory, folder, filename).replace(/\.xml/, '_Electron.xml')
+    fs.readFile(fs.existsSync(specific) ? specific :
+      path.join(XMLRootDirectory, folder, filename), 'utf8', (error, xmlString) => {
+        if (error) throw error
+        resolve(callback(new DOMParser().parseFromString(
+          xmlString.charCodeAt(0) === 0xFEFF ? // BOM
+          xmlString.substring(1) : xmlString, 'text/xml')))
+      })
   })
 }
 
@@ -324,14 +326,13 @@ function queryResultToArray(result) {
     let packet = result[row]
     let dataRow = []
     for (let data in packet) {
-      if (packet[data]) {
-        if (packet[data] instanceof Date)
-          dataRow.push(normalize(packet[data]))
-        else
-          dataRow.push(packet[data].toString())
-      } else { // null or emtpy string
+      if (packet[data] === null ||
+        (typeof packet[data] === 'object' && !Object.keys(packet[data]).length))
         dataRow.push('')
-      }
+      else if (packet[data] instanceof Date)
+        dataRow.push(normalize(packet[data]))
+      else
+        dataRow.push(packet[data].toString())
     }
     result[row] = dataRow
   }

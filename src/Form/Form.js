@@ -64,19 +64,15 @@ async function getField(column) {
     return Options[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
-    Options[name].editor = `<input list="${name}-options" ${inputName}
-                             onfocus="focusDatalist(this)"
-                             ontouchstart="console.log(event)"
-                             ontouchend="console.log(event)"
-                             ontouchcancel="console.log(event)"
-                             ontouchmove="console.log(event)"
-                             onkeydown="switch(event.key){
-                               case'Escape':case'Enter':validateDatalist(this)}"
-                             onblur="validateDatalist(this)"/>
-                            <datalist id="${name}-options">`
     let options = column.querySelector('options')
     if (options) {
-      let get = element => options.querySelector(element).textContent
+      Options[name].editor = `<input list="${name}-options" ${inputName}
+                               onfocus="focusDatalist(this)"
+                               onkeydown="switch(event.key){
+                                 case'Escape':case'Enter':validateDatalist(this)}"
+                               onblur="validateDatalist(this)"/>
+                              <datalist id="${name}-options">`
+      const get = element => options.querySelector(element).textContent
       let query = document.createElement('query')
       query.textContent = `SELECT ${get('value')}, ${get('text')}
                            FROM ${get('from')}
@@ -92,10 +88,15 @@ async function getField(column) {
       })
     } else {
       Options[name].editor = `<select ${inputName}/>`
+
+      if (get(column, 'required') !== 'yes' &&
+        (!Table.fields[get('field')] || !Table.fields[get('field')].required))
+        Options[name].editor += '<option></option>'
+
       column.querySelectorAll('option').forEach(option =>
         Options[name].editor += `<option
-          value="${get(option, 'value') || option.textContent}"
-          >${option.textContent}</option>`
+            value="${get(option, 'value') || option.textContent}"
+            >${option.textContent}</option>`
       )
       return Options[name].editor += '</select>'
     }

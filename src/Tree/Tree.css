@@ -1,0 +1,27 @@
+#TreePanel {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+#TreeSearch {
+  height: 1.5em;
+  padding-left: 1.5em;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+#TreePanel div div {
+  white-space: nowrap;
+  margin-left: 30px;
+}
+
+#TreePanel img {
+  margin: 7px;
+  margin-bottom: 12px;
+  vertical-align: middle;
+}
+
+#TreePanel .collapsed>img {
+  box-shadow: 0 0 5px 5px skyblue;
+}

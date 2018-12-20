@@ -6,11 +6,11 @@ nav>header {
   text-align: center;
 }
 
-#Search {
+#Search, #TreeSearch {
   height: calc(100% - 2 * var(--menu-padding));
   width: calc(100% - 2 * var(--menu-padding));
   border-radius: var(--menu-padding);
-  background-image: url('magnifier_glass.svg');
+  background-image: url('../magnifier_glass.svg');
   background-size: auto 61.8%;
   background-position: 7px center;
   background-repeat: no-repeat;

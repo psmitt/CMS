@@ -32,8 +32,10 @@ foreach($_POST as $post_key => $post_value) {
             break;
 
         case 'readXMLFile':
+            $specific = str_replace('.xml', '_IIS.xml', "$xmlroot/$_SESSION[country]/$post_value");
             $bom = pack('H*','EFBBBF');
-            echo preg_replace("/^$bom/", '', file_get_contents("$xmlroot/$_SESSION[country]/$post_value"));
+            echo preg_replace("/^$bom/", '', file_get_contents(
+              file_exists($specific) ? $specific : "$xmlroot/$_SESSION[country]/$post_value"));
             break;
 
         case 'runPSQuery':
