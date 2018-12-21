@@ -7,9 +7,11 @@ async function loadTree(xmlDoc) {
   let divs = []
   xmlDoc.querySelectorAll('query').forEach(query => {
     promises.push(runSQLQuery(query, result => {
-      let items = {}
+      let items = []
+      let order = 0
       for (let row of result) {
         let item = {
+          index: order++,
           parent_title: row[1],
           parent_id: row[2]
         }
@@ -42,10 +44,24 @@ async function loadTree(xmlDoc) {
     let span = document.createElement('span')
     span.innerHTML = tree.attributes.getNamedItem('item').value
     root.appendChild(span)
+
+    let wrong = document.createElement('div')
+    img = document.createElement('img')
+    img.src = 'Tree/Topography_red.png'
+    wrong.appendChild(img)
+    span = document.createElement('span')
+    span.innerHTML = '<b style="color:red">Nem besorolható!</b>'
+    wrong.appendChild(span)
+    root.appendChild(wrong)
+
     xmlDoc.querySelectorAll('query').forEach(query => {
-      for (let item of Object.values(divs[get(query, 'title')])) {
-        if (item.parent_title && divs[item.parent_title][item.parent_id]) {
-          divs[item.parent_title][item.parent_id].div.appendChild(item.div)
+      for (let item of Object.values(divs[get(query, 'title')]
+          .sort((a, b) => a.index > b.index ? 1 : -1))) {
+        if (item.parent_title) {
+          if (divs[item.parent_title][item.parent_id])
+            divs[item.parent_title][item.parent_id].div.appendChild(item.div)
+          else
+            wrong.appendChild(item.div)
         } else
           root.appendChild(item.div)
       }
