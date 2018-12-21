@@ -66,7 +66,8 @@ var Options = {} // input field name -> [value -> text]
 
 // TABLE
 var Table = {
-  name: '', // XML file name
+  filename: '', // XML file name
+  name: '',
   record: null, // the actual row to edit in View.rows
   clause: [], // record identifier conditions for DELETE and UPDATE
   fields: [] // field name -> { type, required, disabled }
@@ -105,11 +106,11 @@ function xlsxToArray(xlsx, columns) {
 }
 
 function loadReport(type, filename) {
-  while (TreePanel.lastElementChild !== document.getElementById('TreeSearch'))
+  while (TreePanel.lastElementChild !== TreePanel.firstElementChild)
     TreePanel.removeChild(TreePanel.lastElementChild)
   empty(ViewPanel)
   TreePanel.style.display = type === 'Tree' ? 'block' : 'none'
-  ViewPanel.style.display = type === 'View' ? 'block' : 'none'
+  ViewPanel.style.display = type === 'Tree' ? 'none' : 'block'
   empty(Message)
   Message.appendChild(progressGif)
   readXMLFile(type, filename + '.xml', type === 'Tree' ? loadTree : loadView)

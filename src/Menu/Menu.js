@@ -14,31 +14,41 @@ function loadMenuFiles() {
 
 function appendSubMenu(subMenu, parentMenu) {
   let node = document.createElement('div')
-  let title = document.createElement('span')
-  title.innerHTML = get(subMenu, 'title')
   if (subMenu.children.length) {
+    let title = document.createElement('span')
+    title.textContent = get(subMenu, 'title')
     title.classList.add('branch')
     title.classList.add('expanded')
     node.appendChild(title)
     for (let item of subMenu.children)
       appendSubMenu(item, node)
   } else {
-    title.classList.add('item')
-    let menu_class = get(subMenu, 'class')
-    let menu_order = get(subMenu, 'order')
-    if (menu_class && menu_order) {
-      title.classList.add(menu_class)
-      if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {
-        menu_class = 'form'
-        menu_order = menu_order.charAt(13).toUpperCase() +
-          menu_order.substring(14, menu_order.lastIndexOf('.'))
-      }
-      title.onclick = event => {
+    node.appendChild(createMenuItem('span', subMenu))
+  }
+  parentMenu.appendChild(node)
+}
+
+function createMenuItem(type, fromNode) { // type == 'span' or 'button'
+  let item = document.createElement(type)
+  item.classList.add('item')
+  item.textContent = get(fromNode, 'title')
+  let menu_class = get(fromNode, 'class')
+  let menu_order = get(fromNode, 'order')
+  if (menu_class && menu_order) {
+    item.classList.add(menu_class)
+    if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {
+      menu_class = 'form'
+      menu_order = menu_order.charAt(13).toUpperCase() +
+        menu_order.substring(14, menu_order.lastIndexOf('.'))
+    }
+    item.onclick = type === 'button' && menu_class === 'task' ? // subtask?
+      event => saveTask().then(id => Load['task'](menu_order, id)) :
+      event => {
         if (event.ctrlKey) {
           if (Electron) {
             ipc.send('New Window',
               `Load['${menu_class}']('${menu_order}');
-               shrinkNavigationFrame();`)
+             shrinkNavigationFrame();`)
           } else { // IIS
             Load['link'](`index.php?${menu_class}=${menu_order}`)
           }
@@ -46,10 +56,8 @@ function appendSubMenu(subMenu, parentMenu) {
           Load[menu_class](menu_order)
         }
       }
-    }
-    node.appendChild(title)
   }
-  parentMenu.appendChild(node)
+  return item
 }
 
 function setBranchIcons(root) {
@@ -113,14 +121,11 @@ Search.addEventListener('input', _ => {
   all('span').forEach(span => span.classList.remove('hit'))
   let term = Search.value.trim()
   if (term) {
-    let words = term.split(' ').map(word => new RegExp(word, 'i'))
-    let pattern = new RegExp('(' + term.replace(/ /g, '|') + ')', 'ig')
+    let matchAll = new RegExp('(?=.*' + term.replace(/ /g, ')(?=.*') + ')', 'i')
+    let matchAny = new RegExp('(' + term.replace(/ /g, '|') + ')', 'ig')
     for (let span of all('.branch, .item')) {
-      let text = span.textContent
-      let hit = true
-      for (let word of words)
-        hit = hit && word.test(text)
-      span.innerHTML = hit ? text.replace(pattern, '<mark>$1</mark>') : text
+      span.innerHTML = matchAll.test(span.textContent) ?
+        span.textContent.replace(matchAny, '<mark>$1</mark>') : span.textContent
     }
     for (let mark of all('mark')) {
       mark = mark.parentNode // span

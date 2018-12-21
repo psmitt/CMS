@@ -53,14 +53,14 @@ section>header {
   color: white;
 }
 
-#Data {
+#ViewPanel {
   overflow-x: auto;
   overflow-y: scroll;
   font-size: smaller;
 }
 
-#Data th:last-child,
-#Data td:last-child {
+#ViewPanel th:last-child,
+#ViewPanel td:last-child {
   z-index: 6;
   transform: translate3d(0,0,0);
   position: sticky;
@@ -75,16 +75,16 @@ section>header {
   border:none;
 }
 
-#Data th:last-child:hover,
-#Data td:last-child:hover,
-#Data th:last-child:active,
-#Data td:last-child:active {
+#ViewPanel th:last-child:hover,
+#ViewPanel td:last-child:hover,
+#ViewPanel th:last-child:active,
+#ViewPanel td:last-child:active {
   background-color: gray;
   color: white;
 }
 
-#Data thead th, /* filter row */
-#Data thead td {/* title row */
+#ViewPanel thead th, /* filter row */
+#ViewPanel thead td {/* title row */
   background-color: var(--grid-color);
   z-index: 7;
   transform: translate3d(0,0,0);
@@ -93,27 +93,27 @@ section>header {
   top: 0;
 }
 
-#Data thead th:last-child,
-#Data thead td:last-child {
+#ViewPanel thead th:last-child,
+#ViewPanel thead td:last-child {
   z-index: 7;
 }
 
-#Data thead td {/* title row */
+#ViewPanel thead td {/* title row */
   top: 32px;
   font-weight: bold;
   padding-left: var(--title-padding);
   white-space: nowrap;
 }
 
-#Data input {
+#ViewPanel input {
   padding-left: calc(var(--title-padding) - 2px);
 }
 
-#Data input::placeholder {
+#ViewPanel input::placeholder {
   color: lightgray;
 }
 
-#Data tbody td {
+#ViewPanel tbody td {
   border: solid thin var(--grid-color);
   vertical-align: top;
   padding-left: calc(var(--title-padding) - 2px);
@@ -124,25 +124,24 @@ section>header {
   word-wrap: break-word;
 }
 
-#Data .mono {
+#ViewPanel .mono {
   font-family: "Nova Mono", monospace;
   padding-top: 4px;
 }
 
-#Data .sortedUp,
-#Data .sortedDown {
+#ViewPanel .sortedUp,
+#ViewPanel .sortedDown {
   background-position: right center;
   background-repeat: no-repeat;
 }
-
-#Data .sortedUp {
+#ViewPanel .sortedUp {
   background-image: url('sortedUp.svg');
 }
-#Data .sortedDown {
+#ViewPanel .sortedDown {
   background-image: url('sortedDown.svg');
 }
 
-#Data mark {
+#ViewPanel mark {
   background-color: inherit;
   color: red;
 }

@@ -87,7 +87,7 @@ foreach($_POST as $post_key => $post_value) {
                 $result = SQL($parameters->query, $result_list);
               stringify($result_list);
             }
-            echo json_encode($result_list);
+            echo empty($result_list) ? "{\"insertId\":$result[1]}" : json_encode($result_list);
             break;
     }
 }

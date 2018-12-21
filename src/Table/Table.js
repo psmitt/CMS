@@ -1,10 +1,4 @@
-Load['table'] = tablename => {
-  empty(ViewPanel)
-  empty(Message)
-  Message.appendChild(progressGif)
-  readXMLFile('Table', tablename + '.xml', loadView)
-  showFrame(Section)
-}
+Load['table'] = filename => loadReport('Table', Table.filename = filename)
 
 async function tableQuery(xmlDoc) { // return [<query>SQL</query>]
   let fields = []
@@ -82,7 +76,7 @@ async function editRecord(record) {
   Table.record = record
   Table.clause = []
   empty(FormTable)
-  await readXMLFile('Table', Table.name + '.xml', loadForm)
+  await readXMLFile('Table', Table.filename + '.xml', loadForm)
   Object.keys(Table.fields).forEach((name, index) => {
     if (!Table.fields[name].disabled) {
       let input = FormTable.querySelector(`[name="${name}"]`)

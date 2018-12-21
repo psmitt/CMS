@@ -342,5 +342,6 @@ Load['link'] = URL => {
   if (URL.indexOf('HUN/') >= 0)
     shell.openItem(URL.replace('HUN', path.join(XMLRootDirectory, 'File')))
   else
-    shell.openExternal(URL)
+    open(URL, '_blank')
+  //shell.openExternal(URL)
 }

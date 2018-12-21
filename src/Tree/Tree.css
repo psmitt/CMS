@@ -4,10 +4,12 @@
   overflow-y: auto;
 }
 
+#TreePanel header {
+  background-color: white;
+}
+
 #TreeSearch {
-  height: 1.5em;
   padding-left: 1.5em;
-  margin-bottom: 5px;
   width: 100%;
 }
 
@@ -24,4 +26,8 @@
 
 #TreePanel .collapsed>img {
   box-shadow: 0 0 5px 5px skyblue;
+}
+
+cite {
+  font-style: normal;
 }

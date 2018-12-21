@@ -91,3 +91,8 @@ span.close {
   right: 0.5em;
   cursor: pointer;
 }
+
+a {
+  text-decoration: none;
+  color: royalblue;
+}

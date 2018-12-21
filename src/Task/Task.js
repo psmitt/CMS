@@ -81,16 +81,8 @@ function appendStep(step, parent) {
         text = text.replace('src="HUN/img/',
           'src="' + path.join(XMLRootDirectory, 'File', 'img', ' ').trimEnd())
       span.innerHTML = text + '&ensp;'
-      while ((child = child.nextElementSibling) && child.tagName === 'button') {
-        let button = document.createElement('button')
-        let menu_class = get(child, 'class')
-        let menu_order = get(child, 'order')
-        button.textContent = get(child, 'title')
-        button.onclick = menu_class === 'task' ?
-          _ => saveTask().then(id => Load['task'](menu_order, id)) :
-          _ => Load[menu_class](menu_order)
-        span.insertAdjacentElement('beforeend', button)
-      }
+      while ((child = child.nextElementSibling) && child.tagName === 'button')
+        span.insertAdjacentElement('beforeend', createMenuItem('button', child))
       node.appendChild(span)
       while (child) {
         appendStep(child, node)
@@ -194,7 +186,7 @@ function deleteTask() {
   if (Task.id) {
     let query = document.createElement('query')
     query.textContent = `DELETE FROM subtask WHERE subtask_id = ${Task.id}`
-    runSQLQuery(query, result => console.log(result))
+    runSQLQuery(query, result => null)
     Task.id = 0
   }
 }
