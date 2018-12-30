@@ -43,3 +43,10 @@ aside [type="submit"] {
   font-size: x-large;
   font-weight: bold;
 }
+
+aside form .feedback td {
+  padding: 0;
+  padding-left: 4em;
+  font-size: large;
+  font-style: italic;
+}

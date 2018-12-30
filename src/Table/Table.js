@@ -15,11 +15,9 @@ async function tableQuery(xmlDoc) { // return [<query>SQL</query>]
       orders.push(get(order, 'field') + ' ' + get(order, 'way')))
     SQL += ' ORDER BY ' + orders.join(',')
   }
-  let query = document.createElement('query')
-  query.textContent = SQL + ' LIMIT 0'
-  await runSQLQuery(query, result => Table.fields = result, Table.name)
-  query.textContent = SQL
-  return [query]
+  await runSQLQuery(myQuery(SQL + ' LIMIT 0'),
+    result => Table.fields = result, Table.name)
+  return [myQuery(SQL)]
 }
 
 async function loadOptions(xmlDoc) {
@@ -44,21 +42,21 @@ async function loadOptions(xmlDoc) {
 
   async function getOptions(options, index) { // unfiltered options
     let get = selector => options.querySelector(selector).textContent
-    let query = document.createElement('query')
-    query.textContent = `SELECT ${get('value')}, ${get('text')}
-                         FROM ${get('from')}
-                         ORDER BY ${get('text')}`
-    let filteredQuery = document.createElement('query')
-    filteredQuery.textContent = `SELECT ${get('value')}, ${get('text')}
-                                 FROM ${get('from')}
-                                 ${options.querySelector('filter') ?
-                                'WHERE ' + get('filter') : ''}
-                                 ORDER BY ${get('text')}`
     ColumnOptions[index] = []
-    await runSQLQuery(filteredQuery, result => {
+    await runSQLQuery(myQuery(
+      `SELECT ${get('value')}, ${get('text')}
+       FROM ${get('from')}
+       ${options.querySelector('filter') ?
+      'WHERE ' + get('filter') : ''}
+       ORDER BY ${get('text')}`
+    ), result => {
       result.forEach(option => ColumnOptions[index][option[0]] = option[1])
     })
-    return runSQLQuery(query, result => {
+    return runSQLQuery(myQuery(
+      `SELECT ${get('value')}, ${get('text')}
+       FROM ${get('from')}
+       ORDER BY ${get('text')}`
+    ), result => {
       result.forEach(option => {
         if (!ColumnOptions[index][option[0]])
           ColumnOptions[index][option[0]] = `<mark>${option[1]}</mark>`
@@ -99,9 +97,9 @@ async function editRecord(record) {
 }
 
 function deleteRecord(record) {
-  let query = document.createElement('query')
-  query.textContent = `DELETE FROM ${Table.name} WHERE ${Table.clause.join(' AND ')}`
-  runSQLQuery(query, result => {
+  runSQLQuery(myQuery(
+    `DELETE FROM ${Table.name} WHERE ${Table.clause.join(' AND ')}`
+  ), result => {
     if (result.affectedRows === 1) {
       if (record.tr)
         View.tbody.removeChild(record.tr)
@@ -132,11 +130,11 @@ function saveRecord(record) {
       newRow.children[i].innerHTML = field.value
     }
   }
-  let query = document.createElement('query')
-  query.textContent = `UPDATE ${Table.name}
-                       SET ${newValues.join(',')}
-                       WHERE ${Table.clause.join(' AND ')}`
-  runSQLQuery(query, result => {
+  runSQLQuery(myQuery(
+    `UPDATE ${Table.name}
+     SET ${newValues.join(',')}
+     WHERE ${Table.clause.join(' AND ')}`
+  ), result => {
     if (result.affectedRows === 1 && result.changedRows === 1) {
       Object.keys(Table.fields).forEach((name, index) => {
         if (!Table.fields[name].disabled) {

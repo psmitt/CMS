@@ -6,47 +6,60 @@ Load['form'] = formname => {
 
 async function loadForm(xmlDoc) {
   FormTitle.innerHTML = get(xmlDoc.firstElementChild, 'title')
-  Options = []
+  FormFields = []
   for (element of xmlDoc.querySelectorAll('column, button, submit')) {
     if (element.matches('column')) {
       let field = get(element, 'field')
       if (View.isTable && Table.fields[field].disabled) continue;
       await getField(element)
       let label = document.createElement('tr')
-      label.innerHTML = `<th>${Options[field].label}</th>`
+      label.innerHTML = `<th>${FormFields[field].label}</th>`
       FormTable.appendChild(label)
       let editor = document.createElement('tr')
-      editor.innerHTML = `<td>${Options[field].editor}</td>`
+      editor.innerHTML = `<td>${FormFields[field].editor}</td>`
       FormTable.appendChild(editor)
+      // BLUR WHEN DATALIST CHANGE
+      if (element.querySelector('options')) {
+        let inputField = editor.querySelector('input')
+        let formElements = document.querySelector('aside form').elements
+        let i = 0
+        while (formElements[i++] !== inputField);
+        inputField.addEventListener('change', _ => formElements[i].focus())
+      }
     } else {
       let button = document.createElement('tr')
       button.innerHTML =
         `<td style="padding-right:0">
           <input type="${element.tagName}" value="${get(element, 'title') || 'Submit'}"/>
         </td>`
-      if (get(element, 'language') === 'JS')
-        button.onclick = element.textContent
-      else
-        button.addEventListener('click', event => {
+      let objectToListen = button
+      let eventToListen = 'click'
+      if (element.tagName === 'submit') {
+        objectToListen = document.querySelector('aside form')
+        eventToListen = 'submit'
+      }
+      if (get(element, 'language') === 'JS') {
+        objectToListen.setAttribute('on' + eventToListen, element.textContent)
+      } else {
+        objectToListen.addEventListener(eventToListen, event => {
           let callback = get(element, 'callback') || (result => console.log(result))
           let command = element.textContent
           for (field of document.querySelector('aside form').elements) {
-            if (field.name) {
-              let value = `'${field.value}'`
-              if (field.value && field.list)
-                value = document.getElementById(field.list.id)
-                .querySelector(`option[value="${field.value}"]`).dataset.value
-              command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'), value)
-            }
+            if (field.name)
+              command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
+                getFieldValue(field))
           }
-          let query = document.createElement('query')
-          query.textContent = command
-          runSQLQuery(query, callback)
+          runSQLQuery(myQuery(command), callback)
         })
+      }
       FormTable.appendChild(button)
     }
   }
 }
+
+const getFieldValue = field => field.value && field.list ?
+  document.getElementById(field.list.id).querySelector(
+    `option[value="${field.value}"]`).dataset.value : `'${field.value}'`
 
 async function getField(column) {
   let get = attribute =>
@@ -54,64 +67,66 @@ async function getField(column) {
     column.attributes[attribute].value : ''
 
   let name = get('field')
+  let onchange = column.querySelector('onchange')
   let inputName = `name="${name}"` +
-    (get('required') === 'yes' || (View.isTable && Table.fields[name].required) ? ' required' : '')
+    (get('required') === 'yes' || (View.isTable && Table.fields[name].required) ? ' required' : '') +
+    (onchange ? ` onchange="${onchange.textContent}"` : '')
 
-  Options[name] = {
+  FormFields[name] = {
     label: get('title') || get('field')
   }
   if (get('multiline') === 'yes' || (View.isTable && Table.fields[name].type === 'multiline'))
-    return Options[name].editor = `<textarea ${inputName}></textarea>`
+    return FormFields[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
     let options = column.querySelector('options')
     if (options) {
-      Options[name].editor = `<input list="${name}-options" ${inputName}
+      FormFields[name].editor = `<input list="${name}-options" ${inputName}
                                onfocus="focusDatalist(this)"
                                onkeydown="switch(event.key){
                                  case'Escape':case'Enter':validateDatalist(this)}"
                                onblur="validateDatalist(this)"/>
                               <datalist id="${name}-options">`
       const get = element => options.querySelector(element).textContent
-      let query = document.createElement('query')
-      query.textContent = `SELECT ${get('value')}, ${get('text')}
-                           FROM ${get('from')}
-                           ${options.querySelector('filter') ?
-                          'WHERE ' + get('filter') : ''}
-                           ORDER BY ${get('text')}`
-      return runSQLQuery(query, result => {
-        result.forEach(option => Options[name].editor +=
+      return runSQLQuery(myQuery(
+        `SELECT ${get('value')}, ${get('text')}
+         FROM ${get('from')}
+         ${options.querySelector('filter') ?
+        'WHERE ' + get('filter') : ''}
+         ORDER BY ${get('text')}`
+      ), result => {
+        result.forEach(option => FormFields[name].editor +=
           `<option data-value="${option[0]}"
             value="${option[1].replace(/"/g, '&quot;')}"/>`
         )
-        Options[name].editor += '</datalist>'
+        FormFields[name].editor += '</datalist>'
       })
     } else {
-      Options[name].editor = `<select ${inputName}/>`
+      FormFields[name].editor = `<select ${inputName}/>`
 
       if (get(column, 'required') !== 'yes' &&
         (!Table.fields[get('field')] || !Table.fields[get('field')].required))
-        Options[name].editor += '<option></option>'
+        FormFields[name].editor += '<option></option>'
 
       column.querySelectorAll('option').forEach(option =>
-        Options[name].editor += `<option
+        FormFields[name].editor += `<option
             value="${get(option, 'value') || option.textContent}"
             >${option.textContent}</option>`
       )
-      return Options[name].editor += '</select>'
+      return FormFields[name].editor += '</select>'
     }
   }
 
   if (View.isTable && Table.fields[name].type === 'enum') {
-    let query = document.createElement('query')
-    query.textContent = `SHOW COLUMNS FROM ${Table.name}
-                         WHERE FIELD = '${name}'`
-    return runSQLQuery(query, result => {
-      Options[name].editor = `<select ${inputName}/>`
+    return runSQLQuery(myQuery(
+      `SHOW COLUMNS FROM ${Table.name}
+       WHERE FIELD = '${name}'`
+    ), result => {
+      FormFields[name].editor = `<select ${inputName}/>`
       result[0][1].match(/^enum\('(.*)'\)$/)[1].split("','").forEach(option =>
-        Options[name].editor += `<option>${option}</option>`
+        FormFields[name].editor += `<option>${option}</option>`
       )
-      Options[name].editor += '</select>'
+      FormFields[name].editor += '</select>'
     })
   }
 
@@ -121,23 +136,23 @@ async function getField(column) {
     type = 'date'
   switch (type) {
     case '':
-      Options[name].editor = `<input ${inputName}/>`
+      FormFields[name].editor = `<input ${inputName}/>`
       break;
     case 'email':
     case 'url':
     case 'number':
     case 'date':
-      Options[name].editor = `<input type="${type}" ${inputName}/>`
+      FormFields[name].editor = `<input type="${type}" ${inputName}/>`
       break;
     case 'datum':
-      Options[name].editor = `<input type="date" ${inputName}/>`
+      FormFields[name].editor = `<input type="date" ${inputName}/>`
       break;
     case 'datetime':
     case 'time':
-      Options[name].editor = `<input type="datetime-local" ${inputName}/>`
+      FormFields[name].editor = `<input type="datetime-local" ${inputName}/>`
       break;
     default:
-      Options[name].editor = `<input pattern="${type}" ${inputName}/>`
+      FormFields[name].editor = `<input pattern="${type}" ${inputName}/>`
       break;
   }
 }
@@ -163,4 +178,23 @@ function validateDatalist(input) {
   if (!document.getElementById(input.list.id)
     .querySelector(`option[value="${input.value.replace(/"/g, '\\"')}"]`))
     input.value = ''
+}
+
+// display feedback lines after input field
+function formFeedback(input, lines) {
+  let tr = input.parentNode.parentNode
+  let tbody = tr.parentNode
+  while (tr.nextElementSibling && tr.nextElementSibling.className === 'feedback')
+    tbody.removeChild(tr.nextElementSibling)
+  const insertRow = tr.nextElementSibling ?
+    row => tbody.insertBefore(row, tr.nextElementSibling) :
+    row => tbody.appendChild(row)
+  for (let line of lines) {
+    let feedback = document.createElement('tr')
+    feedback.className = 'feedback'
+    let td = document.createElement('td')
+    td.innerHTML = line
+    feedback.appendChild(td)
+    insertRow(feedback)
+  }
 }

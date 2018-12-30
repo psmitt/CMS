@@ -51,10 +51,11 @@ function createMenuItem(type, fromNode) { // type == 'span' or 'button'
   }
   if (menu_class && menu_order) {
     item.classList.add(menu_class)
-    if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {
+    if (menu_class === 'link' && /^\w+\/php\/Form_/.test(menu_order)) {
       menu_class = 'form'
-      menu_order = menu_order.charAt(13).toUpperCase() +
-        menu_order.substring(14, menu_order.lastIndexOf('.'))
+      menu_order = menu_order.replace(/^\w+\/php\/Form_/, '')
+      menu_order = menu_order.charAt(0).toUpperCase() +
+        menu_order.substring(1, menu_order.lastIndexOf('.'))
     }
     item.onclick = type === 'button' && menu_class === 'task' ? // subtask?
       event => saveTask().then(id => Load['task'](menu_order, id)) :

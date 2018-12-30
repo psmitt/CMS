@@ -22,14 +22,7 @@ async function post(parameter, value, callback) {
 document.addEventListener('DOMContentLoaded', async function () {
   await post('getUserName', '', response => UserName = response)
   loadMenuFiles()
-
-  // cleanup subtask table
-  let query = document.createElement('query')
-  query.textContent = `DELETE FROM subtask WHERE subtask_id NOT IN
-                      (SELECT task_id FROM task) AND subtask_opentime <
-                      ${Math.floor(Date.now() / 1000) - 1000000}`
-  runSQLQuery(query, result => null)
-
+  cleanupSubtasks()
   post('getTitle', '', response => document.title = response)
 })
 

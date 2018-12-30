@@ -33,7 +33,6 @@ const Tree = {
   filename: ''
 }
 
-
 // VIEW
 const ViewTitle = document.getElementById('ViewTitle')
 const Message = document.getElementById('Message')
@@ -64,7 +63,7 @@ const rigthColumnWidth = 47
 // FORM
 const FormTitle = document.getElementById('FormTitle')
 const FormTable = document.querySelector('form > table')
-var Options = {} // input field name -> [value -> text]
+var FormFields = [] // input field name -> {label, editor}
 
 // TABLE
 var Table = {
@@ -85,6 +84,19 @@ function empty(node) {
 
 function get(node, attribute) {
   return node.attributes[attribute] ? node.attributes[attribute].value : ''
+}
+
+function myQuery(text) {
+  let query = document.createElement('query')
+  query.textContent = text
+  return query
+}
+
+function cleanupSubtasks() {
+  runSQLQuery(myQuery(
+    `DELETE FROM subtask WHERE subtask_id NOT IN
+     (SELECT task_id FROM task) AND subtask_opentime <
+     ${Math.floor(Date.now() / 1000) - 1000000}`), _ => 0)
 }
 
 function xlsxToArray(xlsx, columns) {

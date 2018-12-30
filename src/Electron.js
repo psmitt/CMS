@@ -112,12 +112,7 @@ function changeMySQLDatabase(server) {
         if (oldPool)
           currentWindow.loadFile('src/index.html')
 
-        // cleanup subtask table
-        let query = document.createElement('query')
-        query.textContent = `DELETE FROM subtask WHERE subtask_id NOT IN
-                            (SELECT task_id FROM task) AND subtask_opentime <
-                            ${Math.floor(Date.now() / 1000) - 1000000}`
-        runSQLQuery(query, result => null)
+        cleanupSubtasks()
       }
     })
   }
@@ -351,8 +346,8 @@ function queryResultToArray(result) {
 }
 
 Load['link'] = URL => {
-  if (URL.indexOf('HUN/') >= 0)
-    shell.openItem(URL.replace('HUN', path.join(XMLRootDirectory, 'File')))
+  if (/^\w+\//.test(URL))
+    shell.openItem(URL.replace(/^\w+\//, path.join(XMLRootDirectory, 'File/')))
   else
     open(URL, '_blank')
   //shell.openExternal(URL)

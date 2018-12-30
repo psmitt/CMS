@@ -1,7 +1,7 @@
 function load_main(id) {
-  let query = document.createElement('query')
-  query.textContent = `SELECT * FROM subtask WHERE subtask_id = ${id}`
-  runSQLQuery(query, result => {
+  runSQLQuery(myQuery(
+    `SELECT * FROM subtask WHERE subtask_id = ${id}`
+  ), result => {
     Task.id = result[0][0]
     Task.fileName = result[0][1]
     Task.main = result[0][2]
@@ -164,29 +164,28 @@ async function saveTask() {
     Task.displayString += input.parentNode.style.display === 'none' ? '0' : '1'
   })
   Task.scrollPosition = Procedure.scrollTop
-  let query = document.createElement('query')
   if (Task.id) { // UPDATE
-    query.textContent = `UPDATE subtask SET
-                                subtask_opentime = ${Task.openTime},
-                                subtask_checkstring = '${Task.checkString.replace(/0+$/, '')}',
-                                subtask_displaystring = '${Task.displayString.replace(/1+$/, '')}',
-                                subtask_scrollposition = ${Task.scrollPosition}
-                          WHERE subtask_id = ${Task.id}`
-    await runSQLQuery(query, result => null)
+    await runSQLQuery(myQuery(
+      `UPDATE subtask SET
+              subtask_opentime = ${Task.openTime},
+              subtask_checkstring = '${Task.checkString.replace(/0+$/, '')}',
+              subtask_displaystring = '${Task.displayString.replace(/1+$/, '')}',
+              subtask_scrollposition = ${Task.scrollPosition}
+        WHERE subtask_id = ${Task.id}`), _ => 0)
   } else { // INSERT -> get lastInsertID
-    query.textContent = `INSERT INTO subtask VALUES (NULL, '${Task.fileName}',
-      ${Task.main || 'NULL'}, ${Task.openTime}, '${Task.checkString.replace(/0+$/, '')}',
+    await runSQLQuery(myQuery(
+      `INSERT INTO subtask VALUES (NULL, '${Task.fileName}',
+       ${Task.main || 'NULL'}, ${Task.openTime}, '${Task.checkString.replace(/0+$/, '')}',
       '${Task.displayString.replace(/1+$/, '')}', ${Task.scrollPosition})`
-    await runSQLQuery(query, result => Task.id = result.insertId)
+    ), result => Task.id = result.insertId)
   }
   return Task.id
 }
 
 function deleteTask() {
   if (Task.id) {
-    let query = document.createElement('query')
-    query.textContent = `DELETE FROM subtask WHERE subtask_id = ${Task.id}`
-    runSQLQuery(query, result => null)
+    runSQLQuery(myQuery(
+      `DELETE FROM subtask WHERE subtask_id = ${Task.id}`), _ => 0)
     Task.id = 0
   }
 }
