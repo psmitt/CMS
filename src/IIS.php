@@ -16,11 +16,16 @@ foreach($_POST as $post_key => $post_value) {
     switch ($post_key) {
         case 'getUserName':
             $local = "$xmlroot/$_SESSION[country]/Favorites/$_SESSION[username].xml";
-            if (!file_exists($local))
-                file_put_contents($local,
-                                  '<?xml version="1.0" encoding="UTF-8"?>'.
-                                  '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'.
-                                  "<menu title=\"FAVORITES\"></menu>");
+            if (!file_exists($local)) {
+                if (file_exists("$profile/Favorites.xml"))
+                  copy("$profile/Favorites.xml", $local);
+                else
+                  file_put_contents($local,
+                                    '<?xml version="1.0" encoding="UTF-8"?>'.
+                                    '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'.
+                                    "<menu title=\"FAVORITES\"></menu>");
+            }
+            copy($local, "$profile/Favorites.xml");
             echo $_SESSION['username'];
             break;
 
@@ -104,14 +109,11 @@ foreach($_POST as $post_key => $post_value) {
             $local = "$xmlroot/$_SESSION[country]/Favorites/$_SESSION[username].xml";
             $title = ($favorites = simplexml_load_file($local, null, LIBXML_NOCDATA)) ?
                       $favorites['title'] : 'FAVORITES';
-            file_put_contents("$profile/Favorites.xml",
-                              '<?xml version="1.0" encoding="UTF-8"?>'.
-                              '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'.
-                              '<menu title="FAVORITES">'."$post_value</menu>");
-            file_put_contents($local,
-                              '<?xml version="1.0" encoding="UTF-8"?>'."\n".
-                              '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'."\n".
-                              "<menu title=\"$title\">\n$post_value</menu>");
+            $contents = '<?xml version="1.0" encoding="UTF-8"?>'."\n".
+                        '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'."\n".
+                        "<menu title=\"$title\">\n$post_value</menu>";
+            file_put_contents($local, $contents);
+            copy($local, "$profile/Favorites.xml");
             break;
     }
 }

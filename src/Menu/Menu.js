@@ -269,6 +269,7 @@ Menu.oncontextmenu = event => {
     event.preventDefault()
     if (event.target.parentNode.parentNode === Favorites) { // remove favorite
       Favorites.removeChild(event.target.parentNode)
+      saveFavorites()
     } else { // add favorite
       let found = false
       Favorites.querySelectorAll('.item').forEach(item =>
@@ -277,6 +278,7 @@ Menu.oncontextmenu = event => {
       if (!found) {
         Favorites.appendChild(createFavorite(event.target.cloneNode(true), true))
         Search.dispatchEvent(new Event('input'))
+        saveFavorites()
       }
     }
   }
