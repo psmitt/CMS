@@ -3,6 +3,16 @@ function loadMenuFiles() {
   listDirectory('Menu', loadFiles) // initialize the menu generator
 
   async function loadFiles(files) {
+    await readXMLFile('Favorites', `${UserName}.xml`, xmlDoc => {
+      Favorites = document.createElement('div')
+      let title = document.createElement('span')
+      title.textContent = get(xmlDoc.firstElementChild, 'title')
+      title.classList.add('branch')
+      Favorites.appendChild(title)
+      for (let favorite of xmlDoc.firstElementChild.children)
+        Favorites.appendChild(createFavorite(favorite))
+      Menu.appendChild(Favorites)
+    })
     for (file of files)
       await readXMLFile('Menu', file, xmlDoc => {
         for (let subMenu of xmlDoc.children)
@@ -34,6 +44,11 @@ function createMenuItem(type, fromNode) { // type == 'span' or 'button'
   item.textContent = get(fromNode, 'title')
   let menu_class = get(fromNode, 'class')
   let menu_order = get(fromNode, 'order')
+  if (type === 'span') {
+    item.dataset.original = `title="${item.textContent}"
+                             class="${menu_class}"
+                             order="${menu_order}"`
+  }
   if (menu_class && menu_order) {
     item.classList.add(menu_class)
     if (menu_class === 'link' && menu_order.indexOf('HUN/php/Form_') === 0) {
@@ -63,7 +78,7 @@ function createMenuItem(type, fromNode) { // type == 'span' or 'button'
 function setBranchIcons(root) {
   for (let branch of root.querySelectorAll('.branch')) { // span
     let expanded = true
-    let collapsed = true
+    let collapsed = Boolean(branch.nextElementSibling)
     let child = branch
     while ((child = child.nextElementSibling) && (collapsed || expanded)) { // div
       collapsed = collapsed && child.style.display === 'none'
@@ -222,4 +237,47 @@ function restoreNavigationFrame(width) {
   Search.style.cursor = ''
   Search.style.color = '' // show last search
   Menu.style.display = 'block' // show menu
+}
+
+/* HANDLING FAVORITES */
+
+function createFavorite(item, span = false) {
+  let node = document.createElement('div')
+  node.appendChild(span ? item : createMenuItem('span', item))
+  node.setAttribute('draggable', true)
+  node.addEventListener('dragstart', event => draggedFavorite = node)
+  node.addEventListener('dragend', event => saveFavorites(draggedFavorite = null))
+  node.addEventListener('dragenter', event => {
+    if (node.nextElementSibling === draggedFavorite)
+      Favorites.insertBefore(node.nextElementSibling, node)
+    else if (node.previousElementSibling === draggedFavorite)
+      Favorites.insertBefore(node, node.previousElementSibling)
+  })
+  return node
+}
+
+function saveFavorites() {
+  let xmlString = ''
+  Favorites.querySelectorAll('.item').forEach(item =>
+    xmlString += `\t<menu ${item.dataset.original}/>\n`
+  )
+  saveFavoritesToXML(xmlString, Favorites.firstElementChild.textContent)
+}
+
+Menu.oncontextmenu = event => {
+  if (event.ctrlKey && event.target.matches('.item')) {
+    event.preventDefault()
+    if (event.target.parentNode.parentNode === Favorites) { // remove favorite
+      Favorites.removeChild(event.target.parentNode)
+    } else { // add favorite
+      let found = false
+      Favorites.querySelectorAll('.item').forEach(item =>
+        found = item.textContent === event.target.textContent
+      )
+      if (!found) {
+        Favorites.appendChild(createFavorite(event.target.cloneNode(true), true))
+        Search.dispatchEvent(new Event('input'))
+      }
+    }
+  }
 }

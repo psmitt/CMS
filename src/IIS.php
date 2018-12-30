@@ -14,6 +14,16 @@ function stringify(&$data) {
 
 foreach($_POST as $post_key => $post_value) {
     switch ($post_key) {
+        case 'getUserName':
+            $local = "$xmlroot/$_SESSION[country]/Favorites/$_SESSION[username].xml";
+            if (!file_exists($local))
+                file_put_contents($local,
+                                  '<?xml version="1.0" encoding="UTF-8"?>'.
+                                  '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'.
+                                  "<menu title=\"FAVORITES\"></menu>");
+            echo $_SESSION['username'];
+            break;
+
         case 'getTitle':
             echo "CMS $_SESSION[country] ( $_SERVER[SERVER_NAME] )";
             break;
@@ -88,6 +98,20 @@ foreach($_POST as $post_key => $post_value) {
               stringify($result_list);
             }
             echo empty($result_list) ? "{\"affectedRows\":$result[0],\"insertId\":$result[1]}" : json_encode($result_list);
+            break;
+            
+        case 'menu_save_favorites':
+            $local = "$xmlroot/$_SESSION[country]/Favorites/$_SESSION[username].xml";
+            $title = ($favorites = simplexml_load_file($local, null, LIBXML_NOCDATA)) ?
+                      $favorites['title'] : 'FAVORITES';
+            file_put_contents("$profile/Favorites.xml",
+                              '<?xml version="1.0" encoding="UTF-8"?>'.
+                              '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'.
+                              '<menu title="FAVORITES">'."$post_value</menu>");
+            file_put_contents($local,
+                              '<?xml version="1.0" encoding="UTF-8"?>'."\n".
+                              '<!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">'."\n".
+                              "<menu title=\"$title\">\n$post_value</menu>");
             break;
     }
 }

@@ -8,6 +8,8 @@ const Aside = document.querySelector('aside').style
 const Search = document.getElementById('Search')
 const Menu = document.getElementById('Menu')
 var Load = [] // loader functions
+var Favorites = null
+var draggedFavorite = null
 
 // TASK
 const TaskTitle = document.getElementById('TaskTitle') // title

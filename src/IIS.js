@@ -19,7 +19,8 @@ async function post(parameter, value, callback) {
   })
 }
 
-document.addEventListener('DOMContentLoaded', _ => {
+document.addEventListener('DOMContentLoaded', async function () {
+  await post('getUserName', '', response => UserName = response)
   loadMenuFiles()
 
   // cleanup subtask table
@@ -70,6 +71,10 @@ async function readXLSXFile(query, callback) {
 async function readXMLFile(folder, filename, callback) {
   return post('readXMLFile', folder + '/' + filename, response =>
     callback(new DOMParser().parseFromString(response, 'text/xml')))
+}
+
+async function saveFavoritesToXML(xmlString) {
+  post('menu_save_favorites', xmlString, response => null)
 }
 
 async function runPSQuery(query, callback) {

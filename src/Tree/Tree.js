@@ -47,10 +47,10 @@ async function loadTree(xmlDoc) {
 
     let wrong = document.createElement('div')
     img = document.createElement('img')
-    img.src = 'Tree/Topography_red.png'
+    img.src = 'Tree/Topography_not_found.png'
     wrong.appendChild(img)
     span = document.createElement('span')
-    span.innerHTML = '<b style="color:red">Nem besorolható!</b>'
+    span.innerHTML = `<b style="color:crimson">${get(tree, 'orphans') || 'Orphans'}</b>`
     wrong.appendChild(span)
     root.appendChild(wrong)
 

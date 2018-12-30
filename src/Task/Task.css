@@ -65,3 +65,7 @@ article {
   font-size: larger;
   font-style: italic;
 }
+
+#Procedure iframe { /* HUN/File/htm/Ticket_Status.htm */
+  margin-bottom: -50px;
+}

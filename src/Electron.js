@@ -8,6 +8,7 @@ const shell = require("electron").shell
 const ipc = require('electron').ipcRenderer
 const powershell = require('node-powershell')
 
+let UserName = os.userInfo().username
 var Profile // Local CMS profile folder
 var XMLRootDirectory // CMS country folder with XML subfolders
 var MySQL_Pool // CMDB connection pool
@@ -33,6 +34,15 @@ const remote = require('electron').remote
 const dialog = remote.dialog
 const currentWindow = remote.getCurrentWindow()
 
+function saveFavoritesToXML(xmlString, title) {
+  fs.writeFileSync(path.join(XMLRootDirectory, 'Favorites', `${UserName}.xml`),
+    `<?xml version="1.0" encoding="UTF-8"?>
+     <!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">
+     <menu title="${title || 'FAVORITES'}">
+     ${xmlString}
+     </menu>`, 'utf8')
+}
+
 ipc.on('Change XML Root Directory', _ => (changeXMLRootDirectory()))
 
 function changeXMLRootDirectory(folder) {
@@ -48,6 +58,8 @@ function changeXMLRootDirectory(folder) {
 
   XMLRootDirectory = folder
   fs.writeFileSync(path.join(Profile, 'lastXMLRootDirectory.txt'), XMLRootDirectory, 'utf8')
+  if (!fs.existsSync(path.join(XMLRootDirectory, 'Favorites', `${UserName}.xml`)))
+    saveFavoritesToXML('')
   loadMenuFiles()
 
   let lastDatabaseServer = path.join(Profile, 'lastDatabaseServer.txt')

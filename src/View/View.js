@@ -408,25 +408,39 @@ document.getElementById('ReloadData').addEventListener('click', _ => {
 
 document.getElementById('ExportXLSX').addEventListener('click', _ => {
   let aoa = [[]]
-  ViewPanel.querySelectorAll('thead td').forEach(td => aoa[0].push(td.textContent))
-  aoa[0].pop() // remove scrollToBottom icon
-  for (let row of View.rows)
-    if (row.display)
-      aoa.push(row.data.map(value => value.replace(/<[^>]+>/g, '')))
+  if (TreePanel.style.display === 'block') {
+    nextLevel(TreePanel.lastElementChild, [])
+  } else {
+    ViewPanel.querySelectorAll('thead td').forEach(td => aoa[0].push(td.textContent))
+    aoa[0].pop() // remove scrollToBottom icon
+    for (let row of View.rows)
+      if (row.display)
+        aoa.push(row.data.map(value => value.replace(/<[^>]+>/g, '')))
+  }
   let workbook = XLSX.utils.book_new()
   let worksheet = XLSX.utils.aoa_to_sheet(aoa)
   XLSX.utils.book_append_sheet(workbook, worksheet, ViewTitle.textContent.substring(0, 31))
   return XLSX.writeFile(workbook, IIS ? 'CMS_View.xlsx' : dialog.showSaveDialog(null, {
-    defaultPath: path.join(os.homedir(), 'CMS_View.xlsx')
+    defaultPath: path.join(os.homedir(), 'Desktop', 'CMS_Report.xlsx')
   }))
+
+  function nextLevel(node, level) {
+    if (node.style.display !== 'none') {
+      let row = level.slice(0)
+      row.push(node.children[0].src.match(/_(\w+)/)[1])
+      row.push(node.children[1].textContent)
+      aoa.push(row)
+      for (let i = 2; i < node.children.length; i++)
+        nextLevel(node.children[i], row)
+    }
+  }
 })
 
 document.getElementById('ClearFilters').addEventListener('click', _ => {
   if (TreePanel.style.display === 'block') {
     TreeSearch.value = ''
     TreeSearch.dispatchEvent(new Event('input'))
-  }
-  if (ViewPanel.style.display === 'block') {
+  } else {
     ViewPanel.querySelectorAll('thead input').forEach(input => input.value = '')
     filterData()
   }

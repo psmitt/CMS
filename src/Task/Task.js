@@ -78,8 +78,8 @@ function appendStep(step, parent) {
       let child = step.firstElementChild // todo, question, answer
       let text = child.textContent
       if (Electron)
-        text = text.replace('src="HUN/img/',
-          'src="' + path.join(XMLRootDirectory, 'File', 'img', ' ').trimEnd())
+        text = text.replace(/src="\w+\/(\w+)\//g,
+          'src="' + path.join(XMLRootDirectory, 'File', '$1', ' ').trimEnd())
       span.innerHTML = text + '&ensp;'
       while ((child = child.nextElementSibling) && child.tagName === 'button')
         span.insertAdjacentElement('beforeend', createMenuItem('button', child))
