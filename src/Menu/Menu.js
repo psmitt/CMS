@@ -69,7 +69,10 @@ function createMenuItem(type, fromNode) { // type == 'span' or 'button'
             Load['link'](`index.php?${menu_class}=${menu_order}`)
           }
         } else {
-          Load[menu_class](menu_order)
+          if (/^\//.test(menu_order) && Electron)
+            shell.openExternal(menu_order.replace(/^\//, `http://${ServerName}/`))
+          else
+            Load[menu_class](menu_order)
         }
       }
   }

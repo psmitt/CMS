@@ -9,6 +9,7 @@ const ipc = require('electron').ipcRenderer
 const powershell = require('node-powershell')
 
 let UserName = os.userInfo().username
+var ServerName // MySQL server
 var Profile // Local CMS profile folder
 var XMLRootDirectory // CMS country folder with XML subfolders
 var MySQL_Pool // CMDB connection pool
@@ -98,7 +99,7 @@ function changeMySQLDatabase(server) {
       multipleStatements: true
     }
 
-    document.title = `CMS ${path.basename(XMLRootDirectory)} ( ${server} )`
+    document.title = `CMS ${path.basename(XMLRootDirectory)} ( ${ServerName = server} )`
 
     mysql.createConnection(connectionObject).connect(error => {
       if (error) {
@@ -350,5 +351,4 @@ Load['link'] = URL => {
     shell.openItem(URL.replace(/^\w+\//, path.join(XMLRootDirectory, 'File/')))
   else
     open(URL, '_blank')
-  //shell.openExternal(URL)
 }
