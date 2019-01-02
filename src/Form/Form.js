@@ -10,7 +10,8 @@ async function loadForm(xmlDoc) {
   for (element of xmlDoc.querySelectorAll('column, button, submit')) {
     if (element.matches('column')) {
       let field = get(element, 'field')
-      if (View.isTable && Table.fields[field].disabled) continue;
+      if (View.isTable && Table.fields[field] && Table.fields[field].disabled)
+        continue;
       await getField(element)
       let label = document.createElement('tr')
       label.innerHTML = `<th>${FormFields[field].label}</th>`
@@ -42,14 +43,16 @@ async function loadForm(xmlDoc) {
         objectToListen.setAttribute('on' + eventToListen, element.textContent)
       } else {
         objectToListen.addEventListener(eventToListen, event => {
-          let callback = get(element, 'callback') || (result => console.log(result))
+          event.preventDefault()
           let command = element.textContent
           for (field of document.querySelector('aside form').elements) {
             if (field.name)
               command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
-                getFieldValue(field))
+                `'${getFieldValue(field)}'`)
           }
-          runSQLQuery(myQuery(command), callback)
+          runSQLQuery(myQuery(command),
+              new Function('return ' + (get(element, 'callback') || 'f(){}'))())
+            .then(closeForm, error => alert(error))
         })
       }
       FormTable.appendChild(button)
@@ -59,7 +62,7 @@ async function loadForm(xmlDoc) {
 
 const getFieldValue = field => field.value && field.list ?
   document.getElementById(field.list.id).querySelector(
-    `option[value="${field.value}"]`).dataset.value : `'${field.value}'`
+    `option[value="${field.value}"]`).dataset.value : field.value
 
 async function getField(column) {
   let get = attribute =>
@@ -70,6 +73,8 @@ async function getField(column) {
   let onchange = column.querySelector('onchange')
   let inputName = `name="${name}"` +
     (get('required') === 'yes' || (View.isTable && Table.fields[name].required) ? ' required' : '') +
+    (get('placeholder') ? ` placeholder="${get('placeholder')}"` : '') +
+    (get('disabled') === 'yes' ? ' disabled' : '') +
     (onchange ? ` onchange="${onchange.textContent}"` : '')
 
   FormFields[name] = {
@@ -81,12 +86,13 @@ async function getField(column) {
   if (column.querySelector('selection')) {
     let options = column.querySelector('options')
     if (options) {
-      FormFields[name].editor = `<input list="${name}-options" ${inputName}
-                               onfocus="focusDatalist(this)"
-                               onkeydown="switch(event.key){
-                                 case'Escape':case'Enter':validateDatalist(this)}"
-                               onblur="validateDatalist(this)"/>
-                              <datalist id="${name}-options">`
+      FormFields[name].editor =
+        `<input list="${name}-options" ${inputName}
+          onfocus="focusDatalist(this)"
+          onkeydown="switch(event.key){
+          case'Escape':case'Enter':validateDatalist(this)}"
+          onblur="validateDatalist(this)"/>
+         <datalist id="${name}-options">`
       const get = element => options.querySelector(element).textContent
       return runSQLQuery(myQuery(
         `SELECT ${get('value')}, ${get('text')}
@@ -104,15 +110,16 @@ async function getField(column) {
     } else {
       FormFields[name].editor = `<select ${inputName}/>`
 
-      if (get(column, 'required') !== 'yes' &&
+      if (get('required') !== 'yes' &&
         (!Table.fields[get('field')] || !Table.fields[get('field')].required))
         FormFields[name].editor += '<option></option>'
 
-      column.querySelectorAll('option').forEach(option =>
+      column.querySelectorAll('option').forEach(option => {
+        let value = option.attributes['value'] ?
+          option.attributes['value'].value : option.textContent
         FormFields[name].editor += `<option
-            value="${get(option, 'value') || option.textContent}"
-            >${option.textContent}</option>`
-      )
+            value="${value}">${option.textContent}</option>`
+      })
       return FormFields[name].editor += '</select>'
     }
   }

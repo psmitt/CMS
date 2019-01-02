@@ -420,7 +420,7 @@ document.getElementById('ExportXLSX').addEventListener('click', _ => {
   let workbook = XLSX.utils.book_new()
   let worksheet = XLSX.utils.aoa_to_sheet(aoa)
   XLSX.utils.book_append_sheet(workbook, worksheet, ViewTitle.textContent.substring(0, 31))
-  return XLSX.writeFile(workbook, IIS ? 'CMS_View.xlsx' : dialog.showSaveDialog(null, {
+  return XLSX.writeFile(workbook, IIS ? 'CMS_Report.xlsx' : dialog.showSaveDialog(null, {
     defaultPath: path.join(os.homedir(), 'Desktop', 'CMS_Report.xlsx')
   }))
 

@@ -190,7 +190,8 @@ async function runPSQuery(query, callback) { // query is XML object
       })
       .catch(error => {
         console.error(error)
-        reject(ps.dispose())
+        reject(error)
+        ps.dispose()
       })
   })
 }
@@ -235,7 +236,8 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
         client.connect()
         client.query(query.textContent, (error, result) => {
           if (error) {
-            reject(client.end())
+            reject(error)
+            client.end()
             throw error
           }
           queryResultToArray(result.rows)
@@ -247,12 +249,14 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
         let mssql = require('mssql')
         mssql.connect(connectionObject, error => {
           if (error) {
-            reject(mssql.close())
+            reject(error)
+            mssql.close()
             throw error
           }
           new mssql.Request().query(query.textContent, (error, result) => {
             if (error) {
-              reject(mssql.close())
+              reject(error)
+              mssql.close()
               throw error
             }
             queryResultToArray(result.recordset)
@@ -264,7 +268,8 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
       default: // MySQL
         MySQL_Pool.getConnection((error, cmdb) => {
           if (error) {
-            reject(cmdb.release())
+            reject(error)
+            cmdb.release()
             throw error
           }
           cmdb.query({
@@ -272,7 +277,8 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
             nestTables: '.'
           }, (error, result, fields) => {
             if (error) {
-              reject(cmdb.release())
+              reject(error)
+              cmdb.release()
               throw error
             }
             if (loadFieldTypes) {
