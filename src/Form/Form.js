@@ -1,7 +1,9 @@
 Load['form'] = formname => {
   empty(FormTable)
-  readXMLFile('Form', formname + '.xml', loadForm)
-  Aside.display = 'block'
+  readXMLFile('Form', formname + '.xml', loadForm).then(_ => {
+    Aside.display = 'block'
+    AsideForm.elements[0].focus()
+  })
 }
 
 async function loadForm(xmlDoc) {
@@ -22,7 +24,7 @@ async function loadForm(xmlDoc) {
       // BLUR WHEN DATALIST CHANGE
       if (element.querySelector('options')) {
         let inputField = editor.querySelector('input')
-        let formElements = document.querySelector('aside form').elements
+        let formElements = AsideForm.elements
         let i = 0
         while (formElements[i++] !== inputField);
         inputField.addEventListener('change', _ => formElements[i].focus())
@@ -36,7 +38,7 @@ async function loadForm(xmlDoc) {
       let objectToListen = button
       let eventToListen = 'click'
       if (element.tagName === 'submit') {
-        objectToListen = document.querySelector('aside form')
+        objectToListen = AsideForm
         eventToListen = 'submit'
       }
       if (get(element, 'language') === 'JS') {
@@ -45,13 +47,13 @@ async function loadForm(xmlDoc) {
         objectToListen.addEventListener(eventToListen, event => {
           event.preventDefault()
           let command = element.textContent
-          for (field of document.querySelector('aside form').elements) {
+          for (field of AsideForm.elements) {
             if (field.name)
               command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
-                `'${getFieldValue(field)}'`)
+                `'${getFieldValue(field)}'`).replace(/''/g, 'NULL')
           }
           runSQLQuery(myQuery(command),
-              new Function('return ' + (get(element, 'callback') || 'f(){}'))())
+              new Function(`return function(){${get(element, 'callback')}}`)())
             .then(closeForm, error => alert(error))
         })
       }
@@ -62,7 +64,7 @@ async function loadForm(xmlDoc) {
 
 const getFieldValue = field => field.value && field.list ?
   document.getElementById(field.list.id).querySelector(
-    `option[value="${field.value}"]`).dataset.value : field.value
+    `option[value="${field.value}"]`).dataset.value : field.value.trim()
 
 async function getField(column) {
   let get = attribute =>
@@ -80,7 +82,8 @@ async function getField(column) {
   FormFields[name] = {
     label: get('title') || get('field')
   }
-  if (get('multiline') === 'yes' || (View.isTable && Table.fields[name].type === 'multiline'))
+  if (get('multiline') === 'yes' || (View.isTable &&
+      Table.fields[name] && Table.fields[name].type === 'multiline'))
     return FormFields[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
@@ -88,9 +91,6 @@ async function getField(column) {
     if (options) {
       FormFields[name].editor =
         `<input list="${name}-options" ${inputName}
-          onfocus="focusDatalist(this)"
-          onkeydown="switch(event.key){
-          case'Escape':case'Enter':validateDatalist(this)}"
           onblur="validateDatalist(this)"/>
          <datalist id="${name}-options">`
       const get = element => options.querySelector(element).textContent
@@ -164,24 +164,7 @@ async function getField(column) {
   }
 }
 
-function focusDatalist(input) {
-  input.placeholder = input.value
-  input.value = ''
-  if (typeof ipc !== 'undefined') {
-    let rect = input.getBoundingClientRect()
-    ipc.send('datalist focused', rect.left, rect.top)
-  }
-  input.addEventListener('input', _ => {
-    input.placeholder = ''
-  }, {
-    once: true
-  })
-}
-
 function validateDatalist(input) {
-  if (!input.value && input.placeholder)
-    input.value = input.placeholder
-  input.placeholder = ''
   if (!document.getElementById(input.list.id)
     .querySelector(`option[value="${input.value.replace(/"/g, '\\"')}"]`))
     input.value = ''
@@ -193,8 +176,9 @@ function formFeedback(input, lines) {
   let tbody = tr.parentNode
   while (tr.nextElementSibling && tr.nextElementSibling.className === 'feedback')
     tbody.removeChild(tr.nextElementSibling)
-  const insertRow = tr.nextElementSibling ?
-    row => tbody.insertBefore(row, tr.nextElementSibling) :
+  tr = tr.nextElementSibling
+  const insertRow = tr ?
+    row => tbody.insertBefore(row, tr) :
     row => tbody.appendChild(row)
   for (let line of lines) {
     let feedback = document.createElement('tr')
@@ -204,4 +188,17 @@ function formFeedback(input, lines) {
     feedback.appendChild(td)
     insertRow(feedback)
   }
+}
+
+function setField(name, value) {
+  document.getElementsByName(name)[0].value = value
+}
+
+function disableField(name, disabled = true) {
+  document.getElementsByName(name)[0].disabled = disabled
+}
+
+function requireField(name, required = true) {
+  document.getElementsByName(name)[0].disabled = false
+  document.getElementsByName(name)[0].required = required
 }

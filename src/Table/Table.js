@@ -114,7 +114,7 @@ function deleteRecord(record) {
 function saveRecord(record) {
   let newValues = []
   let newRow = View.rowTemplate.cloneNode(true)
-  let formElements = document.querySelector('aside form').elements
+  let formElements = AsideForm.elements
   for (i = 0; i < formElements.length; i++) {
     let field = formElements[i]
     if (!field.checkValidity()) {

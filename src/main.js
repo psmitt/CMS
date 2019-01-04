@@ -130,12 +130,4 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('datalist focused', (event, left, top) => {
-  event.sender.sendInputEvent({
-    type: 'mouseDown',
-    x: left + 1,
-    y: top + 1
-  })
-})
-
 ipcMain.on('New Window', (event, openerScript) => createWindow(openerScript))

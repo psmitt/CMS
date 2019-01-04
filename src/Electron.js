@@ -249,14 +249,14 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
         let mssql = require('mssql')
         mssql.connect(connectionObject, error => {
           if (error) {
-            reject(error)
             mssql.close()
+            reject(error)
             throw error
           }
           new mssql.Request().query(query.textContent, (error, result) => {
             if (error) {
-              reject(error)
               mssql.close()
+              reject(error)
               throw error
             }
             queryResultToArray(result.recordset)
@@ -268,17 +268,17 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
       default: // MySQL
         MySQL_Pool.getConnection((error, cmdb) => {
           if (error) {
-            reject(error)
             cmdb.release()
+            reject(error)
             throw error
           }
           cmdb.query({
-            sql: query.textContent,
+            sql: query.textContent.replace(new RegExp(`\\$SESSION_USER\\$`, 'g'), `'${UserName}'`),
             nestTables: '.'
           }, (error, result, fields) => {
             if (error) {
-              reject(error)
               cmdb.release()
+              reject(error)
               throw error
             }
             if (loadFieldTypes) {
@@ -332,10 +332,6 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
 }
 
 function queryResultToArray(result) {
-  let pad = number => number <= 9 ? '0' + number : number
-  let normalize = date => date.getFullYear() + '-' +
-    pad(date.getMonth() + 1) + '-' + pad(date.getDate())
-
   for (let row = 0; row < result.length; row++) {
     let packet = result[row]
     let dataRow = []
@@ -344,7 +340,7 @@ function queryResultToArray(result) {
         (typeof packet[data] === 'object' && !Object.keys(packet[data]).length))
         dataRow.push('')
       else if (packet[data] instanceof Date)
-        dataRow.push(normalize(packet[data]))
+        dataRow.push(normalizeDate(packet[data]))
       else
         dataRow.push(packet[data].toString())
     }

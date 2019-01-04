@@ -78,7 +78,7 @@ async function runPSQuery(query, callback) {
 async function runSQLQuery(query, callback, loadFields = false) {
   let get = attribute => query.attributes[attribute].value
   let connectionObject = {
-    query: query.textContent,
+    query: query.textContent.replace(new RegExp(`\\$SESSION_USER\\$`, 'g'), `'${UserName}'`),
     loadFields: loadFields
   }
   if (query.attributes['dsn']) {

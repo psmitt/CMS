@@ -62,7 +62,8 @@ const rigthColumnWidth = 47
 
 // FORM
 const FormTitle = document.getElementById('FormTitle')
-const FormTable = document.querySelector('form > table')
+const AsideForm = document.getElementById('AsideForm')
+const FormTable = AsideForm.querySelector('#AsideForm > table')
 var FormFields = [] // input field name -> {label, editor}
 
 // TABLE
@@ -90,6 +91,12 @@ function myQuery(text) {
   let query = document.createElement('query')
   query.textContent = text
   return query
+}
+
+function normalizeDate(date) {
+  let pad = number => number <= 9 ? '0' + number : number
+  return date.getFullYear() + '-' +
+    pad(date.getMonth() + 1) + '-' + pad(date.getDate())
 }
 
 function cleanupSubtasks() {
