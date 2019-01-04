@@ -21,14 +21,6 @@ async function loadForm(xmlDoc) {
       let editor = document.createElement('tr')
       editor.innerHTML = `<td>${FormFields[field].editor}</td>`
       FormTable.appendChild(editor)
-      // BLUR WHEN DATALIST CHANGE
-      if (element.querySelector('options')) {
-        let inputField = editor.querySelector('input')
-        let formElements = AsideForm.elements
-        let i = 0
-        while (formElements[i++] !== inputField);
-        inputField.addEventListener('change', _ => formElements[i].focus())
-      }
     } else {
       let button = document.createElement('tr')
       button.innerHTML =
