@@ -2,8 +2,8 @@ document.querySelector('aside .close').addEventListener('click', closeForm)
 
 function closeForm() {
   Aside.display = 'none'
-  empty(FormTable)
-  View.record = null
+  empty(FormPanel)
+  Table.record = null
 }
 
 document.querySelector('article .close').addEventListener('click', _ => {

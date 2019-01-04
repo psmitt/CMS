@@ -62,8 +62,10 @@ const rigthColumnWidth = 47
 
 // FORM
 const FormTitle = document.getElementById('FormTitle')
-const AsideForm = document.getElementById('AsideForm')
-const FormTable = AsideForm.querySelector('#AsideForm > table')
+const FormPanel = document.getElementById('FormPanel')
+var AsideForm // the form
+var FormTable // firstElementChild of AsideForm
+var isForm // or Table? identified when loading a form
 var FormFields = [] // input field name -> {label, editor}
 
 // TABLE

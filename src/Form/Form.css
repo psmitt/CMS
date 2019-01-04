@@ -6,45 +6,45 @@ aside {
   width: calc(100% - 2em);
 }
 
-aside>footer {
+#FormPanel {
   position: relative;
 }
 
-aside form {
+#FormPanel form {
   width: calc(100% - var(--scrollbar-width));
   margin: var(--title-padding);
 }
 
-aside table {
+#FormPanel table {
   table-layout: fixed;
   width: 100%;
 }
 
-aside table th {
+#FormPanel table th {
   text-align: left;
   color: DarkSlateGray;
 }
 
-aside table td {
+#FormPanel table td {
   padding-bottom: 10px;
   padding-right: 10px;
 }
 
-aside form input,
-aside form select,
-aside form textarea,
-aside form button {
+#FormPanel form input,
+#FormPanel form select,
+#FormPanel form textarea,
+#FormPanel form button {
   font-size: large;
   padding: 5px;
 }
 
-aside [type="button"],
-aside [type="submit"] {
+#FormPanel [type="button"],
+#FormPanel [type="submit"] {
   font-size: x-large;
   font-weight: bold;
 }
 
-aside form .feedback td {
+#FormPanel form .feedback td {
   padding: 0;
   padding-left: 4em;
   font-size: large;

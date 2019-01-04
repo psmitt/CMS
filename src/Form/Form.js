@@ -1,5 +1,9 @@
 Load['form'] = formname => {
-  empty(FormTable)
+  empty(FormPanel)
+  AsideForm = document.createElement('form')
+  FormTable = document.createElement('table')
+  AsideForm.appendChild(FormTable)
+  FormPanel.appendChild(AsideForm)
   readXMLFile('Form', formname + '.xml', loadForm).then(_ => {
     Aside.display = 'block'
     AsideForm.elements[0].focus()
@@ -7,12 +11,13 @@ Load['form'] = formname => {
 }
 
 async function loadForm(xmlDoc) {
+  isForm = xmlDoc.firstElementChild.tagName === 'form' // or 'table' ?
   FormTitle.innerHTML = get(xmlDoc.firstElementChild, 'title')
   FormFields = []
   for (element of xmlDoc.querySelectorAll('column, button, submit')) {
     if (element.matches('column')) {
       let field = get(element, 'field')
-      if (View.isTable && Table.fields[field] && Table.fields[field].disabled)
+      if (!isForm && Table.fields[field].disabled)
         continue;
       await getField(element)
       let label = document.createElement('tr')
@@ -34,12 +39,18 @@ async function loadForm(xmlDoc) {
         eventToListen = 'submit'
       }
       if (get(element, 'language') === 'JS') {
-        objectToListen.setAttribute('on' + eventToListen, element.textContent)
+        objectToListen.addEventListener(eventToListen,
+          new Function(`return event => {
+            event.preventDefault();
+            ${element.textContent}
+            return false; // to prevent multiple submission
+          }`)())
+        // objectToListen.setAttribute('on' + eventToListen, element.textContent)
       } else {
         objectToListen.addEventListener(eventToListen, event => {
           event.preventDefault()
           let command = element.textContent
-          for (field of AsideForm.elements) {
+          for (let field of AsideForm.elements) {
             if (field.name)
               command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
                 `'${getFieldValue(field)}'`).replace(/''/g, 'NULL')
@@ -70,7 +81,7 @@ async function getField(column) {
   let name = get('field')
   let onchange = column.querySelector('onchange')
   let inputName = `name="${name}"` +
-    (get('required') === 'yes' || (View.isTable && Table.fields[name].required) ? ' required' : '') +
+    (get('required') === 'yes' || (!isForm && Table.fields[name].required) ? ' required' : '') +
     (get('placeholder') ? ` placeholder="${get('placeholder')}"` : '') +
     (get('disabled') === 'yes' ? ' disabled' : '') +
     (onchange ? ` onchange="${onchange.textContent}"` : '')
@@ -78,8 +89,7 @@ async function getField(column) {
   FormFields[name] = {
     label: get('title') || get('field')
   }
-  if (get('multiline') === 'yes' || (View.isTable &&
-      Table.fields[name] && Table.fields[name].type === 'multiline'))
+  if (get('multiline') === 'yes' || (!isForm && Table.fields[name].type === 'multiline'))
     return FormFields[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
@@ -107,7 +117,7 @@ async function getField(column) {
       FormFields[name].editor = `<select ${inputName}/>`
 
       if (get('required') !== 'yes' &&
-        (!Table.fields[get('field')] || !Table.fields[get('field')].required))
+        (isForm || !Table.fields[get('field')].required))
         FormFields[name].editor += '<option></option>'
 
       column.querySelectorAll('option').forEach(option => {
@@ -120,7 +130,7 @@ async function getField(column) {
     }
   }
 
-  if (View.isTable && Table.fields[name].type === 'enum') {
+  if (!isForm && Table.fields[name].type === 'enum') {
     return runSQLQuery(myQuery(
       `SHOW COLUMNS FROM ${Table.name}
        WHERE FIELD = '${name}'`
@@ -133,7 +143,7 @@ async function getField(column) {
     })
   }
 
-  let type = get('pattern') || get('type') || (View.isTable ? Table.fields[name].type : '')
+  let type = get('pattern') || get('type') || (!isForm ? Table.fields[name].type : '')
 
   if (type === 'datum')
     type = 'date'
