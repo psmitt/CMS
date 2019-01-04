@@ -55,6 +55,7 @@ async function loadForm(xmlDoc) {
           runSQLQuery(myQuery(command),
               new Function(`return function(){${get(element, 'callback')}}`)())
             .then(closeForm, error => alert(error))
+          return false // to prevent multiple submission
         })
       }
       FormTable.appendChild(button)
@@ -62,9 +63,12 @@ async function loadForm(xmlDoc) {
   }
 }
 
-const getFieldValue = field => field.value && field.list ?
-  document.getElementById(field.list.id).querySelector(
-    `option[value="${field.value}"]`).dataset.value : field.value.trim()
+function getFieldValue(field) {
+  let option = field.value && field.list ?
+    document.getElementById(field.list.id)
+    .querySelector(`option[value="${field.value}"]`) : null
+  return option ? option.dataset.value : field.value.trim()
+}
 
 async function getField(column) {
   let get = attribute =>
