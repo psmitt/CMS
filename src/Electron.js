@@ -8,17 +8,15 @@ const shell = require("electron").shell
 const ipc = require('electron').ipcRenderer
 const powershell = require('node-powershell')
 
-let UserName = os.userInfo().username
+const UserName = os.userInfo().username
+const Profile = path.join(os.homedir(), '.cms') // Local CMS profile folder
 var ServerName // MySQL server
-var Profile // Local CMS profile folder
 var XMLRootDirectory // CMS country folder with XML subfolders
 var MySQL_Pool // CMDB connection pool
 
-document.addEventListener('DOMContentLoaded', _ => {
-  Profile = path.join(os.homedir(), '.cms')
+document.addEventListener('DOMContentLoaded', () => {
   if (!fs.existsSync(Profile) || !fs.statSync(Profile).isDirectory())
     fs.mkdirSync(Profile)
-
   let lastXMLRootDirectory = path.join(Profile, 'lastXMLRootDirectory.txt')
   if (fs.existsSync(lastXMLRootDirectory)) {
     let lastDirectory = fs.readFileSync(lastXMLRootDirectory, 'utf8')
@@ -27,37 +25,28 @@ document.addEventListener('DOMContentLoaded', _ => {
   } else {
     changeXMLRootDirectory()
   }
-
-  ipc.on('New Window', (callback, argument) => console.log(callback, argument))
-});
+})
 
 const remote = require('electron').remote
 const dialog = remote.dialog
 const currentWindow = remote.getCurrentWindow()
 
-function saveFavoritesToXML(xmlString, title) {
-  fs.writeFileSync(path.join(XMLRootDirectory, 'Favorites', `${UserName}.xml`),
-    `<?xml version="1.0" encoding="UTF-8"?>
-     <!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">
-     <menu title="${title || 'FAVORITES'}">
-     ${xmlString}
-     </menu>`, 'utf8')
-}
-
-ipc.on('Change XML Root Directory', _ => (changeXMLRootDirectory()))
+ipc.on('Change XML Root Directory', () => (changeXMLRootDirectory()))
 
 function changeXMLRootDirectory(folder) {
-  folder = folder || dialog.showOpenDialog(currentWindow, {
-    title: 'Select Country Folder for CMS',
-    properties: ['openDirectory']
-  })[0]
-
-  if (!folder && !XMLRootDirectory) {
-    currentWindow.close()
-    return
+  if (!folder) {
+    folder = dialog.showOpenDialog(currentWindow, {
+      title: 'Select Country Folder for CMS',
+      properties: ['openDirectory']
+    })
+    if (!folder && !XMLRootDirectory)
+      return currentWindow.close()
+    else
+      XMLRootDirectory = folder[0]
+  } else {
+    XMLRootDirectory = folder
   }
 
-  XMLRootDirectory = folder
   fs.writeFileSync(path.join(Profile, 'lastXMLRootDirectory.txt'), XMLRootDirectory, 'utf8')
   if (!fs.existsSync(path.join(XMLRootDirectory, 'Favorites', `${UserName}.xml`)))
     saveFavoritesToXML('')
@@ -69,27 +58,35 @@ function changeXMLRootDirectory(folder) {
   )
 }
 
+function saveFavoritesToXML(xmlString, title) {
+  fs.writeFileSync(path.join(XMLRootDirectory, 'Favorites', `${UserName}.xml`),
+    `<?xml version="1.0" encoding="UTF-8"?>
+     <!DOCTYPE menu SYSTEM "../../DTD/Menu.dtd">
+     <menu title="${title || 'FAVORITES'}">
+     ${xmlString}
+     </menu>`, 'utf8')
+}
+
 const mysql = require('mysql')
 const prompt = require('electron-prompt')
 
-ipc.on('Change MySQL Database', _ => (changeMySQLDatabase()))
+ipc.on('Change MySQL Database', () => (changeMySQLDatabase()))
 
 function changeMySQLDatabase(server) {
-  if (server)
-    resetConnectionPool(server)
-  else
-    prompt({
+  let basename = path.basename(XMLRootDirectory)
+  if (server) resetConnectionPool(server)
+  else prompt({
       title: 'Server Name',
       label: 'Enter the name of MySQL database server:',
       height: 150
     }, currentWindow)
     .then(server => {
       if (server) resetConnectionPool(server)
+      else document.title = `CMS ${basename} ( DATABASE MISSING! )`
     })
     .catch(console.error)
 
   function resetConnectionPool(server) {
-    let basename = path.basename(XMLRootDirectory)
     let connectionObject = {
       host: server,
       database: basename,
@@ -98,22 +95,18 @@ function changeMySQLDatabase(server) {
       supportBigNumbers: true,
       multipleStatements: true
     }
-
-    document.title = `CMS ${path.basename(XMLRootDirectory)} ( ${ServerName = server} )`
-
     mysql.createConnection(connectionObject).connect(error => {
       if (error) {
         alert(error)
+        document.title = `CMS ${basename} ( DATABASE ERROR! )`
       } else {
         let oldPool = Boolean(MySQL_Pool)
-        if (oldPool)
-          MySQL_Pool.end()
+        if (oldPool) MySQL_Pool.end()
         MySQL_Pool = mysql.createPool(connectionObject)
-        fs.writeFileSync(path.join(Profile, 'lastDatabaseServer.txt'), connectionObject.host, 'utf8')
-        if (oldPool)
-          currentWindow.loadFile('src/index.html')
-
+        fs.writeFileSync(path.join(Profile, 'lastDatabaseServer.txt'), server, 'utf8')
+        if (oldPool) currentWindow.loadFile('src/index.html')
         cleanupSubtasks()
+        document.title = `CMS ${basename} ( ${ServerName = server} )`
       }
     })
   }
@@ -121,25 +114,19 @@ function changeMySQLDatabase(server) {
 
 function listDirectory(folder, callback) {
   fs.readdir(path.join(XMLRootDirectory, folder), (error, entries) => {
-    if (error) throw error
-    let filenames = []
-    for (let entry of entries)
-      if (fs.statSync(path.join(XMLRootDirectory, folder, entry)).isFile())
-        filenames.push(entry)
-    callback(filenames)
+    if (error) alert(error)
+    else callback(entries.filter(entry =>
+      fs.statSync(path.join(XMLRootDirectory, folder, entry)).isFile()
+    ))
   })
 }
 
 let XLSX = require('xlsx')
 async function readXLSXFile(query, callback) {
   let parameters = query.textContent.trim().split('\n')
-  // Create proper access path
-  let prefix = 'C:\\\\inetpub\\\\xmlroot\\\\' + path.basename(XMLRootDirectory)
-  let filePath = path.join(XMLRootDirectory,
-    parameters[0].trim().replace(new RegExp('^' + prefix), ''))
   let columns = parameters[1] ? parameters[1].trim().split(',') : []
   return new Promise((resolve, reject) => {
-    let xlsx = XLSX.readFile(filePath, {
+    let xlsx = XLSX.readFile(parameters[0].trim(), {
       type: 'array',
       cellFormula: false,
       cellHTML: false
@@ -153,8 +140,8 @@ async function readXMLFile(folder, filename, callback) {
     let specific = path.join(XMLRootDirectory, folder, filename).replace(/\.xml/, '_Electron.xml')
     fs.readFile(fs.existsSync(specific) ? specific :
       path.join(XMLRootDirectory, folder, filename), 'utf8', (error, xmlString) => {
-        if (error) throw error
-        resolve(callback(new DOMParser().parseFromString(
+        if (error) alert(error)
+        else resolve(callback(new DOMParser().parseFromString(
           xmlString.charCodeAt(0) === 0xFEFF ? // BOM
           xmlString.substring(1) : xmlString, 'text/xml')))
       })
@@ -163,10 +150,10 @@ async function readXMLFile(folder, filename, callback) {
 
 async function runPSQuery(query, callback) { // query is XML object
   let psQuery = `Import-Module ActiveDirectory;
-           Import-Module Microsoft.PowerShell.Utility;
-           [Console]::OutputEncoding = [System.Text.Encoding]::UTF8;
-           ${query.textContent.replace(/;+$/, '')} | ConvertTo-HTML -Fragment
-          `.replace(/(?:\r\n|\r|\n)/g, ' ')
+     Import-Module Microsoft.PowerShell.Utility;
+     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8;
+     ${query.textContent.replace(/;+$/, '')} | ConvertTo-HTML -Fragment`
+    .replace(/(?:\r\n|\r|\n)/g, ' ')
   let ps = new powershell({
     debugMsg: false,
     executionPolicy: 'Bypass',
@@ -189,9 +176,8 @@ async function runPSQuery(query, callback) { // query is XML object
         resolve(ps.dispose())
       })
       .catch(error => {
-        console.error(error)
-        reject(error)
         ps.dispose()
+        reject(error)
       })
   })
 }
@@ -224,10 +210,6 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
     default: // MySQL
       break;
   }
-  if (query.attributes['dsn']) {
-    let dsn = get('dsn')
-    switch (dsn.substr(0, dsn.indexOf(':'))) {}
-  }
   return new Promise((resolve, reject) => {
     switch (dbType) {
       case 'pgsql':
@@ -238,97 +220,69 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
           if (error) {
             reject(error)
             client.end()
-            throw error
+          } else {
+            queryResultToArray(result.rows)
+            callback(result.rows)
+            resolve(client.end())
           }
-          queryResultToArray(result.rows)
-          callback(result.rows)
-          resolve(client.end())
         })
         break;
       case 'sqlsrv':
         let mssql = require('mssql')
         mssql.connect(connectionObject, error => {
           if (error) {
-            mssql.close()
             reject(error)
-            throw error
+            mssql.close()
+          } else {
+            new mssql.Request().query(query.textContent, (error, result) => {
+              if (error) {
+                reject(error)
+                mssql.close()
+              } else {
+                queryResultToArray(result.recordset)
+                callback(result.recordset)
+                resolve(mssql.close())
+              }
+            })
           }
-          new mssql.Request().query(query.textContent, (error, result) => {
-            if (error) {
-              mssql.close()
-              reject(error)
-              throw error
-            }
-            queryResultToArray(result.recordset)
-            callback(result.recordset)
-            resolve(mssql.close())
-          })
         })
         break;
       default: // MySQL
         MySQL_Pool.getConnection((error, cmdb) => {
           if (error) {
-            cmdb.release()
             reject(error)
-            throw error
-          }
-          cmdb.query({
-            sql: query.textContent.replace(new RegExp(`\\$SESSION_USER\\$`, 'g'), `'${UserName}'`),
-            nestTables: '.'
-          }, (error, result, fields) => {
-            if (error) {
-              cmdb.release()
-              reject(error)
-              throw error
-            }
-            if (loadFieldTypes) {
-              result = []
-              fields.forEach(field => {
-                result[field.name] = {}
-                if (field.type < 10)
-                  result[field.name].type = 'number'
-                else switch (field.type) {
-                  case 16: // BIT
-                  case 17: // TIMESTAMP2
-                  case 246: // NEWDECIMAL
-                    result[field.name].type = 'number'
-                    break;
-                  case 10: // DATE
-                  case 13: // YEAR
-                  case 14: // NEWDATE
-                    result[field.name].type = 'date'
-                    break;
-                  case 11: // TIME
-                  case 19: // TIME2
-                    result[field.name].type = 'time'
-                    break;
-                  case 12: // DATETIME
-                  case 18: // DATETIME2
-                    result[field.name].type = 'datetime'
-                    break;
-                  case 250: // MEDIUMBLOB, MEDIUMTEXT
-                  case 251: // LONGBLOG, LONGTEXT
-                  case 252: // BLOB, TEXT
-                    result[field.name].type = 'multiline'
-                    break;
-                  default: // anything else --> text
-                    result[field.name].type = ''
-                    break;
+            cmdb.release()
+          } else {
+            cmdb.query({
+              sql: query.textContent.replace(new RegExp(`\\$SESSION_USER\\$`, 'g'), `'${UserName}'`),
+              nestTables: '.'
+            }, (error, result, fields) => {
+              if (error) {
+                reject(error)
+                cmdb.release()
+              } else {
+                if (loadFieldTypes) {
+                  result = []
+                  fields.forEach(field => {
+                    result[field.name] = {}
+                    result[field.name].type =
+                      field.type < 10 ? 'number' :
+                      field.flags & 256 ? 'enum' :
+                      MySQLFieldType[field.type] || ''
+                    result[field.name].required = Boolean(field.flags & 1) // NOT NULL
+                    result[field.name].disabled = Boolean(field.flags & 512) // AUTO INCREMENT
+                  })
+                } else if (result.constructor.name !== 'OkPacket') {
+                  queryResultToArray(result)
                 }
-                if (field.flags & 256) result[field.name].type = 'enum'
-                result[field.name].required = Boolean(field.flags & 1) // NOT NULL
-                result[field.name].disabled = Boolean(field.flags & 512) // AUTO INCREMENT
-              })
-            } else if (result.constructor.name !== 'OkPacket') {
-              queryResultToArray(result)
-            }
-            callback(result)
-            resolve(cmdb.release())
-          })
-        })
-        break;
-    }
-  })
+                callback(result)
+                resolve(cmdb.release())
+              }
+            }) // query
+          } // else
+        }) // getConnection
+    } // switch
+  }) // Promise
 }
 
 function queryResultToArray(result) {

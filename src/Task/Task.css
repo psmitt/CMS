@@ -19,29 +19,29 @@ article {
   display: none;
 }
 
-#Procedure {
+#TaskPanel {
   white-space: normal;
   padding-left: var(--title-padding);
   padding-right: var(--title-padding);
 }
 
-#Procedure div {
+#TaskPanel div {
   position: relative;
   white-space: nowrap;
 }
 
-#Procedure div div {
+#TaskPanel div div {
   margin-left: var(--div-margin);
 }
 
-#Procedure input {
+#TaskPanel input {
   height: 1em;
   width: 1em;
   margin: var(--input-margin);
   vertical-align: top;
 }
 
-#Procedure span {
+#TaskPanel span {
   display: inline-block;
   position: relative;
   width: calc(100% - var(--div-margin) - var(--input-margin));
@@ -50,7 +50,7 @@ article {
   white-space: normal;
 }
 
-#Procedure button {
+#TaskPanel button {
   font-family: inherit;
   font-size: large;
   font-weight: bold;
@@ -61,11 +61,11 @@ article {
   border-radius: 5px;
 }
 
-#Procedure h2 {
+#TaskPanel h2 {
   font-size: larger;
   font-style: italic;
 }
 
-#Procedure iframe { /* HUN/File/htm/Ticket_Status.htm */
+#TaskPanel iframe { /* HUN/File/htm/Ticket_Status.htm */
   margin-bottom: -50px;
 }

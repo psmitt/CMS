@@ -6,11 +6,10 @@ async function post(parameter, value, callback) {
     let httpRequest = new XMLHttpRequest()
     httpRequest.onreadystatechange = function () {
       if (httpRequest.readyState == 4) {
-        if (httpRequest.status == 200) {
+        if (httpRequest.status == 200)
           resolve(callback(httpRequest.responseText))
-        } else
-          reject(console.log('HTTP status: ', httpRequest.status,
-            '\nResponse: ', httpRequest.responseText))
+        else
+          reject(`${httpRequest.status}: ${httpRequest.responseText}`)
       }
     }
     httpRequest.open('POST', '/CMS5/src/IIS.php')
@@ -50,9 +49,9 @@ async function readXLSXFile(query, callback) {
             cellHTML: false
           })
           resolve(callback(xlsxToArray(xlsx, columns)))
-        } else
-          reject(console.log('HTTP status: ', httpRequest.status,
-            '\nResponse: ', httpRequest.response))
+        } else {
+          reject(`${httpRequest.status}: ${httpRequest.responseText}`)
+        }
       }
     }
     httpRequest.open('POST', '/CMS5/src/IIS.php')

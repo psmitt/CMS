@@ -23,7 +23,7 @@ Load['task'] = (taskname, main = 0, id = 0) => { // taskname is filename without
     BackToMain.display = 'none'
     CloseArticle.display = 'inline'
   }
-  empty(Procedure)
+  empty(TaskPanel)
   readXMLFile('Task', taskname + '.xml', loadTask)
   showFrame(Article)
 }
@@ -31,15 +31,15 @@ Load['task'] = (taskname, main = 0, id = 0) => { // taskname is filename without
 function loadTask(xmlDoc) {
   TaskTitle.textContent = get(xmlDoc.querySelector('task'), 'title')
   for (let step of xmlDoc.querySelector('task').children)
-    appendStep(step, Procedure)
+    appendStep(step, TaskPanel)
   if (Task.id) { // restoreTask
-    Procedure.querySelectorAll('input').forEach((input, index) => {
+    TaskPanel.querySelectorAll('input').forEach((input, index) => {
       input.checked = Task.checkString.length > index &&
         Task.checkString.charAt(index) === '1'
       input.parentNode.style.display = (Task.displayString.length > index &&
         Task.displayString.charAt(index) === '0') ? 'none' : 'block'
     })
-    Procedure.scrollTop = Task.scrollPosition
+    TaskPanel.scrollTop = Task.scrollPosition
   } else {
     Task.openTime = Math.floor(Date.now() / 1000)
     Task.checkString = '0'
@@ -101,7 +101,7 @@ TaskTitle.addEventListener('click', event => {
 
 /* EXECUTE PROCEDURE */
 
-Procedure.addEventListener('change', event => {
+TaskPanel.addEventListener('change', event => {
   if (event.target.matches('[type="checkbox"], [type="radio"]')) {
     let radio = event.target.matches('[type="radio"]')
     // If step taken, validate all parents
@@ -135,7 +135,7 @@ Procedure.addEventListener('change', event => {
           }
         }
       }
-      while (Procedure !== (node = node.parentNode))
+      while (TaskPanel !== (node = node.parentNode))
         if (!node.firstElementChild.checked)
           node.firstElementChild.click()
     }
@@ -159,11 +159,11 @@ function recurseDivs(parent, operation, onlyForChildren = false) {
 
 async function saveTask() {
   Task.checkString = Task.displayString = ''
-  Procedure.querySelectorAll('input').forEach(input => {
+  TaskPanel.querySelectorAll('input').forEach(input => {
     Task.checkString += input.checked ? '1' : '0'
     Task.displayString += input.parentNode.style.display === 'none' ? '0' : '1'
   })
-  Task.scrollPosition = Procedure.scrollTop
+  Task.scrollPosition = TaskPanel.scrollTop
   if (Task.id) { // UPDATE
     await runSQLQuery(myQuery(
       `UPDATE subtask SET

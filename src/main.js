@@ -1,5 +1,3 @@
-'use strict'
-
 require('electron-reload')(__dirname)
 
 const {
@@ -16,7 +14,7 @@ const menu = Menu.buildFromTemplate([{
   submenu: [{
     label: 'New Window',
     accelerator: 'Ctrl+N',
-    click: _ => createWindow(false)
+    click: () => createWindow(false)
   }, {
     label: 'Change Root',
     accelerator: 'Ctrl+O',
@@ -96,13 +94,10 @@ function createWindow(openerScript) {
   })
   window.loadFile('src/index.html')
   window.webContents.on('did-finish-load', function () {
-    if (openerScript)
-      window.webContents.executeJavaScript(openerScript)
-    window.maximize();
-  });
-
-  window.on('closed', _ => windows.splice(windows.indexOf(window), 1))
-
+    window.webContents.executeJavaScript(openerScript || '')
+    window.maximize()
+  })
+  window.on('closed', () => windows.splice(windows.indexOf(window), 1))
   windows.push(window)
 }
 
@@ -111,8 +106,6 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -123,8 +116,6 @@ app.on('will-quit', () => {
 })
 
 app.on('activate', () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (!windows.length) {
     createWindow()
   }

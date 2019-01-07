@@ -6,7 +6,7 @@ const Aside = document.querySelector('aside').style
 
 // MENU
 const Search = document.getElementById('Search')
-const Menu = document.getElementById('Menu')
+const MenuPanel = document.getElementById('MenuPanel')
 var Load = [] // loader functions
 var Favorites = null
 var draggedFavorite = null
@@ -15,7 +15,7 @@ var draggedFavorite = null
 const TaskTitle = document.getElementById('TaskTitle') // title
 const BackToMain = document.getElementById('BackToMain').style
 const CloseArticle = document.getElementById('CloseArticle').style
-const Procedure = document.getElementById('Procedure')
+const TaskPanel = document.getElementById('TaskPanel')
 const Task = {
   id: 0,
   fileName: '',
@@ -76,6 +76,21 @@ var Table = {
   clause: [], // record identifier conditions for DELETE and UPDATE
   fields: [] // field name -> { type, required, disabled }
 }
+const MySQLFieldType = {
+  '16': 'number', // BIT
+  '17': 'number', // TIMESTAMP2
+  '246': 'number', // NEWDECIMAL
+  '10': 'date', // DATE
+  '13': 'date', // YEAR
+  '14': 'date', // NEWDATE
+  '11': 'time', // TIME
+  '19': 'time', // TIME2
+  '12': 'datetime', // DATETIME
+  '18': 'datetime', // DATETIME2
+  '250': 'multiline', // MEDIUMBLOB, MEDIUMTEXT
+  '251': 'multiline', // LONGBLOG, LONGTEXT
+  '252': 'multiline', // BLOB, TEXT
+}
 var ColumnOptions = {} // index -> [ value -> text ]
 
 // UTILITIES
@@ -105,7 +120,7 @@ function cleanupSubtasks() {
   runSQLQuery(myQuery(
     `DELETE FROM subtask WHERE subtask_id NOT IN
      (SELECT task_id FROM task) AND subtask_opentime <
-     ${Math.floor(Date.now() / 1000) - 1000000}`), _ => 0)
+     ${Math.floor(Date.now() / 1000) - 1000000}`), () => 0)
 }
 
 function xlsxToArray(xlsx, columns) {
@@ -114,9 +129,9 @@ function xlsxToArray(xlsx, columns) {
   if (!columns.length)
     columns = [...Array(range.e.c).keys()]
   let result = []
-  for (var R = range.s.r + 1; R <= range.e.r; R++) {
+  for (let R = range.s.r + 1; R <= range.e.r; R++) {
     let row = []
-    for (var C = range.s.c; C <= columns.length; C++) {
+    for (let C = range.s.c; C <= columns.length; C++) {
       let cell = cells[XLSX.utils.encode_cell({
         c: columns[C],
         r: R

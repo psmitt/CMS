@@ -169,7 +169,7 @@ function reloadData() {
         tr: null
       })
     filterData()
-  })
+  }, error => alert(error))
 }
 
 async function compoundQuery(query, callback) {

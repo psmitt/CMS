@@ -1,9 +1,13 @@
-Load['form'] = formname => {
-  empty(FormPanel)
+function createForm() {
   AsideForm = document.createElement('form')
   FormTable = document.createElement('table')
   AsideForm.appendChild(FormTable)
   FormPanel.appendChild(AsideForm)
+}
+
+Load['form'] = formname => {
+  empty(FormPanel)
+  createForm()
   readXMLFile('Form', formname + '.xml', loadForm).then(_ => {
     Aside.display = 'block'
     AsideForm.elements[0].focus()
@@ -17,8 +21,7 @@ async function loadForm(xmlDoc) {
   for (element of xmlDoc.querySelectorAll('column, button, submit')) {
     if (element.matches('column')) {
       let field = get(element, 'field')
-      if (!isForm && Table.fields[field].disabled)
-        continue;
+      if (!isForm && Table.fields[field].disabled) continue;
       await getField(element)
       let label = document.createElement('tr')
       label.innerHTML = `<th>${FormFields[field].label}</th>`
@@ -32,12 +35,9 @@ async function loadForm(xmlDoc) {
         `<td style="padding-right:0">
           <input type="${element.tagName}" value="${get(element, 'title') || 'Submit'}"/>
         </td>`
-      let objectToListen = button
-      let eventToListen = 'click'
-      if (element.tagName === 'submit') {
-        objectToListen = AsideForm
-        eventToListen = 'submit'
-      }
+      let isSubmit = element.tagName === 'submit'
+      let objectToListen = isSubmit ? AsideForm : button
+      let eventToListen = isSubmit ? 'submit' : 'click'
       if (get(element, 'language') === 'JS') {
         objectToListen.addEventListener(eventToListen,
           new Function(`return event => {
@@ -45,7 +45,6 @@ async function loadForm(xmlDoc) {
             ${element.textContent}
             return false; // to prevent multiple submission
           }`)())
-        // objectToListen.setAttribute('on' + eventToListen, element.textContent)
       } else {
         objectToListen.addEventListener(eventToListen, event => {
           event.preventDefault()

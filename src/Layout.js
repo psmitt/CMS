@@ -6,7 +6,7 @@ function closeForm() {
   Table.record = null
 }
 
-document.querySelector('article .close').addEventListener('click', _ => {
+document.querySelector('article .close').addEventListener('click', () => {
   Article.display = 'none'
   if (Section.display === 'block')
     Section.height = '100%'
@@ -15,7 +15,7 @@ document.querySelector('article .close').addEventListener('click', _ => {
   deleteTask()
 })
 
-document.getElementById('CloseView').addEventListener('click', _ => {
+document.getElementById('CloseView').addEventListener('click', () => {
   Section.display = 'none'
   if (Article.display === 'block')
     Article.height = '100%'
@@ -32,9 +32,7 @@ function showFrame(frame) { // frame = Article or Section
 }
 
 function growFrame(frame) { // frame = Article or Section
-  // Close Form Frame
-  Aside.display = 'none'
-  // Shrink Navigation Frame
+  closeForm()
   shrinkNavigationFrame()
   // Change height of main frames
   if (frame.height === 'var(--header-height)')

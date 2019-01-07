@@ -1,6 +1,6 @@
 function loadMenuFiles() {
-  empty(Menu)
-  listDirectory('Menu', loadFiles) // initialize the menu generator
+  empty(MenuPanel)
+  listDirectory('Menu', loadFiles)
 
   async function loadFiles(files) {
     await readXMLFile('Favorites', `${UserName}.xml`, xmlDoc => {
@@ -11,14 +11,14 @@ function loadMenuFiles() {
       Favorites.appendChild(title)
       for (let favorite of xmlDoc.firstElementChild.children)
         Favorites.appendChild(createFavorite(favorite))
-      Menu.appendChild(Favorites)
+      MenuPanel.appendChild(Favorites)
     })
     for (file of files)
       await readXMLFile('Menu', file, xmlDoc => {
         for (let subMenu of xmlDoc.children)
-          appendSubMenu(subMenu, Menu)
+          appendSubMenu(subMenu, MenuPanel)
       })
-    Search.dispatchEvent(new Event('input'))
+    Search.dispatchEvent(new Event('input')) // collapse all
   }
 }
 
@@ -60,7 +60,7 @@ function createMenuItem(type, fromNode) { // type == 'span' or 'button'
     item.onclick = type === 'button' && menu_class === 'task' ? // subtask?
       event => saveTask().then(id => Load['task'](menu_order, id)) :
       event => {
-        if (event.ctrlKey) {
+        if (event.ctrlKey) { // open item in new window
           if (Electron) {
             ipc.send('New Window',
               `Load['${menu_class}']('${menu_order}');
@@ -103,7 +103,7 @@ function setBranchIcons(root) {
 var lastClickedMenuItem = document.body // just to have an initial node value
 
 // select menu item or expand|collapse menu branch
-Menu.addEventListener('click', event => {
+MenuPanel.addEventListener('click', event => {
   let node = event.target
   if (node.matches('span')) {
     lastClickedMenuItem.classList.remove('clicked')
@@ -127,7 +127,7 @@ Menu.addEventListener('click', event => {
   }
 })
 
-Menu.addEventListener('mousedown', event => {
+MenuPanel.addEventListener('mousedown', event => {
   if (event.target.matches('mark')) {
     event.path[1].click()
   }
@@ -135,7 +135,7 @@ Menu.addEventListener('mousedown', event => {
 
 // Search Menu on input
 Search.addEventListener('input', _ => {
-  const all = selector => Menu.querySelectorAll(selector)
+  const all = selector => MenuPanel.querySelectorAll(selector)
   all('div').forEach(div => div.style.display = 'none')
   all('span').forEach(span => span.classList.remove('hit'))
   let term = Search.value.trim()
@@ -148,18 +148,18 @@ Search.addEventListener('input', _ => {
     }
     for (let mark of all('mark')) {
       mark = mark.parentNode // span
-      while ((mark = mark.parentNode) !== Menu) // div
+      while ((mark = mark.parentNode) !== MenuPanel) // div
         mark.style.display = 'block'
     }
-    if (Menu.querySelector('.item mark'))
-      Menu.querySelector('.item mark').parentNode.classList.add('hit')
+    if (MenuPanel.querySelector('.item mark'))
+      MenuPanel.querySelector('.item mark').parentNode.classList.add('hit')
   } else {
     for (let span of all('.branch, .item'))
       span.innerHTML = span.textContent
-    for (let div of Menu.children)
+    for (let div of MenuPanel.children)
       div.style.display = 'block'
   }
-  setBranchIcons(Menu)
+  setBranchIcons(MenuPanel)
 })
 
 // Navigate up and down among hits
@@ -170,7 +170,7 @@ Search.addEventListener('keydown', event => {
     case 'Enter':
       event.preventDefault(); // stop cursor move in input field
       lastClickedMenuItem.classList.remove('clicked')
-      let items = Array.from(Menu.querySelectorAll('.item')).filter(item => item.querySelector('mark'))
+      let items = Array.from(MenuPanel.querySelectorAll('.item')).filter(item => item.querySelector('mark'))
       for (let i = 0; i < items.length; i++) {
         if (items[i].classList.contains('hit')) {
           switch (event.code) {
@@ -178,12 +178,18 @@ Search.addEventListener('keydown', event => {
               if (i + 1 < items.length) {
                 items[i].classList.remove('hit')
                 items[i + 1].classList.add('hit')
+                let slide = items[i + 1].offsetTop + items[i + 1].offsetHeight - innerHeight + 75
+                if (MenuPanel.scrollTop < slide)
+                  MenuPanel.scrollTop = slide
               }
               return;
             case 'ArrowUp':
               if (i > 0) {
                 items[i].classList.remove('hit')
                 items[i - 1].classList.add('hit')
+                let slide = items[i - 1].offsetTop - 25
+                if (MenuPanel.scrollTop > slide)
+                  MenuPanel.scrollTop = slide
               }
               return;
             case 'Enter':
@@ -197,9 +203,9 @@ Search.addEventListener('keydown', event => {
 
 // Release hits on blur
 Search.addEventListener('blur', _ => {
-  if (Menu.querySelector('.hit'))
-    Menu.querySelector('.hit').classList.remove('hit')
-  Menu.querySelectorAll('span').forEach(item => item.innerHTML = item.textContent)
+  if (MenuPanel.querySelector('.hit'))
+    MenuPanel.querySelector('.hit').classList.remove('hit')
+  MenuPanel.querySelectorAll('span').forEach(item => item.innerHTML = item.textContent)
 })
 
 // Restore hits on focus
@@ -230,7 +236,7 @@ function shrinkNavigationFrame() {
   Search.style.paddingLeft = '0'
   Search.style.cursor = 'pointer'
   Search.style.color = 'rgba(0,0,0,0)' // hide last search
-  Menu.style.display = 'none' // hide menu
+  MenuPanel.style.display = 'none' // hide menu
 }
 
 function restoreNavigationFrame(width) {
@@ -240,7 +246,7 @@ function restoreNavigationFrame(width) {
   Search.style.paddingLeft = '1.75em'
   Search.style.cursor = ''
   Search.style.color = '' // show last search
-  Menu.style.display = 'block' // show menu
+  MenuPanel.style.display = 'block' // show menu
 }
 
 /* HANDLING FAVORITES */
@@ -268,7 +274,7 @@ function saveFavorites() {
   saveFavoritesToXML(xmlString, Favorites.firstElementChild.textContent)
 }
 
-Menu.oncontextmenu = event => {
+MenuPanel.oncontextmenu = event => {
   if (event.ctrlKey && event.target.matches('.item')) {
     event.preventDefault()
     if (event.target.parentNode.parentNode === Favorites) { // remove favorite

@@ -73,7 +73,8 @@ function resolveForeignKeys(result) {
 async function editRecord(record) {
   Table.record = record
   Table.clause = []
-  empty(FormTable)
+  empty(FormPanel)
+  createForm()
   await readXMLFile('Table', Table.filename + '.xml', loadForm)
   Object.keys(Table.fields).forEach((name, index) => {
     if (!Table.fields[name].disabled) {
