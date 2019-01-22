@@ -47,10 +47,13 @@ foreach($_POST as $post_key => $post_value) {
             break;
 
         case 'readXMLFile':
-            $specific = str_replace('.xml', '_IIS.xml', "$xmlroot/$_SESSION[country]/$post_value");
+            $generic = "$xmlroot/$_SESSION[country]/$post_value";
+            $IIS_specific = str_replace('.xml', '_IIS.xml', $generic);
+            $Electron_specific = str_replace('.xml', '_Electron.xml', $generic);
             $bom = pack('H*','EFBBBF');
             echo preg_replace("/^$bom/", '', file_get_contents(
-              file_exists($specific) ? $specific : "$xmlroot/$_SESSION[country]/$post_value"));
+              file_exists($IIS_specific) ? $IIS_specific :
+              file_exists($Electron_specific) ? $Electron_specific : $generic));
             break;
 
         case 'runPSQuery':

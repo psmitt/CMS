@@ -177,7 +177,7 @@ function saveRecord(record) {
         View.rows.push(record)
         clearFilters()
         scrollToBottom()
-        closeForm()
+        AsideForm.reset()
       } else {
         alert(result.message)
       }
