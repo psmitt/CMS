@@ -345,12 +345,13 @@ function appendRow() { // return success
       break
   if (last < View.rows.length && View.rows[last].display) {
     let newRow = View.rowTemplate.cloneNode(true)
+    let record = View.rows[last] // constant reference to indexed array item
     for (let cell = 0; cell < View.columns; cell++)
-      newRow.children[cell].innerHTML = View.rows[last].data[cell]
+      newRow.children[cell].innerHTML = record.data[cell]
     newRow.children[View.columns].addEventListener('click', _ =>
-      editRecord(View.rows[last]))
+      editRecord(record))
     View.tbody.appendChild(newRow)
-    View.rows[last].tr = newRow
+    record.tr = newRow
     View.last = last
     return true
   }
@@ -364,15 +365,16 @@ function prependRow() { // return success
       break
   if (first >= 0 && View.rows[first].display) {
     let newRow = View.rowTemplate.cloneNode(true)
+    let record = View.rows[first] // constant reference to indexed array item
     for (let cell = 0; cell < View.columns; cell++)
-      newRow.children[cell].innerHTML = View.rows[first].data[cell]
+      newRow.children[cell].innerHTML = record.data[cell]
     newRow.children[View.columns].addEventListener('click', _ =>
-      editRecord(View.rows[first]))
+      editRecord(record))
     if (View.tbody.firstChild)
       View.tbody.insertBefore(newRow, View.tbody.firstChild)
     else
       View.tbody.appendChild(newRow)
-    View.rows[first].tr = newRow
+    record.tr = newRow
     View.first = first
     return true
   }
@@ -436,7 +438,9 @@ document.getElementById('ExportXLSX').addEventListener('click', _ => {
   }
 })
 
-document.getElementById('ClearFilters').addEventListener('click', _ => {
+document.getElementById('ClearFilters').addEventListener('click', clearFilters)
+
+function clearFilters() {
   if (TreePanel.style.display === 'block') {
     TreeSearch.value = ''
     TreeSearch.dispatchEvent(new Event('input'))
@@ -444,4 +448,4 @@ document.getElementById('ClearFilters').addEventListener('click', _ => {
     ViewPanel.querySelectorAll('thead input').forEach(input => input.value = '')
     filterData()
   }
-})
+}

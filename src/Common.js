@@ -149,6 +149,7 @@ function loadReport(type, filename) {
   empty(ViewPanel)
   TreePanel.style.display = type === 'Tree' ? 'block' : 'none'
   ViewPanel.style.display = type === 'Tree' ? 'none' : 'block'
+  document.getElementById('AddNew').style.display = type === 'Table' ? 'table-row' : 'none'
   empty(Message)
   Message.appendChild(progressGif)
   readXMLFile(type, filename + '.xml', type === 'Tree' ? loadTree : loadView)

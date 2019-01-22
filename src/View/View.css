@@ -35,22 +35,20 @@ section>header {
   position: absolute;
   top: var(--header-height);
   right: 0;
-  line-height: 1;
   background-color: white;
   border: ridge thick lightgray;
   border-radius: 5px;
 }
 
-#Tools span {
-  display: block;
+#Tools th, #Tools td {
   font-weight: bold;
-  padding: 5px;
-  cursor: pointer;
+  line-height: 1.5em;
 }
 
-#Tools span:hover {
+#Tools tr:hover {
   background-color: tan;
   color: white;
+  cursor: pointer;
 }
 
 #ViewPanel {

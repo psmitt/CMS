@@ -40,10 +40,10 @@ async function loadForm(xmlDoc) {
       let eventToListen = isSubmit ? 'submit' : 'click'
       if (get(element, 'language') === 'JS') {
         objectToListen.addEventListener(eventToListen,
-          new Function(`return event => {
+          new Function(`return async event => {
             event.preventDefault();
             ${element.textContent}
-            return false; // to prevent multiple submission
+            closeForm()
           }`)())
       } else {
         objectToListen.addEventListener(eventToListen, event => {
@@ -57,7 +57,6 @@ async function loadForm(xmlDoc) {
           runSQLQuery(myQuery(command),
               new Function(`return function(){${get(element, 'callback')}}`)())
             .then(closeForm, error => alert(error))
-          return false // to prevent multiple submission
         })
       }
       FormTable.appendChild(button)
