@@ -64,12 +64,14 @@ async function loadForm(xmlDoc) {
   }
 }
 
-function getFieldValue(field) {
-  let option = field.value && field.list ?
-    document.getElementById(field.list.id)
-    .querySelector(`option[value="${field.value}"]`) : null
-  return option ? option.dataset.value : field.value.trim()
+function validateDatalist(input) {
+  let option = document.getElementById(input.list.id)
+    .querySelector(`option[value="${input.value.replace(/"/g, '\\"')}"]`)
+  input.dataset.value = option ? option.dataset.value : input.value = ''
 }
+
+const getFieldValue = field =>
+  field.list ? field.dataset.value : field.value.trim()
 
 async function getField(column) {
   let get = attribute =>
@@ -77,12 +79,16 @@ async function getField(column) {
     column.attributes[attribute].value : ''
 
   let name = get('field')
-  let onchange = column.querySelector('onchange')
   let inputName = `name="${name}"` +
     (get('required') === 'yes' || (!isForm && Table.fields[name].required) ? ' required' : '') +
     (get('placeholder') ? ` placeholder="${get('placeholder')}"` : '') +
-    (get('disabled') === 'yes' ? ' disabled' : '') +
-    (onchange ? ` onchange="${onchange.textContent}"` : '')
+    (get('disabled') === 'yes' ? ' disabled' : '')
+
+  let onchange = column.querySelector('onchange')
+  let options = column.querySelector('options')
+  inputName += options ?
+    ` onchange="validateDatalist(this);${onchange ? onchange.textContent : ''}"` :
+    onchange ? ` onchange="${onchange.textContent}"` : ''
 
   FormFields[name] = {
     label: get('title') || get('field')
@@ -91,11 +97,9 @@ async function getField(column) {
     return FormFields[name].editor = `<textarea ${inputName}></textarea>`
 
   if (column.querySelector('selection')) {
-    let options = column.querySelector('options')
     if (options) {
       FormFields[name].editor =
-        `<input list="${name}-options" ${inputName}
-          onblur="validateDatalist(this)"/>
+        `<input list="${name}-options" ${inputName} data-value=""/>
          <datalist id="${name}-options">`
       const get = element => options.querySelector(element).textContent
       return runSQLQuery(myQuery(
@@ -166,12 +170,6 @@ async function getField(column) {
       FormFields[name].editor = `<input pattern="${type}" ${inputName}/>`
       break;
   }
-}
-
-function validateDatalist(input) {
-  if (!document.getElementById(input.list.id)
-    .querySelector(`option[value="${input.value.replace(/"/g, '\\"')}"]`))
-    input.value = ''
 }
 
 // display feedback lines after input field

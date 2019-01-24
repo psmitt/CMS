@@ -40,7 +40,7 @@ aside {
 /* MOBILE LAYOUT */
 
 @media only screen and (max-width : 720px) {
-  html, body, nav, main, aside, article, section {
+  html, body, nav, main, article, section, aside {
     position: absolute;
     top: 0;
     left: 0;
