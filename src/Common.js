@@ -55,7 +55,8 @@ const View = { /* global properties for tabular view */
   first: 0, // index of first displayed data row when scrolling
   last: 0, // index of last data displayed row when scrolling
   table: null, // the data table
-  tbody: null // the data table body
+  tbody: null, // the data table body
+  processRecord: record => null // triggered by side-click
 }
 
 const rigthColumnWidth = 47

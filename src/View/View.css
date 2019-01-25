@@ -100,7 +100,10 @@ section>header {
   top: 32px;
   font-weight: bold;
   padding-left: var(--title-padding);
+  padding-right: 20px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #ViewPanel input {

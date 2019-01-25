@@ -18,10 +18,9 @@ async function loadView(xmlDoc) {
   ViewTitle.innerHTML =
     get(xmlDoc.querySelector(View.isTable ? 'table' : 'view'), 'title')
 
+  let automation = xmlDoc.querySelector('automation')
   let editorCell = View.isTable ? '<td class="editor">✐</td>' :
-    `<td class="editor" title="${
-      get(xmlDoc.querySelector('view'), 'automation') || ''
-    }">⚙</td>`
+    `<td class="editor" title="${automation ? get(automation, 'title') : ''}">⚙</td>`
 
   if (View.queries.length > 1) { // gap analysis
 
@@ -121,15 +120,11 @@ async function loadView(xmlDoc) {
   View.tbody = ViewPanel.querySelector('tbody')
 
   if (View.isTable) {
-    /*
-      View.tbody.addEventListener('click', event => {
-        if (event.target.matches('.editor')) {
-          editRecord(View.rows[event.target.parentNode.dataset.index])
-        }
-      })
-    */
+    View.processRecord = editRecord
     loadOptions(xmlDoc).then(reloadData)
   } else {
+    View.processRecord = new Function(`return function(record) {
+      ${automation ? automation.textContent : 'alert("Link automation here...")'}}`)()
     reloadData()
   }
 }
@@ -349,7 +344,7 @@ function appendRow() { // return success
     for (let cell = 0; cell < View.columns; cell++)
       newRow.children[cell].innerHTML = record.data[cell]
     newRow.children[View.columns].addEventListener('click', _ =>
-      editRecord(record))
+      View.processRecord(record))
     View.tbody.appendChild(newRow)
     record.tr = newRow
     View.last = last
@@ -369,7 +364,7 @@ function prependRow() { // return success
     for (let cell = 0; cell < View.columns; cell++)
       newRow.children[cell].innerHTML = record.data[cell]
     newRow.children[View.columns].addEventListener('click', _ =>
-      editRecord(record))
+      View.processRecord(record))
     if (View.tbody.firstChild)
       View.tbody.insertBefore(newRow, View.tbody.firstChild)
     else
