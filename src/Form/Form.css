@@ -49,3 +49,17 @@ aside {
   font-size: large;
   font-style: italic;
 }
+
+#FormProcess {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+#FormProcess>img {
+  position: absolute;
+  top: var(--header-height);
+  right: var(--scrollbar-width);
+}

@@ -99,11 +99,13 @@ async function editRecord(record) {
     <input type="submit" onclick="event.preventDefault();saveRecord(Table.record)"
      style="width:40%;float:right" value="${saveTitle}"/></td>`
   FormTable.appendChild(buttons)
+  FormProcess.display = 'none'
   Aside.display = 'block'
   AsideForm.elements[0].focus()
 }
 
 function deleteRecord(record) {
+  FormProcess.display = 'block'
   runSQLQuery(myQuery(
     `DELETE FROM ${Table.name} WHERE ${Table.clause.join(' AND ')}`
   ), result => {
@@ -113,12 +115,14 @@ function deleteRecord(record) {
       View.rows.splice(View.rows.indexOf(record), 1)
       closeForm()
     } else {
-      alert(result.message)
+      alert(result.affectedRows + ' rows deleted')
+      FormProcess.display = 'none'
     }
   })
 }
 
 function saveRecord(record) {
+  FormProcess.display = 'block'
   let fieldNames = []
   let newValues = []
   let newRow = View.rowTemplate.cloneNode(true)
@@ -126,6 +130,7 @@ function saveRecord(record) {
   for (i = 0; i < formElements.length; i++) {
     let field = formElements[i]
     if (!field.checkValidity()) {
+      FormProcess.display = 'none'
       field.focus()
       return
     }
@@ -156,7 +161,9 @@ function saveRecord(record) {
         })
         closeForm()
       } else {
-        alert(result.message)
+        alert(result.affectedRows + " rows affected\n" +
+          result.changedRows + ' rows updated')
+        FormProcess.display = 'none'
       }
     })
   } else { // INSERT
@@ -164,14 +171,14 @@ function saveRecord(record) {
       `INSERT INTO ${Table.name} (${fieldNames.join(',')})
        VALUES (${newValues.join(',')})`
     ), result => {
-      if (result.affectedRows === 1 && result.insertId) {
+      if (result.affectedRows === 1) {
         record = {
           data: [],
           display: true,
           tr: null
         }
         Object.keys(Table.fields).forEach((name, index) => {
-          record.data[index] = Table.fields[name].disabled ? result.insertId :
+          record.data[index] = Table.fields[name].disabled ? result.insertId || '' :
             FormTable.querySelector(`[name="${name}"]`).value
         })
         View.rows.push(record)
@@ -179,8 +186,9 @@ function saveRecord(record) {
         scrollToBottom()
         AsideForm.reset()
       } else {
-        alert(result.message)
+        alert(result.affectedRows + ' rows inserted')
       }
+      FormProcess.display = 'none'
     })
   }
 }

@@ -64,6 +64,7 @@ const rigthColumnWidth = 47
 // FORM
 const FormTitle = document.getElementById('FormTitle')
 const FormPanel = document.getElementById('FormPanel')
+const FormProcess = document.getElementById('FormProcess').style
 var AsideForm // the form
 var FormTable // firstElementChild of AsideForm
 var isForm // or Table? identified when loading a form

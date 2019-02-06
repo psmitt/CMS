@@ -9,6 +9,7 @@ Load['form'] = formname => {
   empty(FormPanel)
   createForm()
   readXMLFile('Form', formname + '.xml', loadForm).then(_ => {
+    FormProcess.display = 'none'
     Aside.display = 'block'
     AsideForm.elements[0].focus()
   })
@@ -38,26 +39,38 @@ async function loadForm(xmlDoc) {
       let isSubmit = element.tagName === 'submit'
       let objectToListen = isSubmit ? AsideForm : button
       let eventToListen = isSubmit ? 'submit' : 'click'
-      if (get(element, 'language') === 'JS') {
-        objectToListen.addEventListener(eventToListen,
-          new Function(`return async event => {
-            event.preventDefault();
-            ${element.textContent}
-            closeForm()
-          }`)())
-      } else {
-        objectToListen.addEventListener(eventToListen, event => {
-          event.preventDefault()
-          let command = element.textContent
-          for (let field of AsideForm.elements) {
-            if (field.name)
-              command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
-                `'${getFieldValue(field)}'`).replace(/''/g, 'NULL')
-          }
-          runSQLQuery(myQuery(command),
-              new Function(`return function(){${get(element, 'callback')}}`)())
-            .then(closeForm, error => alert(error))
-        })
+      let queryFunction = runSQLQuery // default for SQL
+      let commands = element.textContent // element can change!
+      switch (get(element, 'language')) {
+        case 'JS':
+          objectToListen.addEventListener(eventToListen,
+            new Function(`return async event => {
+              event.preventDefault();
+              FormProcess.display = 'block'
+              ${commands}
+              closeForm()
+            }`)())
+          break;
+        case 'PS':
+          queryFunction = runPSQuery
+        default: // SQL if not PS
+          let callback = get(element, 'callback') // element can change!
+          objectToListen.addEventListener(eventToListen, event => {
+            event.preventDefault()
+            FormProcess.display = 'block'
+            let command = commands // command will change!
+            for (let field of AsideForm.elements) {
+              if (field.name)
+                command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
+                  `'${getFieldValue(field)}'`).replace(/''/g, 'NULL')
+            }
+            queryFunction(myQuery(command),
+                new Function(`return result => {${callback}}`)())
+              .then(closeForm, error => {
+                alert(error)
+                FormProcess.display = 'none'
+              })
+          })
       }
       FormTable.appendChild(button)
     }

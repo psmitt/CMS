@@ -90,8 +90,8 @@ function changeMySQLDatabase(server) {
     let connectionObject = {
       host: server,
       database: basename,
-      user: `${basename}_Admin`,
-      password: require('md5')(`${basename}_Admin`),
+      user: `${basename}_Agent`,
+      password: require('md5')(`${basename}_Agent`),
       supportBigNumbers: true,
       multipleStatements: true
     }
@@ -250,16 +250,18 @@ async function runSQLQuery(query, callback, loadFieldTypes = false) { // query i
       default: // MySQL
         MySQL_Pool.getConnection((error, cmdb) => {
           if (error) {
-            reject(error)
-            cmdb.release()
+            alert(error)
+            FormProcess.display = 'none'
+            reject(cmdb.release())
           } else {
             cmdb.query({
               sql: query.textContent.replace(new RegExp(`\\$SESSION_USER\\$`, 'g'), `'${UserName}'`),
               nestTables: '.'
             }, (error, result, fields) => {
               if (error) {
-                reject(error)
-                cmdb.release()
+                alert(error)
+                FormProcess.display = 'none'
+                reject(cmdb.release())
               } else {
                 if (loadFieldTypes) {
                   result = []
