@@ -1,3 +1,5 @@
+'use strict'
+
 document.querySelector('aside .close').addEventListener('click', closeForm)
 
 function closeForm() {

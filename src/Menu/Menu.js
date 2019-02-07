@@ -1,3 +1,5 @@
+'use strict'
+
 function loadMenuFiles() {
   empty(MenuPanel)
   listDirectory('Menu', loadFiles)
@@ -13,7 +15,7 @@ function loadMenuFiles() {
         Favorites.appendChild(createFavorite(favorite))
       MenuPanel.appendChild(Favorites)
     })
-    for (file of files)
+    for (let file of files)
       await readXMLFile('Menu', file, xmlDoc => {
         for (let subMenu of xmlDoc.children)
           appendSubMenu(subMenu, MenuPanel)

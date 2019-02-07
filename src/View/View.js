@@ -1,3 +1,5 @@
+'use strict'
+
 Load['view'] = filename => loadReport('View', filename)
 
 async function loadView(xmlDoc) {

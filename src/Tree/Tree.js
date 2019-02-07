@@ -1,3 +1,5 @@
+'use strict'
+
 Load['tree'] = filename => loadReport('Tree', Tree.filename = filename)
 
 async function loadTree(xmlDoc) {

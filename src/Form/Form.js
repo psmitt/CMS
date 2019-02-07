@@ -1,3 +1,5 @@
+'use strict'
+
 function createForm() {
   AsideForm = document.createElement('form')
   FormTable = document.createElement('table')
@@ -19,7 +21,7 @@ async function loadForm(xmlDoc) {
   isForm = xmlDoc.firstElementChild.tagName === 'form' // or 'table' ?
   FormTitle.innerHTML = get(xmlDoc.firstElementChild, 'title')
   FormFields = []
-  for (element of xmlDoc.querySelectorAll('column, button, submit')) {
+  for (let element of xmlDoc.querySelectorAll('column, button, submit')) {
     if (element.matches('column')) {
       let field = get(element, 'field')
       if (!isForm && Table.fields[field].disabled) continue;
@@ -40,7 +42,6 @@ async function loadForm(xmlDoc) {
       let objectToListen = isSubmit ? AsideForm : button
       let eventToListen = isSubmit ? 'submit' : 'click'
       let queryFunction = runSQLQuery // default for SQL
-      let commands = element.textContent // element can change!
       switch (get(element, 'language')) {
         case 'JS':
           objectToListen.addEventListener(eventToListen,
@@ -54,18 +55,17 @@ async function loadForm(xmlDoc) {
         case 'PS':
           queryFunction = runPSQuery
         default: // SQL if not PS
-          let callback = get(element, 'callback') // element can change!
           objectToListen.addEventListener(eventToListen, event => {
             event.preventDefault()
             FormProcess.display = 'block'
-            let command = commands // command will change!
+            let command = element.textContent
             for (let field of AsideForm.elements) {
               if (field.name)
                 command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
                   `'${getFieldValue(field)}'`).replace(/''/g, 'NULL')
             }
             queryFunction(myQuery(command),
-                new Function(`return result => {${callback}}`)())
+                new Function(`return result => {${get(element, 'callback')}}`)())
               .then(closeForm, error => {
                 alert(error)
                 FormProcess.display = 'none'

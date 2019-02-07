@@ -1,3 +1,5 @@
+'use strict'
+
 function load_main(id) {
   runSQLQuery(myQuery(
     `SELECT * FROM subtask WHERE subtask_id = ${id}`

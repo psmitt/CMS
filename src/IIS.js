@@ -1,3 +1,5 @@
+'use strict'
+
 const Electron = false
 const IIS = true
 

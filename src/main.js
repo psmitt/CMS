@@ -1,3 +1,5 @@
+'use strict'
+
 require('electron-reload')(__dirname)
 
 const {

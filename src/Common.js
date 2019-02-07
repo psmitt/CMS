@@ -1,3 +1,5 @@
+'use strict'
+
 // LAYOUT STYLES
 const Nav = document.querySelector('nav').style
 const Article = document.querySelector('article').style

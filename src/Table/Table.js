@@ -1,3 +1,5 @@
+'use strict'
+
 Load['table'] = filename => loadReport('Table', Table.filename = filename)
 
 async function tableQuery(xmlDoc) { // return [<query>SQL</query>]
