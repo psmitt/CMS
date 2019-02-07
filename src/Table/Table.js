@@ -84,7 +84,13 @@ async function editRecord(record) {
     Object.keys(Table.fields).forEach((name, index) => {
       if (!Table.fields[name].disabled) {
         let input = FormTable.querySelector(`[name="${name}"]`)
-        let value = input.value = record.data[index]
+        if (input.options) {
+          input.selectedIndex = [...input.options].findIndex(
+            option => option.text === record.data[index])
+        } else {
+          input.value = record.data[index]
+        }
+        let value = input.value
         if (input.list && value)
           value = document.getElementById(input.list.id)
           .querySelector(`option[value="${value.replace(/"/g, '\\"')}"]`).dataset.value
@@ -129,7 +135,7 @@ function saveRecord(record) {
   let newValues = []
   let newRow = View.rowTemplate.cloneNode(true)
   let formElements = AsideForm.elements
-  for (i = 0; i < formElements.length; i++) {
+  for (let i = 0; i < formElements.length; i++) {
     let field = formElements[i]
     if (!field.checkValidity()) {
       FormProcess.display = 'none'

@@ -294,11 +294,11 @@ function queryResultToArray(result) {
     let packet = result[row]
     let dataRow = []
     for (let data in packet) {
-      if (packet[data] === null ||
+      if (packet[data] instanceof Date)
+        dataRow.push(normalizeDate(packet[data]))
+      else if (packet[data] === null ||
         (typeof packet[data] === 'object' && !Object.keys(packet[data]).length))
         dataRow.push('')
-      else if (packet[data] instanceof Date)
-        dataRow.push(normalizeDate(packet[data]))
       else
         dataRow.push(packet[data].toString())
     }

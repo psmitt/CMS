@@ -48,7 +48,7 @@ async function loadForm(xmlDoc) {
             new Function(`return async event => {
               event.preventDefault();
               FormProcess.display = 'block'
-              ${commands}
+              ${element.textContent}
               closeForm()
             }`)())
           break;
@@ -60,9 +60,11 @@ async function loadForm(xmlDoc) {
             FormProcess.display = 'block'
             let command = element.textContent
             for (let field of AsideForm.elements) {
-              if (field.name)
+              if (field.name) {
+                let value = getFieldValue(field).replace(/'/g, "''")
                 command = command.replace(new RegExp(`\\$${field.name}\\$`, 'g'),
-                  `'${getFieldValue(field)}'`).replace(/''/g, 'NULL')
+                  value ? `'${value}'` : 'NULL')
+              }
             }
             queryFunction(myQuery(command),
                 new Function(`return result => {${get(element, 'callback')}}`)())

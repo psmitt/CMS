@@ -2,6 +2,7 @@
 
 const Electron = false
 const IIS = true
+var UserName
 
 async function post(parameter, value, callback) {
   return new Promise((resolve, reject) => {
