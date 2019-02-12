@@ -134,24 +134,23 @@ async function loadView(xmlDoc) {
 function reloadData() {
   let promises = []
   let results = []
-  const addResult = result => results.push(result)
-  View.queries.forEach(query => {
+  View.queries.forEach((query, index) => {
     if (query.querySelector('query')) {
-      promises.push(compoundQuery(query, addResult))
+      promises.push(compoundQuery(query, result => results[index] = result))
     } else {
       switch (get(query, 'language')) {
         case 'PHP':
           switch (get(query, 'callback')) {
             case 'readExcel':
             case 'readExcelColumns':
-              promises.push(readXLSXFile(query, addResult))
+              promises.push(readXLSXFile(query, result => results[index] = result))
           }
           break
         case 'PS':
-          promises.push(runPSQuery(query, addResult))
+          promises.push(runPSQuery(query, result => results[index] = result))
           break
         default: // nothing
-          promises.push(runSQLQuery(query, addResult))
+          promises.push(runSQLQuery(query, result => results[index] = result))
       }
     }
   })
@@ -235,6 +234,7 @@ function gapAnalysis(results) {
   ]
   let i = 0
   let j = 0
+  console.log(results);
   while (i < results[0].length && j < results[1].length) {
     let comparison = results[0][i][0].localeCompare(results[1][j][0])
     if (comparison < 0) push[0](i++)
