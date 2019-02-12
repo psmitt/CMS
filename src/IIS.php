@@ -53,7 +53,7 @@ foreach($_POST as $post_key => $post_value) {
             $bom = pack('H*','EFBBBF');
             echo preg_replace("/^$bom/", '', file_get_contents(
               file_exists($IIS_specific) ? $IIS_specific :
-              file_exists($Electron_specific) ? $Electron_specific : $generic));
+              (file_exists($Electron_specific) ? $Electron_specific : $generic)));
             break;
 
         case 'runPSQuery':

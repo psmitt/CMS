@@ -233,7 +233,8 @@ function gapAnalysis(results) {
     index => result.push([results[1][index][0], '*', '',
       `<mark title="${results[1][index].join('\n')}">*</mark>`])
   ]
-  let i = j = 0
+  let i = 0
+  let j = 0
   while (i < results[0].length && j < results[1].length) {
     let comparison = results[0][i][0].localeCompare(results[1][j][0])
     if (comparison < 0) push[0](i++)

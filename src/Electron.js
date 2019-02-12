@@ -130,6 +130,7 @@ async function readXLSXFile(query, callback) {
   return new Promise((resolve, reject) => {
     let xlsx = XLSX.readFile(parameters[0].trim(), {
       type: 'array',
+      cellDates: true,
       cellFormula: false,
       cellHTML: false
     })
@@ -153,7 +154,7 @@ async function readXMLFile(folder, filename, callback) {
 async function runPSQuery(query, callback) { // query is XML object
   let psQuery = `Import-Module ActiveDirectory;
      Import-Module Microsoft.PowerShell.Utility;
-     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8;
+     [Console]::InputEncoding = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8;
      ${query.textContent.replace(/;+$/, '')} | ConvertTo-HTML -Fragment`
     .replace(/(?:\r\n|\r|\n)/g, ' ')
   let ps = new powershell({

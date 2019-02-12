@@ -140,7 +140,10 @@ function xlsxToArray(xlsx, columns) {
         c: columns[C],
         r: R
       })]
-      row.push(cell ? cell.w.toString() ? cell.v.toString() : '' : '')
+      row.push(cell ?
+        cell.w.toString() ?
+        cell.v instanceof Date ?
+        normalizeDate(cell.v) : cell.v.toString() : '' : '')
     }
     result.push(row)
   }

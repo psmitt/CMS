@@ -48,6 +48,7 @@ async function readXLSXFile(query, callback) {
         if (httpRequest.status == 200) {
           let xlsx = XLSX.read(new Uint8Array(httpRequest.response), {
             type: 'array',
+            cellDates: true,
             cellFormula: false,
             cellHTML: false
           })
