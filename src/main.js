@@ -92,7 +92,10 @@ let windows = []
 
 function createWindow(openerScript) {
   let window = new BrowserWindow({
-    show: false
+    show: false,
+    webPreferences: {
+      nativeWindowOpen: true
+    }
   })
   window.loadFile('src/index.html')
   window.webContents.on('did-finish-load', function () {

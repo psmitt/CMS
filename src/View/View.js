@@ -234,7 +234,6 @@ function gapAnalysis(results) {
   ]
   let i = 0
   let j = 0
-  console.log(results);
   while (i < results[0].length && j < results[1].length) {
     let comparison = results[0][i][0].localeCompare(results[1][j][0])
     if (comparison < 0) push[0](i++)
@@ -346,7 +345,7 @@ function appendRow() { // return success
     let record = View.rows[last] // constant reference to indexed array item
     for (let cell = 0; cell < View.columns; cell++)
       newRow.children[cell].innerHTML = record.data[cell]
-    newRow.children[View.columns].addEventListener('click', _ =>
+    newRow.children[View.columns].addEventListener('click', () =>
       View.processRecord(record))
     View.tbody.appendChild(newRow)
     record.tr = newRow
@@ -366,7 +365,7 @@ function prependRow() { // return success
     let record = View.rows[first] // constant reference to indexed array item
     for (let cell = 0; cell < View.columns; cell++)
       newRow.children[cell].innerHTML = record.data[cell]
-    newRow.children[View.columns].addEventListener('click', _ =>
+    newRow.children[View.columns].addEventListener('click', () =>
       View.processRecord(record))
     if (View.tbody.firstChild)
       View.tbody.insertBefore(newRow, View.tbody.firstChild)
@@ -379,7 +378,7 @@ function prependRow() { // return success
   return false
 }
 
-ViewPanel.addEventListener('scroll', _ => {
+ViewPanel.addEventListener('scroll', () => {
   while ((screenSize > ViewPanel.scrollTop && prependRow()) ||
     (View.table.offsetHeight - ViewPanel.scrollTop < screenSize && appendRow()));
 })
@@ -391,22 +390,22 @@ ViewTitle.addEventListener('click', event => {
     growFrame(Section)
 })
 
-Tool.addEventListener('click', _ =>
+Tool.addEventListener('click', () =>
   Tools.style.display = Tools.style.display !== 'block' ? 'block' : 'none'
 )
 
-Tools.addEventListener('click', _ =>
+Tools.addEventListener('click', () =>
   Tools.style.display = Tools.style.display !== 'block' ? 'block' : 'none'
 )
 
-document.getElementById('ReloadData').addEventListener('click', _ => {
+document.getElementById('ReloadData').addEventListener('click', () => {
   if (TreePanel.style.display === 'block')
     Load['tree'](Tree.filename)
   if (ViewPanel.style.display === 'block')
     reloadData()
 })
 
-document.getElementById('ExportXLSX').addEventListener('click', _ => {
+document.getElementById('ExportXLSX').addEventListener('click', () => {
   let aoa = [[]]
   if (TreePanel.style.display === 'block') {
     nextLevel(TreePanel.lastElementChild, [])
