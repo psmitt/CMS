@@ -139,7 +139,14 @@ function reloadData() {
       promises.push(compoundQuery(query, result => results[index] = result))
     } else {
       switch (get(query, 'language')) {
-        case 'PHP':
+        case 'JS':
+          promises.push(new Promise(async (resolve, reject) => {
+            const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
+            results[index] = await new AsyncFunction(query.textContent)()
+            resolve()
+          }))
+          break
+        case 'PHP': // backward compatibility
           switch (get(query, 'callback')) {
             case 'readExcel':
             case 'readExcelColumns':
@@ -149,12 +156,12 @@ function reloadData() {
         case 'PS':
           promises.push(runPSQuery(query, result => results[index] = result))
           break
-        default: // nothing
+        default: // SQL
           promises.push(runSQLQuery(query, result => results[index] = result))
       }
     }
   })
-  Promise.all(promises).then(_ => {
+  Promise.all(promises).then(() => {
     let result = results.length > 1 ? gapAnalysis(results) : results[0]
     if (View.isTable) resolveForeignKeys(result)
     View.rows = []

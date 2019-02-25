@@ -40,6 +40,13 @@ foreach($_POST as $post_key => $post_value) {
             echo json_encode($filenames);
             break;
 
+        case 'listFullDirectory':
+            $filenames = [];
+            foreach (glob("$post_value/*") as $path)
+              $filenames[] = basename($path);
+            echo json_encode($filenames);
+            break;
+
         case 'readXLSXFile':
             if (str_replace('\\', '/', substr($post_value, 0, strlen($xmlroot))) !== $xmlroot)
               $post_value = "$xmlroot/$_SESSION[country]/".str_replace('\\', '/',$post_value);

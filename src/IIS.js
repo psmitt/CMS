@@ -32,8 +32,11 @@ function openNewWindow(folder, filename) {
   open('/CMS5/src/index.php', '_blank')
 }
 
-function listDirectory(folder, callback) {
-  post('listDirectory', folder, response => callback(JSON.parse(response)))
+function listDirectory(folder, callback, full) {
+  if (full)
+    post('listFullDirectory', folder, response => callback(JSON.parse(response)))
+  else
+    post('listDirectory', folder, response => callback(JSON.parse(response)))
 }
 
 async function readXLSXFile(query, callback) {
