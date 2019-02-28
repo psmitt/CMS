@@ -87,13 +87,20 @@ button {
   white-space: nowrap;
 }
 
+a {
+  text-decoration: none;
+  color: royalblue;
+  cursor: pointer;
+}
+
 span.close {
   position: absolute;
   right: 0.5em;
   cursor: pointer;
 }
 
-a {
-  text-decoration: none;
-  color: royalblue;
+span.ping {
+  background: black;
+  color: white;
+  cursor: pointer;
 }

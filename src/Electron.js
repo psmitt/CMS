@@ -314,9 +314,10 @@ Load['link'] = URL => {
     open(URL, '_blank')
 }
 
-function ping(IP) {
+function pingHost(host) {
   let child_process = require('child_process')
-  child_process.execSync(`start cmd.exe /C ping ${IP} -n 10`)
+  child_process.execSync(`start cmd.exe /C ping ${host} -n 10`)
+  return false // oncontextmenu
 }
 
 function runExe(path, parameters) {

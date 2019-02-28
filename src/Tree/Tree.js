@@ -20,6 +20,7 @@ async function loadTree(xmlDoc) {
         item.div = document.createElement('div')
         let img = document.createElement('img')
         img.src = `Tree/${row[3]}`
+        img.style.cursor = 'pointer'
         item.div.appendChild(img)
         let span = document.createElement('span')
         span.innerHTML = row[4]
