@@ -21,6 +21,7 @@ function loadMenuFiles() {
           appendSubMenu(subMenu, MenuPanel)
       })
     Search.dispatchEvent(new Event('input')) // collapse all
+    Search.focus()
   }
 }
 
@@ -135,6 +136,11 @@ MenuPanel.addEventListener('mousedown', event => {
   }
 })
 
+document.addEventListener('keyup', event => {
+  if (event.altKey && event.key == 'q')
+    Search.focus()
+})
+
 // Search Menu on input
 Search.addEventListener('input', _ => {
   const all = selector => MenuPanel.querySelectorAll(selector)
@@ -222,13 +228,6 @@ Search.addEventListener('focus', _ => {
   }
 })
 
-/*
-$(document).on('keypress', event => {
-  if (event.ctrlKey && event.originalEvent.code === 'KeyF')
-    $('#search').focus()
-});
-*/
-
 /* NAV SIZING */
 
 function shrinkNavigationFrame() {
@@ -289,7 +288,6 @@ MenuPanel.oncontextmenu = event => {
       )
       if (!found) {
         Favorites.appendChild(createFavorite(event.target.cloneNode(true), true))
-        Search.dispatchEvent(new Event('input'))
         saveFavorites()
       }
     }

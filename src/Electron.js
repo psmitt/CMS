@@ -313,3 +313,22 @@ Load['link'] = URL => {
   else
     open(URL, '_blank')
 }
+
+function ping(IP) {
+  let child_process = require('child_process')
+  child_process.execSync(`start cmd.exe /C ping ${IP} -n 10`)
+}
+
+function runExe(path, parameters) {
+  let execFile = require('child_process').execFile
+  execFile(path, parameters, (error, data) => {
+    if (error) console.log(error)
+  })
+}
+
+function runCommand(command) {
+  let exec = require('child_process').exec
+  exec(command, (error, data) => {
+    if (error) console.log(error)
+  })
+}
