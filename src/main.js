@@ -36,6 +36,12 @@ const menu = Menu.buildFromTemplate([{
   }, {
     type: 'separator'
   }, {
+    label: 'Print',
+    accelerator: 'Ctrl+P',
+    click: (item, window) => {
+      window.webContents.print()
+    }
+  }, {
     label: 'Minimize',
     role: 'minimize'
   }, {
