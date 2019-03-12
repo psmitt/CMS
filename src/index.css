@@ -103,4 +103,6 @@ span.ping {
   background: black;
   color: white;
   cursor: pointer;
+  font-family: monospace;
+  font-weight: bold;
 }
