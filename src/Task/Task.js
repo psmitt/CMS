@@ -101,63 +101,44 @@ TaskTitle.addEventListener('click', event => {
     growFrame(Article)
 })
 
-/* EXECUTE PROCEDURE */
+/* EXECUTE TASK */
 
 TaskPanel.addEventListener('change', event => {
-  if (event.target.matches('[type="checkbox"], [type="radio"]')) {
-    let radio = event.target.matches('[type="radio"]')
-    // If step taken, validate all parents
-    if (event.target.checked) {
-      let node = event.target
-      // except if you just take a look at an option
-      if (radio) { // check siblings
-        for (let child of node.parentNode.parentNode.children) {
-          if (child.tagName === 'DIV' && child !== node.parentNode) {
-            if (child.firstElementChild.checked) { // found checked sibling
-              for (let grandChild of child.children) { // check substeps
-                if (grandChild.tagName === 'DIV') {
-                  if (grandChild.firstElementChild.checked) { // found executed branch
-                    if (!confirm('Dismiss the other already selected option?')) {
-                      node.checked = false
-                      recurseDivs(node.parentNode, div => {
-                        div.style.display = div.style.display === 'none' ? 'block' : 'none'
-                      }, true)
-                      return
-                    }
-                  }
-                }
-              }
-              child.firstElementChild.checked = false
-              recurseDivs(node.parentNode, div => div.style.display = 'block')
-            }
-            recurseDivs(child, div => {
-              div.firstElementChild.checked = false
-              div.style.display = 'none'
-            }, true)
-          }
-        }
-      }
-      while (TaskPanel !== (node = node.parentNode))
-        if (!node.firstElementChild.checked)
-          node.firstElementChild.click()
+  let input = event.target
+  const checkUp = node => {
+    while (TaskPanel !== (node = node.parentNode))
+      if (!node.firstElementChild.checked)
+        node.firstElementChild.click()
+  }
+  const uncheckDown = (node, expand) => {
+    node.firstElementChild.checked = false
+    node.querySelectorAll('div').forEach(div => {
+      div.firstElementChild.checked = false
+      div.style.display = expand ? 'block' : 'none'
+    })
+  }
+  // radio
+  if (input.matches('[type="radio"]')) {
+    checkUp(input)
+    for (let sibling of input.parentNode.parentNode.children)
+      if (sibling.matches('div') && sibling.firstElementChild !== input)
+        uncheckDown(sibling)
+    input.parentNode.querySelectorAll('div').forEach(div =>
+      div.style.display = 'block')
+  }
+  // checkbox
+  if (input.matches('[type="checkbox"]')) {
+    if (input.checked) {
+      checkUp(input)
+      let child = input.nextElementSibling
+      while ((child = child.nextElementSibling) &&
+        child.firstElementChild.matches('[type="radio"]')) // decision
+        child.querySelectorAll('div').forEach(div => div.style.display = 'none')
+    } else { // step back
+      uncheckDown(input.parentNode, true)
     }
-    // Check if it is a step back
-    if (!radio && !event.target.checked && confirm(
-        'Invalidate this step and all sub-steps?'))
-      recurseDivs(event.target.parentNode, child => {
-        child.firstElementChild.checked = false
-        child.style.display = 'block'
-      })
   }
 })
-
-function recurseDivs(parent, operation, onlyForChildren = false) {
-  if (!onlyForChildren)
-    operation(parent)
-  for (let child of parent.children)
-    if (child.tagName === 'DIV')
-      recurseDivs(child, operation)
-}
 
 async function saveTask() {
   Task.checkString = Task.displayString = ''
