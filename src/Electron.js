@@ -323,13 +323,13 @@ function pingHost(host) {
 function runExe(path, parameters) {
   let execFile = require('child_process').execFile
   execFile(path, parameters, (error, data) => {
-    if (error) console.log(error)
+    if (error) alert(error)
   })
 }
 
 function runCommand(command) {
   let exec = require('child_process').exec
   exec(command, (error, data) => {
-    if (error) console.log(error)
+    if (error) alert(error)
   })
 }
