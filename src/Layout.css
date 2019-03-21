@@ -16,9 +16,10 @@ nav>header     { z-index: 2; }
 article        { z-index: 3; }
 article>header { z-index: 4; }
 section        { z-index: 5; }
-section>header { z-index: 6; }
-aside          { z-index: 7; }
-aside>header   { z-index: 8; }
+/* Viewpanel last column has z-index: 6 */
+section>header { z-index: 7; }
+aside          { z-index: 8; }
+aside>header   { z-index: 9; }
 
 /* WIDE SCREEN LAYOUT */
 

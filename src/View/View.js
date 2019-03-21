@@ -297,6 +297,36 @@ function filterData() {
 }
 
 ViewPanel.addEventListener('input', filterData)
+ViewPanel.addEventListener('contextmenu', event => {
+  if (event.target.matches('input')) {
+    event.preventDefault()
+    let input = event.target
+    let index = Array.from(ViewPanel.querySelectorAll('thead input')).indexOf(input)
+    let filterList = {}
+    for (let row of View.rows)
+      if (row.display)
+        filterList[row.data[index]] = true
+
+    let datalist = document.createElement('datalist')
+    datalist.id = 'filter-list'
+    for (let key of Object.keys(filterList).sort()) {
+      let option = document.createElement('option')
+      option.textContent = key || '^$'
+      if (key)
+        datalist.appendChild(option)
+      else
+        datalist.prepend(option)
+    }
+    input.after(datalist)
+    input.setAttribute('list', 'filter-list')
+    input.addEventListener('blur', () => {
+      input.removeAttribute('list')
+      datalist.remove()
+    }, {
+      once: true
+    })
+  }
+})
 
 ViewPanel.addEventListener('click', event => { // SORT DATA
   if (event.target.matches('thead td') && !getSelection().toString()) {

@@ -98,6 +98,7 @@ let windows = []
 
 function createWindow(openerScript) {
   let window = new BrowserWindow({
+    icon: 'CMS.PNG',
     show: false,
     webPreferences: {
       nativeWindowOpen: true

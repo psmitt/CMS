@@ -6,10 +6,6 @@ section {
   background-color: WhiteSmoke;
 }
 
-section>header {
-  z-index: 7;
-}
-
 #ViewTitle {
   width: calc(100% - 4em); /* give space to message and tools */
 }
@@ -38,6 +34,7 @@ section>header {
   background-color: white;
   border: ridge thick lightgray;
   border-radius: 5px;
+  z-index: 7;
 }
 
 #Tools th, #Tools td {
@@ -55,6 +52,10 @@ section>header {
   overflow-x: auto;
   overflow-y: scroll;
   font-size: smaller;
+}
+
+#ViewPanel tbody>tr:nth-child(even) {
+  background-color: MistyRose;
 }
 
 #ViewPanel th:last-child,

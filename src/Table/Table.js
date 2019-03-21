@@ -100,12 +100,14 @@ async function editRecord(record) {
     })
   }
   let buttons = document.createElement('tr')
-  let deleteButton = `<input type="button"
-    onclick="deleteRecord(Table.record)" style="width:40%" value="Delete"/>`
+  let deleteAndNewButton = `<input type="button"
+    onclick="deleteRecord(Table.record)" style="width:30%;float:left" value="Delete"/>
+    <input type="button"
+      onclick="saveRecord()" style="width:30%" value="Add New"/>`
   let saveTitle = record ? 'Save' : 'Add'
-  buttons.innerHTML = `<td style="padding:0">${record ? deleteButton : ''}
+  buttons.innerHTML = `<td style="padding:0;text-align:center">${record ? deleteAndNewButton : ''}
     <input type="submit" onclick="event.preventDefault();saveRecord(Table.record)"
-     style="width:40%;float:right" value="${saveTitle}"/></td>`
+     style="width:30%;float:right" value="${saveTitle}"/></td>`
   FormTable.appendChild(buttons)
   FormProcess.display = 'none'
   Aside.display = 'block'
@@ -158,7 +160,7 @@ function saveRecord(record) {
        SET ${newValues.join(',')}
        WHERE ${Table.clause.join(' AND ')}`
     ), result => {
-      if (result.affectedRows === 1 && result.changedRows === 1) {
+      if (result.affectedRows === 1 && (typeof result.changedRows === 'undefined' || result.changedRows === 1)) {
         Object.keys(Table.fields).forEach((name, index) => {
           if (!Table.fields[name].disabled) {
             let value = FormTable.querySelector(`[name="${name}"]`).value
