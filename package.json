@@ -5,7 +5,7 @@
   "description": "Client application for Local Configuration Management System",
   "main": "src/main.js",
   "scripts": {
-    "build": "rimraf CMS-* && electron-packager . --platform=win32 --arch=x64 --icon=CMS.PNG",
+    "build": "rimraf CMS-* && electron-packager . --platform=win32 --arch=x64 --icon=CMS",
     "start": "electron ."
   },
   "repository": {
