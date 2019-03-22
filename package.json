@@ -1,7 +1,7 @@
 {
   "name": "cms",
   "productName": "CMS",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Client application for Local Configuration Management System",
   "main": "src/main.js",
   "scripts": {
