@@ -49,7 +49,7 @@ async function loadForm(xmlDoc) {
               event.preventDefault();
               FormProcess.display = 'block'
               ${element.textContent}
-              closeForm()
+              ${get(element, 'callback') || 'closeForm()'}
             }`)())
           break;
         case 'PS':
@@ -67,8 +67,10 @@ async function loadForm(xmlDoc) {
               }
             }
             queryFunction(myQuery(command),
-                new Function(`return result => {${get(element, 'callback')}}`)())
-              .then(closeForm, error => {
+                new Function(`return result => {
+                  ${get(element, 'callback') || 'closeForm()'}
+                }`)())
+              .then(null, error => {
                 alert(error)
                 FormProcess.display = 'none'
               })
