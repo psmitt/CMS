@@ -208,7 +208,10 @@ function formFeedback(input, lines) {
 }
 
 function setField(name, value) {
-  document.getElementsByName(name)[0].value = value
+  let field = document.getElementsByName(name)[0]
+  field.value = value
+  if (field.hasAttribute('list'))
+    validateDatalist(field)
 }
 
 function disableField(name, disabled = true) {
