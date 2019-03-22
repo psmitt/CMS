@@ -81,7 +81,7 @@ async function loadForm(xmlDoc) {
 
 function validateDatalist(input) {
   let option = document.getElementById(input.list.id)
-    .querySelector(`option[value="${input.value.replace(/"/g, '\\"')}"]`)
+    .querySelector(`option[value="${input.value.replace(/("|\\)/g, '\\$&')}"]`)
   input.dataset.value = option ? option.dataset.value : input.value = ''
 }
 
