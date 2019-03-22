@@ -90,12 +90,19 @@ async function editRecord(record) {
         } else {
           input.value = record.data[index]
         }
-        let value = input.value
-        if (input.list && value)
-          value = document.getElementById(input.list.id)
-          .querySelector(`option[value="${value.replace(/("|\\)/g, '\\$&')}"]`).dataset.value
-        Table.clause.push(input.name +
-          (value ? `='${value.replace(/'/g, "\\'")}'` : ' IS NULL'))
+        if (input.list && input.value) {
+          let option = document.getElementById(input.list.id)
+            .querySelector(`option[value="${input.value.replace(/("|\\)/g, '\\$&')}"]`)
+          if (option) {
+            Table.clause.push(`${input.name}='${option.dataset.value.replace(/'/g, "\\'")}'`)
+          } else {
+            input.value = '(historical data)'
+            input.disabled = true
+          }
+        } else {
+          Table.clause.push(input.name +
+            (input.value ? `='${input.value.replace(/'/g, "\\'")}'` : ' IS NULL'))
+        }
       }
     })
   }
@@ -144,7 +151,7 @@ function saveRecord(record) {
       field.focus()
       return
     }
-    if (field.name) {
+    if (field.name && !field.disabled) {
       fieldNames.push(field.name)
       let value = `'${field.value.replace(/'/g, "\\'")}'`
       if (field.value && field.list)
@@ -162,11 +169,11 @@ function saveRecord(record) {
     ), result => {
       if (result.affectedRows === 1 && (typeof result.changedRows === 'undefined' || result.changedRows === 1)) {
         Object.keys(Table.fields).forEach((name, index) => {
-          if (!Table.fields[name].disabled) {
-            let value = FormTable.querySelector(`[name="${name}"]`).value
-            record.data[index] = value
+          let input = FormTable.querySelector(`[name="${name}"]`)
+          if (!input.disabled && !Table.fields[name].disabled) {
+            record.data[index] = input.value
             if (record.tr)
-              record.tr.children[index].innerHTML = value
+              record.tr.children[index].innerHTML = input.value
           }
         })
         closeForm()
@@ -188,8 +195,9 @@ function saveRecord(record) {
           tr: null
         }
         Object.keys(Table.fields).forEach((name, index) => {
+          let input = FormTable.querySelector(`[name="${name}"]`)
           record.data[index] = Table.fields[name].disabled ? result.insertId || '' :
-            FormTable.querySelector(`[name="${name}"]`).value
+            input.disabled ? '' : input.value
         })
         View.rows.push(record)
         clearFilters()
