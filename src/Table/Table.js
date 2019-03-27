@@ -170,7 +170,7 @@ function saveRecord(record) {
       if (result.affectedRows === 1 && (typeof result.changedRows === 'undefined' || result.changedRows === 1)) {
         Object.keys(Table.fields).forEach((name, index) => {
           let input = FormTable.querySelector(`[name="${name}"]`)
-          if (!input.disabled && !Table.fields[name].disabled) {
+          if (!Table.fields[name].disabled && !input.disabled) {
             record.data[index] = input.value
             if (record.tr)
               record.tr.children[index].innerHTML = input.value
