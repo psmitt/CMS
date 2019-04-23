@@ -101,7 +101,8 @@ function createWindow(openerScript) {
     icon: 'CMS.PNG',
     show: false,
     webPreferences: {
-      nativeWindowOpen: true
+      nativeWindowOpen: true,
+      nodeIntegration: true
     }
   })
   window.loadFile('src/index.html')
