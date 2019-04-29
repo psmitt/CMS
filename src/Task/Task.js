@@ -82,6 +82,8 @@ function appendStep(step, parent) {
       if (Electron)
         text = text.replace(/src="\w+\/(\w+)\//g,
           'src="' + path.join(XMLRootDirectory, 'File', '$1', ' ').trimEnd())
+      else // IIS
+        text = text.replace(/src="(\w+)\//g, 'src="/CMS/$1/')
       span.innerHTML = text + '&ensp;'
       while ((child = child.nextElementSibling) && child.tagName === 'button')
         span.insertAdjacentElement('beforeend', createMenuItem('button', child))

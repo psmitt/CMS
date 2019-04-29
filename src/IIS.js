@@ -97,5 +97,5 @@ async function runSQLQuery(query, callback, loadFields = false) {
 }
 
 Load['link'] = URL => {
-  open(URL, '_blank')
+  open(URL.replace(/^(\w+)\//g, '/CMS/$1/'), '_blank')
 }

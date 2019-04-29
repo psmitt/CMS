@@ -1,4 +1,5 @@
 function assetDetails(asset_id) {
+  let popup = open('', `Eszközadatok`, 'width=500,height=600,scrollbars=1')
   runSQLQuery(myQuery(`
         SELECT
           IF (category_en = 'Communication', 'Kommunikáció',
@@ -66,8 +67,7 @@ function assetDetails(asset_id) {
         WHERE asset_id = ${asset_id}
         GROUP BY asset_id
     `), result => {
-    let popup = open('', `Eszközadatok - ${result[0][4]}/${result[0][7]}`, 'width=500,height=600,scrollbars=1')
-    popup.onload = () => popup.document.write(`
+    popup.document.write(`
 <!DOCTYPE html>
 <html>
 <head>
@@ -148,7 +148,7 @@ function siteInventory(site_record, site_id, location_id) {
                  signature`
 
     runSQLQuery(myQuery(query), result => {
-      let popup = open(Electron ? path.join(XMLRootDirectory, 'File', 'Inventory.html') : '',
+      let popup = open(Electron ? path.join(XMLRootDirectory, 'File', 'Inventory.html') : '/CMS/HUN/Inventory.html',
         `Leltári lap - ${site[0][1]}`, 'width=500,height=600,scrollbars=1')
       popup.onload = () => {
         if (Electron) {

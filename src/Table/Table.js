@@ -155,8 +155,8 @@ function saveRecord(record) {
       fieldNames.push(field.name)
       let value = `'${field.value.replace(/'/g, "\\'")}'`
       if (field.value && field.list)
-        value = document.getElementById(field.list.id)
-        .querySelector(`option[value="${field.value.replace(/("|\\)/g, '\\$&')}"]`).dataset.value
+        value = "'" + document.getElementById(field.list.id)
+        .querySelector(`option[value="${field.value.replace(/("|\\)/g, '\\$&')}"]`).dataset.value + "'"
       newValues.push((record ? `${field.name}= ` : '') + (field.value ? value : 'NULL'))
       newRow.children[i].innerHTML = field.value
     }
