@@ -171,9 +171,10 @@ function saveRecord(record) {
         Object.keys(Table.fields).forEach((name, index) => {
           let input = FormTable.querySelector(`[name="${name}"]`)
           if (!Table.fields[name].disabled && !input.disabled) {
-            record.data[index] = input.value
+            let value = input.options ? input.options[input.selectedIndex].text : input.value
+            record.data[index] = value
             if (record.tr)
-              record.tr.children[index].innerHTML = input.value
+              record.tr.children[index].innerHTML = value
           }
         })
         closeForm()
